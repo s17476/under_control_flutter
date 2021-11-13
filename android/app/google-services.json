@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1000722485536",
+    "project_id": "under-control-flutter",
+    "storage_bucket": "under-control-flutter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1000722485536:android:e28903d069fcff03aec745",
+        "android_client_info": {
+          "package_name": "com.lna.under_control_flutter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1000722485536-7ulbmh3u9tu136msuejn5borqu9igsdv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7mFFsLT4OD10ik0x9627yXt4L8yDawvo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1000722485536-7ulbmh3u9tu136msuejn5borqu9igsdv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
