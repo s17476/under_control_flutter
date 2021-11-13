@@ -33,8 +33,20 @@ class _AppState extends State<App> {
       colorScheme: Theme.of(context).colorScheme.copyWith(
             secondary: Colors.indigo,
           ),
-      scaffoldBackgroundColor: Colors.white24,
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          primary: Colors.green,
+          textStyle: const TextStyle(fontSize: 16),
+        ),
+      ),
+      scaffoldBackgroundColor: Colors.white12,
       primaryColor: Colors.green,
+      cardColor: Colors.black87,
+      splashColor: Colors.white12,
+      shadowColor: Colors.white24,
+      hintColor: Colors.white54,
+      iconTheme:
+          const IconThemeData(color: Colors.green, size: 50, opacity: 0.9),
     );
 
     return MaterialApp(
