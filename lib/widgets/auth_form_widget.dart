@@ -1,10 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:under_control_flutter/helpers/size_config.dart';
+import 'package:under_control_flutter/pickers/user_image_picker.dart';
+import 'package:under_control_flutter/widgets/logo_widget.dart';
 
 class AuthFormWidget extends StatefulWidget {
   const AuthFormWidget(
-      {Key? key, required this.submitAuthForm, required this.isLoading})
+      {Key? key, required this.submitAuthForm, required this.isLoadingFromDB})
       : super(key: key);
 
   final void Function(
@@ -16,13 +19,14 @@ class AuthFormWidget extends StatefulWidget {
     BuildContext context,
   ) submitAuthForm;
 
-  final bool isLoading;
+  final bool isLoadingFromDB;
 
   @override
   State<AuthFormWidget> createState() => _AuthFormWidgetState();
 }
 
-class _AuthFormWidgetState extends State<AuthFormWidget> {
+class _AuthFormWidgetState extends State<AuthFormWidget>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
 
   var _isInLoginMode = true;
@@ -30,88 +34,223 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
   String _userEmail = '';
   String _userName = '';
   String _userPassword = '';
+  File? _userImageFile;
+
+  double _fieldHeight = 0;
+  // double _fieldWidth = 0;
+
+  AnimationController? _animationController;
+  Animation<Offset>? _userSlideAnimation;
+  Animation<Offset>? _slideAnimation;
+  Animation<double>? _opacityAnimation;
+  Animation<double>? _opacityAnimationBackward;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _userSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, -1.3),
+      end: const Offset(0, 0),
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController!,
+        curve: Curves.linear,
+      ),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, -1.3),
+      end: const Offset(0, 0),
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController!,
+        curve: Curves.linear,
+      ),
+    );
+    _opacityAnimation = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+      parent: _animationController!,
+      curve: Curves.easeIn,
+    ));
+    _opacityAnimationBackward =
+        Tween(begin: 1.0, end: 0.0).animate(CurvedAnimation(
+      parent: _animationController!,
+      curve: Curves.easeIn,
+    ));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _animationController!.dispose();
+  }
+
+  void _pickImage(File? image) {
+    _userImageFile = image;
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
+  }
+
+  void _trySubmit() {
+    // if (_formKey.currentState != null) {
+    //   final isValid = _formKey.currentState!.validate();
+    if (_formKey.currentState != null) {
+      _formKey.currentState!.save();
+      // bool isValid = false;
+
+      FocusScope.of(context).unfocus();
+
+      if (!_isInLoginMode && _userImageFile == null) {
+        _showSnackBar('Please add avatar');
+        return;
+      } else if (!_userEmail.contains('@')) {
+        _showSnackBar('Bad email format');
+        return;
+      } else if (!_isInLoginMode && _userName.length < 4) {
+        _showSnackBar('User name to short');
+        return;
+      } else if (_userPassword.length < 7) {
+        _showSnackBar('Password is to short');
+        return;
+      }
+      // if (isValid) {
+      // print('.......................................is OK');
+
+      widget.submitAuthForm(
+        _userEmail.trim(),
+        _userName.trim(),
+        _userPassword.trim(),
+        _userImageFile,
+        _isInLoginMode,
+        context,
+      );
+      // }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                //email field
-                Row(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(right: 10),
-                      child: Icon(
-                        Icons.person,
-                        size: 50,
+    SizeConfig.init(context);
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: SizeConfig.blockSizeHorizontal * 10,
+          right: SizeConfig.blockSizeHorizontal * 10,
+          top: WidgetsBinding.instance!.window.viewInsets.bottom == 0
+              ? SizeConfig.blockSizeHorizontal * 40
+              : SizeConfig.blockSizeHorizontal * 20,
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _isInLoginMode
+                  ? FadeTransition(
+                      opacity: _opacityAnimationBackward!,
+                      child: const Logo(),
+                    )
+                  : FadeTransition(
+                      opacity: _opacityAnimation!,
+                      child: UserImagePicker(
+                        imagePickFn: _pickImage,
+                        image: _userImageFile,
                       ),
                     ),
-                    Expanded(
-                      child: TextFormField(
-                        key: const ValueKey('email'),
-                        validator: (value) {
-                          if (value!.isEmpty || !value.contains('@')) {
-                            return 'Please enter a valid email address';
-                          }
-                          return null;
-                        },
-                        keyboardType: TextInputType.emailAddress,
-                        textInputAction: TextInputAction.next,
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10,
-                            horizontal: 16,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: BorderSide.none,
-                          ),
-                          filled: true,
-                          fillColor: Theme.of(context).splashColor,
-                          hintText: 'E-mail address',
+              SizedBox(
+                height: SizeConfig.blockSizeHorizontal * 5,
+              ),
+              //email field
+              Row(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        right: SizeConfig.blockSizeHorizontal * 2),
+                    child: Icon(
+                      Icons.person,
+                      color: Colors.green,
+                      size: SizeConfig.blockSizeHorizontal * 10,
+                    ),
+                  ),
+                  Expanded(
+                    child: TextFormField(
+                      key: const ValueKey('email'),
+                      // validator: (value) {
+                      //   if (value!.isEmpty || !value.contains('@')) {
+                      //     return 'Please enter a valid email address';
+                      //   }
+
+                      //   return null;
+                      // },
+                      keyboardType: TextInputType.emailAddress,
+                      // textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: SizeConfig.blockSizeHorizontal * 1,
+                          horizontal: SizeConfig.blockSizeHorizontal * 5,
                         ),
-                        onSaved: (value) {
-                          _userEmail = value!;
-                        },
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).splashColor,
+                        hintText: 'E-mail address',
                       ),
+                      onSaved: (value) {
+                        _userEmail = value!;
+                      },
                     ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                //name field
-                if (!_isInLoginMode)
-                  Row(
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: SizeConfig.blockSizeHorizontal * 4,
+              ),
+              //name field
+
+              FadeTransition(
+                opacity: _opacityAnimation!,
+                child: SlideTransition(
+                  position: _userSlideAnimation!,
+                  child: Row(
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.only(right: 10),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            right: SizeConfig.blockSizeHorizontal * 2),
                         child: Icon(
                           Icons.person_outline,
-                          size: 50,
+                          color: Colors.green,
+                          size: SizeConfig.blockSizeHorizontal * 10,
                         ),
                       ),
                       Expanded(
                         child: TextFormField(
                           key: const ValueKey('name'),
-                          validator: (value) {
-                            if (value!.isEmpty || value.length < 4) {
-                              return 'Please enter at least 4 characters';
-                            }
-                            return null;
-                          },
+                          enabled: _isInLoginMode ? false : true,
+                          // validator: (value) {
+                          //   if (_isInLoginMode) {
+                          //     return null;
+                          //   }
+                          //   if (value!.isEmpty || value.length < 4) {
+                          //     return 'Please enter at least 4 characters';
+                          //   }
+
+                          //   return null;
+                          // },
                           keyboardType: TextInputType.name,
-                          textInputAction: TextInputAction.next,
                           decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 16,
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: SizeConfig.blockSizeHorizontal * 1,
+                              horizontal: SizeConfig.blockSizeHorizontal * 5,
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30),
@@ -128,34 +267,45 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
                       ),
                     ],
                   ),
-                const SizedBox(
-                  height: 10,
                 ),
-                //password
-                Row(
+              ),
+
+              SlideTransition(
+                position: _userSlideAnimation!,
+                child: SizedBox(
+                  height: SizeConfig.blockSizeHorizontal * 4,
+                ),
+              ),
+              //password
+              SlideTransition(
+                position: _slideAnimation!,
+                child: Row(
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.only(right: 10),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          right: SizeConfig.blockSizeHorizontal * 2),
                       child: Icon(
                         Icons.lock,
-                        size: 50,
+                        color: Colors.green,
+                        size: SizeConfig.blockSizeHorizontal * 10,
                       ),
                     ),
                     Expanded(
                       child: TextFormField(
                         key: const ValueKey('password'),
-                        validator: (value) {
-                          if (value!.isEmpty || value.length < 7) {
-                            return 'Password must bre at least 7 characters long';
-                          }
-                          return null;
-                        },
-                        keyboardType: TextInputType.name,
-                        textInputAction: TextInputAction.next,
+                        // validator: (value) {
+                        //   if (value!.isEmpty || value.length < 7) {
+                        //     return 'Password must bre at least 7 characters long';
+                        //   }
+
+                        //   return null;
+                        // },
+                        keyboardType: TextInputType.visiblePassword,
+                        // textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: 10,
-                            horizontal: 16,
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: SizeConfig.blockSizeHorizontal * 1,
+                            horizontal: SizeConfig.blockSizeHorizontal * 5,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -173,15 +323,31 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text(
-                    _isInLoginMode ? 'Login' : 'Signup',
-                    style: const TextStyle(fontSize: 18),
-                  ),
+              ),
+              SizedBox(
+                height: SizeConfig.blockSizeHorizontal * 6,
+              ),
+              SlideTransition(
+                position: _slideAnimation!,
+                child: ElevatedButton(
+                  onPressed: _trySubmit,
+                  child: widget.isLoadingFromDB
+                      ? Padding(
+                          padding: EdgeInsets.all(SizeConfig.blockSizeVertical),
+                          child: SizedBox(
+                            height: SizeConfig.blockSizeVertical * 2.5,
+                            width: SizeConfig.blockSizeVertical * 2.5,
+                            child: const CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          ),
+                        )
+                      : Text(
+                          _isInLoginMode ? 'Login' : 'Signup',
+                          style: TextStyle(
+                            fontSize: SizeConfig.blockSizeHorizontal * 5.5,
+                          ),
+                        ),
                   style: ElevatedButton.styleFrom(
                     primary: Theme.of(context).primaryColor,
                     shape: RoundedRectangleBorder(
@@ -189,31 +355,44 @@ class _AuthFormWidgetState extends State<AuthFormWidget> {
                     ),
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                TextButton(
+              ),
+              SizedBox(
+                height: SizeConfig.blockSizeHorizontal * 5,
+              ),
+              SlideTransition(
+                position: _slideAnimation!,
+                child: TextButton(
                   onPressed: () {
                     setState(() {
                       _isInLoginMode = !_isInLoginMode;
                     });
+                    if (!_isInLoginMode) {
+                      _animationController!.forward();
+                      _fieldHeight = SizeConfig.blockSizeVertical * 8;
+                    } else {
+                      _animationController!.reverse();
+                      _fieldHeight = 0;
+                    }
                   },
-                  child: widget.isLoading
-                      ? const SizedBox(
-                          child: CircularProgressIndicator(
+                  child: widget.isLoadingFromDB
+                      ? SizedBox(
+                          child: const CircularProgressIndicator(
                             color: Colors.white,
                           ),
-                          height: 20,
-                          width: 20,
+                          height: SizeConfig.blockSizeHorizontal * 7,
+                          width: SizeConfig.blockSizeHorizontal * 7,
                         )
                       : Text(
                           _isInLoginMode
                               ? 'Create new account'
                               : 'I aleready have an account',
+                          style: TextStyle(
+                            fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                          ),
                         ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
