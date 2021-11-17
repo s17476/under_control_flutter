@@ -37,7 +37,6 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
   File? _userImageFile;
 
   double _fieldHeight = 0;
-  // double _fieldWidth = 0;
 
   AnimationController? _animationController;
   Animation<Offset>? _userSlideAnimation;
@@ -100,12 +99,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
   }
 
   void _trySubmit() {
-    // if (_formKey.currentState != null) {
-    //   final isValid = _formKey.currentState!.validate();
     if (_formKey.currentState != null) {
       _formKey.currentState!.save();
-      // bool isValid = false;
-
       FocusScope.of(context).unfocus();
 
       if (!_isInLoginMode && _userImageFile == null) {
@@ -121,8 +116,6 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
         _showSnackBar('Password is to short');
         return;
       }
-      // if (isValid) {
-      // print('.......................................is OK');
 
       widget.submitAuthForm(
         _userEmail.trim(),
@@ -132,7 +125,6 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
         _isInLoginMode,
         context,
       );
-      // }
     }
   }
 
@@ -151,7 +143,6 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
         child: Form(
           key: _formKey,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
               _isInLoginMode
                   ? FadeTransition(
@@ -168,6 +159,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
               SizedBox(
                 height: SizeConfig.blockSizeHorizontal * 5,
               ),
+
               //email field
               Row(
                 children: [
@@ -183,15 +175,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                   Expanded(
                     child: TextFormField(
                       key: const ValueKey('email'),
-                      // validator: (value) {
-                      //   if (value!.isEmpty || !value.contains('@')) {
-                      //     return 'Please enter a valid email address';
-                      //   }
-
-                      //   return null;
-                      // },
                       keyboardType: TextInputType.emailAddress,
-                      // textInputAction: TextInputAction.next,
+                      textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.symmetric(
                           vertical: SizeConfig.blockSizeHorizontal * 1,
@@ -212,11 +197,12 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                   ),
                 ],
               ),
+
               SizedBox(
                 height: SizeConfig.blockSizeHorizontal * 4,
               ),
-              //name field
 
+              //name field
               FadeTransition(
                 opacity: _opacityAnimation!,
                 child: SlideTransition(
@@ -236,16 +222,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                         child: TextFormField(
                           key: const ValueKey('name'),
                           enabled: _isInLoginMode ? false : true,
-                          // validator: (value) {
-                          //   if (_isInLoginMode) {
-                          //     return null;
-                          //   }
-                          //   if (value!.isEmpty || value.length < 4) {
-                          //     return 'Please enter at least 4 characters';
-                          //   }
-
-                          //   return null;
-                          // },
+                          textInputAction: TextInputAction.next,
                           keyboardType: TextInputType.name,
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.symmetric(
@@ -276,6 +253,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                   height: SizeConfig.blockSizeHorizontal * 4,
                 ),
               ),
+
               //password
               SlideTransition(
                 position: _slideAnimation!,
@@ -292,16 +270,12 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                     ),
                     Expanded(
                       child: TextFormField(
+                        onFieldSubmitted: (val) {
+                          _trySubmit();
+                        },
                         key: const ValueKey('password'),
-                        // validator: (value) {
-                        //   if (value!.isEmpty || value.length < 7) {
-                        //     return 'Password must bre at least 7 characters long';
-                        //   }
-
-                        //   return null;
-                        // },
                         keyboardType: TextInputType.visiblePassword,
-                        // textInputAction: TextInputAction.next,
+                        textInputAction: TextInputAction.done,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(
                             vertical: SizeConfig.blockSizeHorizontal * 1,
@@ -324,9 +298,12 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                   ],
                 ),
               ),
+
               SizedBox(
                 height: SizeConfig.blockSizeHorizontal * 6,
               ),
+
+              // Login button
               SlideTransition(
                 position: _slideAnimation!,
                 child: ElevatedButton(
@@ -359,6 +336,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
               SizedBox(
                 height: SizeConfig.blockSizeHorizontal * 5,
               ),
+
+              // toggle button
               SlideTransition(
                 position: _slideAnimation!,
                 child: TextButton(
@@ -368,10 +347,10 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                     });
                     if (!_isInLoginMode) {
                       _animationController!.forward();
-                      _fieldHeight = SizeConfig.blockSizeVertical * 8;
+                      // _fieldHeight = SizeConfig.blockSizeVertical * 8;
                     } else {
                       _animationController!.reverse();
-                      _fieldHeight = 0;
+                      // _fieldHeight = 0;
                     }
                   },
                   child: widget.isLoadingFromDB

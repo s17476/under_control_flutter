@@ -82,7 +82,7 @@ class _AppState extends State<App> {
             theme: mainTheme,
             home: StreamBuilder(
               stream: FirebaseAuth.instance.authStateChanges(),
-              builder: (ctx, userSnapshot) {
+              builder: (ctx, AsyncSnapshot<User?> userSnapshot) {
                 if (userSnapshot.hasData) {
                   return const MainScreen();
                 }

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:under_control_flutter/widgets/main_sliver_app_bar.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -37,44 +38,15 @@ class MainScreen extends StatelessWidget {
       ),
       body: CustomScrollView(
         slivers: [
-          SliverAppBar(
-            pinned: true,
-            snap: true,
-            floating: true,
-
-            // title: const Text(
-            //   'UnderControl',
-            //   style: TextStyle(
-            //     fontSize: 30,
-            //     color: Colors.white,
-            //   ),
-            // ),
-            // title: Text('UnderControl'),
-            expandedHeight: MediaQuery.of(context).size.height * 0.15,
-
-            flexibleSpace: FlexibleSpaceBar(
-              title: const Text(
-                'UnderControl',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-              background: Opacity(
-                opacity: 0.15,
-                child: Image.asset(
-                  'assets/slivers/main_screen.jpg',
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
+          MainSliverAppBar(),
           SliverList(
-              delegate: SliverChildListDelegate([
-            const SizedBox(
-              width: double.infinity,
-              height: 4000,
-            )
-          ]))
+            delegate: SliverChildListDelegate([
+              const SizedBox(
+                width: double.infinity,
+                height: 4000,
+              )
+            ]),
+          ),
         ],
       ),
     );
