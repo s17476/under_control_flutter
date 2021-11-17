@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
 import 'package:under_control_flutter/helpers/size_config.dart';
 
 class UserImagePicker extends StatefulWidget {
@@ -16,12 +17,14 @@ class UserImagePicker extends StatefulWidget {
   ) imagePickFn;
 
   @override
-  _UserImagePickerState createState() => _UserImagePickerState(image);
+  _UserImagePickerState createState() => _UserImagePickerState();
 }
 
 class _UserImagePickerState extends State<UserImagePicker> {
-  _UserImagePickerState(File? image) {
-    _image = image;
+  @override
+  void initState() {
+    super.initState();
+    _image = widget.image;
   }
 
   File? _image;
@@ -30,6 +33,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
     final picker = ImagePicker();
 
     try {
+      //get low quality avatar image to improve loading speed
       final pickedFile = await picker.pickImage(
         source: souruce,
         imageQuality: 80,
@@ -42,9 +46,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
         });
         widget.imagePickFn(_image!);
       }
-    } catch (e) {
-      print('Picker error' + e.toString());
-    }
+    } catch (e) {}
   }
 
   @override
@@ -69,6 +71,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
+            //take foto
             TextButton.icon(
               onPressed: () {
                 _pickImage(ImageSource.camera);
@@ -90,6 +93,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
                 fontSize: SizeConfig.blockSizeHorizontal * 5,
               ),
             ),
+            //choose avatar image from device
             TextButton.icon(
               onPressed: () {
                 _pickImage(ImageSource.gallery);

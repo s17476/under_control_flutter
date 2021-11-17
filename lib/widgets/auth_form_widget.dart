@@ -1,25 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/pickers/user_image_picker.dart';
+import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/widgets/logo_widget.dart';
 
 class AuthFormWidget extends StatefulWidget {
-  const AuthFormWidget(
-      {Key? key, required this.submitAuthForm, required this.isLoadingFromDB})
-      : super(key: key);
-
-  final void Function(
-    String email,
-    String userName,
-    String password,
-    File? userImage,
-    bool isLogin,
-    BuildContext context,
-  ) submitAuthForm;
-
-  final bool isLoadingFromDB;
+  const AuthFormWidget({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<AuthFormWidget> createState() => _AuthFormWidgetState();
@@ -36,8 +27,6 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
   String _userPassword = '';
   File? _userImageFile;
 
-  double _fieldHeight = 0;
-
   AnimationController? _animationController;
   Animation<Offset>? _userSlideAnimation;
   Animation<Offset>? _slideAnimation;
@@ -47,6 +36,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
   @override
   void initState() {
     super.initState();
+    //initialize animations controllers
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -91,14 +81,18 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
   }
 
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-      ),
-    );
+    ScaffoldMessenger.of(context)
+      ..removeCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Theme.of(context).errorColor,
+        ),
+      );
   }
 
   void _trySubmit() {
+    //input fields validation
     if (_formKey.currentState != null) {
       _formKey.currentState!.save();
       FocusScope.of(context).unfocus();
@@ -117,7 +111,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
         return;
       }
 
-      widget.submitAuthForm(
+      //submiting formular
+      Provider.of<UserProvider>(context, listen: false).submitAuthForm(
         _userEmail.trim(),
         _userName.trim(),
         _userPassword.trim(),
@@ -132,14 +127,16 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
   Widget build(BuildContext context) {
     SizeConfig.init(context);
     return SingleChildScrollView(
-      child: Padding(
+      child: AnimatedPadding(
         padding: EdgeInsets.only(
           left: SizeConfig.blockSizeHorizontal * 10,
           right: SizeConfig.blockSizeHorizontal * 10,
-          top: WidgetsBinding.instance!.window.viewInsets.bottom == 0
-              ? SizeConfig.blockSizeHorizontal * 40
-              : SizeConfig.blockSizeHorizontal * 20,
+          top: WidgetsBinding.instance!.window.viewInsets.bottom > 0
+              ? SizeConfig.blockSizeHorizontal * 20
+              : SizeConfig.blockSizeHorizontal * 40,
         ),
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
         child: Form(
           key: _formKey,
           child: Column(
@@ -147,7 +144,15 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
               _isInLoginMode
                   ? FadeTransition(
                       opacity: _opacityAnimationBackward!,
-                      child: const Logo(),
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          top: SizeConfig.blockSizeVertical * 4.7,
+                        ),
+                        child: const Logo(
+                          greenLettersSize: 16,
+                          whitheLettersSize: 10,
+                        ),
+                      ),
                     )
                   : FadeTransition(
                       opacity: _opacityAnimation!,
@@ -157,7 +162,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                       ),
                     ),
               SizedBox(
-                height: SizeConfig.blockSizeHorizontal * 5,
+                height: _isInLoginMode
+                    ? SizeConfig.blockSizeHorizontal * 13
+                    : SizeConfig.blockSizeHorizontal * 5,
               ),
 
               //email field
@@ -308,7 +315,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                 position: _slideAnimation!,
                 child: ElevatedButton(
                   onPressed: _trySubmit,
-                  child: widget.isLoadingFromDB
+                  child: Provider.of<UserProvider>(context).isLoading
                       ? Padding(
                           padding: EdgeInsets.all(SizeConfig.blockSizeVertical),
                           child: SizedBox(
@@ -353,7 +360,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                       // _fieldHeight = 0;
                     }
                   },
-                  child: widget.isLoadingFromDB
+                  child: Provider.of<UserProvider>(context).isLoading
                       ? SizedBox(
                           child: const CircularProgressIndicator(
                             color: Colors.white,
