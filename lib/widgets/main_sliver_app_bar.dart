@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:under_control_flutter/models/app_user.dart';
+import 'package:under_control_flutter/providers/user_provider.dart';
 
 class MainSliverAppBar extends StatefulWidget {
   const MainSliverAppBar({Key? key}) : super(key: key);
@@ -24,7 +27,12 @@ class _MainSliverAppBarState extends State<MainSliverAppBar> {
       // ),
       // title: Text('UnderControl'),
       expandedHeight: MediaQuery.of(context).size.height * 0.15,
-
+      actions: [
+        TextButton.icon(
+            onPressed: Provider.of<UserProvider>(context).signout,
+            icon: Icon(Icons.logout),
+            label: Text('Logout')),
+      ],
       flexibleSpace: FlexibleSpaceBar(
         title: const Text(
           'UnderControl',

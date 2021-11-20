@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 import 'package:under_control_flutter/models/app_user.dart';
+import 'package:under_control_flutter/screens/choose_company.dart';
 
 class UserProvider with ChangeNotifier {
   late final AppUser _user;
@@ -17,7 +19,7 @@ class UserProvider with ChangeNotifier {
         userId: _user.userId,
         email: _user.email,
         userName: _user.userName,
-        password: _user.password,
+        // password: _user.password,
         userImage: _user.userImage,
         company: _user.company,
         companyId: _user.companyId,
@@ -45,8 +47,41 @@ class UserProvider with ChangeNotifier {
           email: email,
           password: password,
         );
-        _isLoading = false;
-        notifyListeners();
+
+        //get user data from DB
+        CollectionReference usersRef =
+            FirebaseFirestore.instance.collection('users');
+        final snapshot = await usersRef.doc(userCredential.user!.uid).get();
+
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(userCredential.user!.uid)
+            .get()
+            .then((DocumentSnapshot documentSnapshot) {
+          if (documentSnapshot.exists) {
+            final userSnapshot =
+                documentSnapshot.data() as Map<String, dynamic>;
+            ///////////////////////////////////////////////////print
+            if (userSnapshot['company'] == null) {
+              print(userSnapshot.toString() + 'nie ma firmy');
+              Navigator.of(context).pushNamed(ChooseCompany.routeName);
+            } else if (userSnapshot['company'] as String ==
+                userSnapshot['companyId'] as String) {
+              print(userSnapshot.toString() + ' prywatny');
+            } else {
+              print(userSnapshot.toString() + '   jest firma');
+            }
+            _isLoading = false;
+            notifyListeners();
+          } else {
+            ScaffoldMessenger.of(context)
+              ..removeCurrentSnackBar()
+              ..showSnackBar(SnackBar(
+                content: const Text('Unable to login. Try again later...'),
+                backgroundColor: Theme.of(context).errorColor,
+              ));
+          }
+        });
       } else {
         userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
           email: email,
@@ -76,7 +111,7 @@ class UserProvider with ChangeNotifier {
           userId: userCredential.user!.uid,
           email: email,
           userName: userName,
-          password: password,
+          // password: password,
           userImage: imgUrl,
         );
 
@@ -101,15 +136,22 @@ class UserProvider with ChangeNotifier {
           content: Text(errorMessage),
           backgroundColor: Theme.of(context).errorColor,
         ));
-      if (isLogin) {
-        _isLoading = false;
-        notifyListeners();
-      }
+
+      _isLoading = false;
+      notifyListeners();
     } catch (e) {
-      if (isLogin) {
-        _isLoading = false;
-        notifyListeners();
-      }
+      _isLoading = false;
+      notifyListeners();
     }
+  }
+
+  void signout() {
+    _isLoading = false;
+    notifyListeners();
+    FirebaseAuth.instance.signOut();
+  }
+
+  Stream<User?> authStateChanges() {
+    return FirebaseAuth.instance.authStateChanges();
   }
 }

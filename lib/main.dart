@@ -2,8 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/auth_screen.dart';
+import 'package:under_control_flutter/screens/choose_company.dart';
 import 'package:under_control_flutter/screens/initialize_went_wrong_screen.dart';
 import 'package:under_control_flutter/screens/main_screen.dart';
 import 'package:under_control_flutter/widgets/loading_widget.dart';
@@ -48,12 +50,26 @@ class _AppState extends State<App> {
       splashColor: Colors.white12,
       shadowColor: Colors.white24,
       hintColor: Colors.white54,
+      bottomNavigationBarTheme:
+          Theme.of(context).bottomNavigationBarTheme.copyWith(
+                backgroundColor: Colors.black,
+                selectedItemColor: Colors.green,
+                unselectedItemColor: Colors.white24,
+                type: BottomNavigationBarType.shifting,
+              ),
+      popupMenuTheme: Theme.of(context).popupMenuTheme.copyWith(
+            color: Colors.grey,
+          ),
+      dialogTheme: Theme.of(context).dialogTheme.copyWith(
+            backgroundColor: Colors.white12,
+          ),
     );
 
     //injecting data providers
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (ctx) => UserProvider()),
+        ChangeNotifierProvider(create: (ctx) => CompanyProvider()),
       ],
       child: FutureBuilder(
         future: _initialization,
@@ -81,6 +97,9 @@ class _AppState extends State<App> {
                   return const AuthScreen();
                 },
               ),
+              routes: {
+                ChooseCompany.routeName: (ctx) => const ChooseCompany(),
+              },
             );
           }
           //waiting for Firebase initialization
