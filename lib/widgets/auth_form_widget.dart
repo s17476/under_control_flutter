@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/pickers/user_image_picker.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
-import 'package:under_control_flutter/screens/choose_company.dart';
+import 'package:under_control_flutter/screens/choose_company_screen.dart';
 import 'package:under_control_flutter/widgets/logo_widget.dart';
 
 class AuthFormWidget extends StatefulWidget {
@@ -351,7 +351,6 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                 position: _slideAnimation!,
                 child: TextButton(
                   onPressed: () {
-                    Navigator.of(context).pushNamed(ChooseCompany.routeName);
                     setState(() {
                       _isInLoginMode = !_isInLoginMode;
                     });

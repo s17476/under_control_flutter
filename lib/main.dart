@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
+import 'package:under_control_flutter/screens/add_company_screen.dart';
 import 'package:under_control_flutter/screens/auth_screen.dart';
-import 'package:under_control_flutter/screens/choose_company.dart';
+import 'package:under_control_flutter/screens/choose_company_screen.dart';
 import 'package:under_control_flutter/screens/initialize_went_wrong_screen.dart';
 import 'package:under_control_flutter/screens/main_screen.dart';
 import 'package:under_control_flutter/widgets/loading_widget.dart';
@@ -58,10 +60,11 @@ class _AppState extends State<App> {
                 type: BottomNavigationBarType.shifting,
               ),
       popupMenuTheme: Theme.of(context).popupMenuTheme.copyWith(
-            color: Colors.grey,
+            color: Colors.black54,
           ),
       dialogTheme: Theme.of(context).dialogTheme.copyWith(
-            backgroundColor: Colors.white12,
+            backgroundColor: Colors.black,
+            elevation: 7,
           ),
     );
 
@@ -71,41 +74,73 @@ class _AppState extends State<App> {
         ChangeNotifierProvider(create: (ctx) => UserProvider()),
         ChangeNotifierProvider(create: (ctx) => CompanyProvider()),
       ],
-      child: FutureBuilder(
-        future: _initialization,
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return const InitializeWentWrong();
-          }
-          if (snapshot.connectionState == ConnectionState.done) {
-            return MaterialApp(
-              debugShowCheckedModeBanner: false,
-              title: 'UnderControl',
-              theme: mainTheme,
-              home: StreamBuilder(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'UnderControl',
+        theme: mainTheme,
+        home: FutureBuilder(
+          future: _initialization,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return const InitializeWentWrong();
+            }
+            //Firebase initialized
+            if (snapshot.connectionState == ConnectionState.done) {
+              return StreamBuilder(
                 stream: FirebaseAuth.instance.authStateChanges(),
-                builder: (ctx, AsyncSnapshot<User?> userSnapshot) {
+                builder: (BuildContext ctx, AsyncSnapshot<User?> userSnapshot) {
+                  //set status bar and bottom navigation colors
+                  SystemChrome.setSystemUIOverlayStyle(
+                      const SystemUiOverlayStyle(
+                    systemNavigationBarColor: Colors.black,
+                    statusBarColor: Colors.black,
+                  ));
                   //user logged in
                   if (userSnapshot.hasData) {
-                    return const MainScreen();
+                    UserProvider userProvider =
+                        Provider.of<UserProvider>(context);
+                    // user data initialized and has company
+                    if (userProvider.user != null &&
+                        userProvider.user!.companyId != null) {
+                      return const MainScreen();
+                    } else {
+                      // user data initialized and has no company
+                      if (userProvider.user != null &&
+                          userProvider.user!.companyId == null) {
+                        return const ChooseCompanyScreen();
+                      } else {
+                        // initialize user provider
+                        userProvider
+                            .initializeUser(context, userSnapshot.data!.uid)
+                            .then((user) {
+                          if (user != null && user.companyId != null) {
+                            print(user.companyId);
+                            // initialize user provider
+                            Provider.of<CompanyProvider>(context, listen: false)
+                                .initializeCompany(context, user.companyId!)
+                                .then((company) {
+                              if (company != null) {
+                                print(company.name);
+                              }
+                            });
+                          }
+                        });
+                      }
+                    }
+                  } else if (!userSnapshot.hasData) {
+                    return const AuthScreen();
                   }
-                  //waiting for data
-                  if (userSnapshot.connectionState == ConnectionState.waiting) {
-                    return const LoadingWidget();
-                  }
-                  //user not logged in
-                  return const AuthScreen();
+                  return const LoadingWidget();
                 },
-              ),
-              routes: {
-                ChooseCompany.routeName: (ctx) => const ChooseCompany(),
-              },
-            );
-          }
-          //waiting for Firebase initialization
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+              );
+            }
+            //waiting for Firebase initialization
+            return const LoadingWidget();
+          },
+        ),
+        routes: {
+          ChooseCompanyScreen.routeName: (ctx) => const ChooseCompanyScreen(),
+          AddCompanyScreen.routeName: (ctx) => const AddCompanyScreen(),
         },
       ),
     );

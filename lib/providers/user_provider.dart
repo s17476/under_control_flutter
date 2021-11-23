@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,26 +6,109 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 import 'package:under_control_flutter/models/app_user.dart';
-import 'package:under_control_flutter/screens/choose_company.dart';
+import 'package:under_control_flutter/models/company.dart';
+import 'package:under_control_flutter/screens/choose_company_screen.dart';
 
 class UserProvider with ChangeNotifier {
-  late final AppUser _user;
+  AppUser? _user;
   var _isLoading = false;
+  var _hasData = false;
   final _firebaseAuth = FirebaseAuth.instance;
 
   //returns a copy of current user object
-  AppUser get user => AppUser.company(
-        userId: _user.userId,
-        email: _user.email,
-        userName: _user.userName,
+  AppUser? get user {
+    if (_user != null) {
+      return AppUser.company(
+        userId: _user!.userId,
+        email: _user!.email,
+        userName: _user!.userName,
         // password: _user.password,
-        userImage: _user.userImage,
-        company: _user.company,
-        companyId: _user.companyId,
+        userImage: _user!.userImage,
+        company: _user!.company,
+        companyId: _user!.companyId,
       );
+    }
+    return null;
+  }
 
   //returns data loading status
   bool get isLoading => _isLoading;
+
+  bool get hasData => _hasData;
+
+  // initialize user
+  Future<AppUser?> initializeUser(
+    BuildContext context,
+    String userId,
+  ) async {
+    _isLoading = true;
+    // UserCredential userCredential = FirebaseAuth.instance.;
+    _user = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      AppUser? tmpUser;
+      if (documentSnapshot.exists) {
+        final userSnapshot = documentSnapshot.data() as Map<String, dynamic>;
+        if (userSnapshot['company'] == null) {
+          tmpUser = AppUser(
+              userId: documentSnapshot.id,
+              email: userSnapshot['email'],
+              userName: userSnapshot['userName'],
+              userImage: userSnapshot['imgUrl']);
+        } else {
+          tmpUser = AppUser.company(
+            userId: documentSnapshot.id,
+            email: userSnapshot['email'],
+            userName: userSnapshot['userName'],
+            userImage: userSnapshot['imgUrl'],
+            company: userSnapshot['company'],
+            companyId: userSnapshot['companyId'],
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(SnackBar(
+            content: const Text('Unable get user data. Try again later...'),
+            backgroundColor: Theme.of(context).errorColor,
+          ));
+      }
+      _isLoading = false;
+      _hasData = true;
+      notifyListeners();
+      return tmpUser;
+    });
+    return _user;
+  }
+
+  // set company to the current user
+  Future<void> setCompany(BuildContext context, Company company) async {
+    _user = AppUser.company(
+      userId: _user!.userId,
+      email: _user!.email,
+      userName: _user!.userName,
+      userImage: _user!.userImage,
+      company: company.name,
+      companyId: company.companyId,
+    );
+    await updateUser(context);
+  }
+
+  Future<void> updateUser(BuildContext context) async {
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(_user!.userId)
+        .set({
+      'userName': _user!.userName,
+      'email': _user!.email,
+      'imgUrl': _user!.userImage,
+      'company': _user!.company,
+      'companyId': _user!.companyId,
+    });
+    notifyListeners();
+  }
 
   //signup and signin method
   void submitAuthForm(
@@ -49,39 +131,14 @@ class UserProvider with ChangeNotifier {
         );
 
         //get user data from DB
-        CollectionReference usersRef =
-            FirebaseFirestore.instance.collection('users');
-        final snapshot = await usersRef.doc(userCredential.user!.uid).get();
+        // CollectionReference usersRef =
+        //     FirebaseFirestore.instance.collection('users');
+        // final snapshot = await usersRef.doc(userCredential.user!.uid).get();
 
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(userCredential.user!.uid)
-            .get()
-            .then((DocumentSnapshot documentSnapshot) {
-          if (documentSnapshot.exists) {
-            final userSnapshot =
-                documentSnapshot.data() as Map<String, dynamic>;
-            ///////////////////////////////////////////////////print
-            if (userSnapshot['company'] == null) {
-              print(userSnapshot.toString() + 'nie ma firmy');
-              Navigator.of(context).pushNamed(ChooseCompany.routeName);
-            } else if (userSnapshot['company'] as String ==
-                userSnapshot['companyId'] as String) {
-              print(userSnapshot.toString() + ' prywatny');
-            } else {
-              print(userSnapshot.toString() + '   jest firma');
-            }
-            _isLoading = false;
-            notifyListeners();
-          } else {
-            ScaffoldMessenger.of(context)
-              ..removeCurrentSnackBar()
-              ..showSnackBar(SnackBar(
-                content: const Text('Unable to login. Try again later...'),
-                backgroundColor: Theme.of(context).errorColor,
-              ));
-          }
-        });
+        await initializeUser(context, userCredential.user!.uid);
+
+        _isLoading = false;
+        notifyListeners();
       } else {
         userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
           email: email,
@@ -147,6 +204,7 @@ class UserProvider with ChangeNotifier {
 
   void signout() {
     _isLoading = false;
+    _hasData = false;
     notifyListeners();
     FirebaseAuth.instance.signOut();
   }
