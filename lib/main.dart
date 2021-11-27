@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
+import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/add_company_screen.dart';
 import 'package:under_control_flutter/screens/auth_screen.dart';
@@ -14,6 +17,8 @@ import 'package:under_control_flutter/widgets/loading_widget.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const App());
 }
 
@@ -35,6 +40,9 @@ class _AppState extends State<App> {
       ),
       textTheme: const TextTheme(
         headline1: TextStyle(
+          color: Colors.white70,
+        ),
+        headline6: TextStyle(
           color: Colors.white,
         ),
       ),
@@ -48,7 +56,7 @@ class _AppState extends State<App> {
       ),
       scaffoldBackgroundColor: Colors.white12,
       primaryColor: Colors.green,
-      cardColor: Colors.black87,
+      cardColor: Colors.white24,
       splashColor: Colors.white12,
       shadowColor: Colors.white24,
       hintColor: Colors.white54,
@@ -73,6 +81,10 @@ class _AppState extends State<App> {
       providers: [
         ChangeNotifierProvider(create: (ctx) => UserProvider()),
         ChangeNotifierProvider(create: (ctx) => CompanyProvider()),
+        ChangeNotifierProxyProvider<UserProvider, ItemProvider>(
+          create: (ctx) => ItemProvider(),
+          update: (ctx, user, item) => ItemProvider.user(user: user.user),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -114,15 +126,15 @@ class _AppState extends State<App> {
                             .initializeUser(context, userSnapshot.data!.uid)
                             .then((user) {
                           if (user != null && user.companyId != null) {
-                            print(user.companyId);
-                            // initialize user provider
+                            // print(user.companyId);
+                            // initialize company provider
                             Provider.of<CompanyProvider>(context, listen: false)
-                                .initializeCompany(context, user.companyId!)
-                                .then((company) {
-                              if (company != null) {
-                                print(company.name);
-                              }
-                            });
+                                .initializeCompany(context, user.companyId!);
+                            // .then((company) {
+                            // if (company != null) {
+                            // print(company.name);
+                            // }
+                            // });
                           }
                         });
                       }

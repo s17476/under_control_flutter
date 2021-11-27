@@ -77,9 +77,10 @@ class UserProvider with ChangeNotifier {
       }
       _isLoading = false;
       _hasData = true;
-      notifyListeners();
+
       return tmpUser;
     });
+    notifyListeners();
     return _user;
   }
 

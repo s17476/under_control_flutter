@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
-import 'package:under_control_flutter/models/app_user.dart';
+import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
+import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
-import 'package:under_control_flutter/screens/choose_company_screen.dart';
 import 'package:under_control_flutter/widgets/bottom_navi_bar.dart';
-import 'package:under_control_flutter/widgets/logo_widget.dart';
 import 'package:under_control_flutter/widgets/main_drawer.dart';
 
 class MainScreen extends StatefulWidget {
@@ -77,22 +75,76 @@ class _MainScreenState extends State<MainScreen> {
                 BottomNaviBar.tabs[_selectedPageIndex]['title'] as String,
               ),
               actions: [
-                IconButton(onPressed: () {}, icon: const Icon(Icons.chat)),
+                if (_selectedPageIndex != 1)
+                  IconButton(onPressed: () {}, icon: const Icon(Icons.chat)),
+                if (_selectedPageIndex == 1)
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.checklist_rtl),
+                  ),
                 SizedBox(
-                  width: SizeConfig.blockSizeHorizontal * 4,
+                  width:
+                      SizeConfig.blockSizeHorizontal * _selectedPageIndex != 1
+                          ? 4
+                          : 1,
                 ),
-                CircleAvatar(
-                  backgroundColor:
-                      Theme.of(context).appBarTheme.backgroundColor,
-                  backgroundImage: NetworkImage(userProvider.user!.userImage),
-                  maxRadius: SizeConfig.blockSizeHorizontal * 4,
+                if (_selectedPageIndex != 1)
+                  CircleAvatar(
+                    backgroundColor:
+                        Theme.of(context).appBarTheme.backgroundColor,
+                    backgroundImage: NetworkImage(userProvider.user!.userImage),
+                    maxRadius: SizeConfig.blockSizeHorizontal * 4,
+                  ),
+                if (_selectedPageIndex == 1)
+                  IconButton(
+                    onPressed: () {},
+                    icon: const Icon(Icons.category),
+                  ),
+                SizedBox(
+                  width:
+                      SizeConfig.blockSizeHorizontal * _selectedPageIndex != 1
+                          ? 4
+                          : 1,
                 ),
+
+                // show add button for task and equipment screen
+                if (_selectedPageIndex == 1)
+                  IconButton(
+                    onPressed: () {
+                      try {
+                        Provider.of<ItemProvider>(context, listen: false)
+                            .addNewItem(
+                          Item(
+                            internalId: 'B1',
+                            producer: 'Bosh',
+                            model: 'Turbo1000',
+                            category: 'power tool',
+                            lastInspection: DateTime.now(),
+                            interval: 12,
+                            inspectionStatus: InspectionStatus.ok.index,
+                          ),
+                        );
+                      } catch (error) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(error as String),
+                          ),
+                        );
+                      }
+                    },
+                    icon: Icon(
+                      Icons.add,
+                      size: SizeConfig.blockSizeVertical * 5,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
                 SizedBox(
                   width: SizeConfig.blockSizeHorizontal * 4,
                 ),
               ],
               pinned: false,
               floating: true,
+              snap: true,
             ),
           ];
         },

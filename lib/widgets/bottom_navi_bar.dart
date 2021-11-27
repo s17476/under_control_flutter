@@ -55,7 +55,7 @@ class BottomNaviBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 400),
       height: isBottomNavBarVisible ? SizeConfig.blockSizeVertical * 7 : 0,
       child: Wrap(
         children: [

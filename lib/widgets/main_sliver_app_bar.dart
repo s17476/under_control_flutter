@@ -15,8 +15,8 @@ class _MainSliverAppBarState extends State<MainSliverAppBar> {
   Widget build(BuildContext context) {
     return SliverAppBar(
       pinned: true,
-      snap: true,
-      floating: true,
+      snap: false,
+      floating: false,
 
       // title: const Text(
       //   'UnderControl',
