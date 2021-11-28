@@ -94,6 +94,7 @@ class _AppState extends State<App> {
           future: _initialization,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
+              print(snapshot.error);
               return const InitializeWentWrong();
             }
             //Firebase initialized
