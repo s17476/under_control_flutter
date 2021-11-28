@@ -9,6 +9,7 @@ import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/add_company_screen.dart';
+import 'package:under_control_flutter/screens/add_equipment_screen.dart';
 import 'package:under_control_flutter/screens/auth_screen.dart';
 import 'package:under_control_flutter/screens/choose_company_screen.dart';
 import 'package:under_control_flutter/screens/initialize_went_wrong_screen.dart';
@@ -37,13 +38,14 @@ class _AppState extends State<App> {
     ThemeData mainTheme = Theme.of(context).copyWith(
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
       ),
       textTheme: const TextTheme(
         headline1: TextStyle(
           color: Colors.white70,
         ),
         headline6: TextStyle(
-          color: Colors.white,
+          color: Colors.white70,
         ),
       ),
       colorScheme: Theme.of(context).colorScheme.copyWith(
@@ -56,6 +58,7 @@ class _AppState extends State<App> {
       ),
       scaffoldBackgroundColor: Colors.white12,
       primaryColor: Colors.green,
+      backgroundColor: Colors.grey,
       cardColor: Colors.white24,
       splashColor: Colors.white12,
       shadowColor: Colors.white24,
@@ -154,6 +157,7 @@ class _AppState extends State<App> {
         routes: {
           ChooseCompanyScreen.routeName: (ctx) => const ChooseCompanyScreen(),
           AddCompanyScreen.routeName: (ctx) => const AddCompanyScreen(),
+          AddEquipmentScreen.routeName: (ctx) => const AddEquipmentScreen(),
         },
       ),
     );
