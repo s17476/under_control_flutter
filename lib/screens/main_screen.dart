@@ -6,6 +6,7 @@ import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
+import 'package:under_control_flutter/screens/add_equipment_screen.dart';
 import 'package:under_control_flutter/widgets/bottom_navi_bar.dart';
 import 'package:under_control_flutter/widgets/main_drawer.dart';
 
@@ -79,7 +80,20 @@ class _MainScreenState extends State<MainScreen> {
                   IconButton(onPressed: () {}, icon: const Icon(Icons.chat)),
                 if (_selectedPageIndex == 1)
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      final itemProvider =
+                          Provider.of<ItemProvider>(context, listen: false);
+                      // if (itemProvider.showCategories) {
+                      itemProvider
+                        ..setShowCategories = false
+                        ..toggleDescendning()
+                        ..fetchAndSetItems();
+                      // }
+
+                      // setState(() {
+                      //   _selectedPageIndex = 1;
+                      // });
+                    },
                     icon: const Icon(Icons.checklist_rtl),
                   ),
                 SizedBox(
@@ -97,7 +111,16 @@ class _MainScreenState extends State<MainScreen> {
                   ),
                 if (_selectedPageIndex == 1)
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      final itemProvider =
+                          Provider.of<ItemProvider>(context, listen: false);
+                      // if (!itemProvider.showCategories) {
+                      itemProvider
+                        ..setShowCategories = true
+                        ..toggleDescendning()
+                        ..fetchAndSetItems();
+                      // }
+                    },
                     icon: const Icon(Icons.category),
                   ),
                 SizedBox(
@@ -111,26 +134,28 @@ class _MainScreenState extends State<MainScreen> {
                 if (_selectedPageIndex == 1)
                   IconButton(
                     onPressed: () {
-                      try {
-                        Provider.of<ItemProvider>(context, listen: false)
-                            .addNewItem(
-                          Item(
-                            internalId: 'B1',
-                            producer: 'Bosh',
-                            model: 'Turbo1000',
-                            category: 'power tool',
-                            lastInspection: DateTime.now(),
-                            interval: 12,
-                            inspectionStatus: InspectionStatus.ok.index,
-                          ),
-                        );
-                      } catch (error) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(error as String),
-                          ),
-                        );
-                      }
+                      Navigator.of(context)
+                          .pushNamed(AddEquipmentScreen.routeName);
+                      // try {
+                      //   Provider.of<ItemProvider>(context, listen: false)
+                      //       .addNewItem(
+                      //     Item(
+                      //       internalId: 'B1',
+                      //       producer: 'Bosh',
+                      //       model: 'Turbo1000',
+                      //       category: 'power tool',
+                      //       lastInspection: DateTime.now(),
+                      //       interval: 12,
+                      //       inspectionStatus: InspectionStatus.ok.index,
+                      //     ),
+                      //   );
+                      // } catch (error) {
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     SnackBar(
+                      //       content: Text(error as String),
+                      //     ),
+                      //   );
+                      // }
                     },
                     icon: Icon(
                       Icons.add,

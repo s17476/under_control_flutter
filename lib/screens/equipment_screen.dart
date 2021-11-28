@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
-import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
-import 'package:under_control_flutter/providers/user_provider.dart';
 
 class EquipmentScreen extends StatefulWidget {
-  const EquipmentScreen({Key? key}) : super(key: key);
+  const EquipmentScreen({
+    Key? key,
+  }) : super(key: key);
 
   // final AppUser appUser;
 
@@ -16,7 +16,6 @@ class EquipmentScreen extends StatefulWidget {
 }
 
 class _EquipmentScreenState extends State<EquipmentScreen> {
-  var _showCategories = true;
   var _isLoading = false;
   var _currentCategory = '';
   final colors = [
@@ -26,8 +25,7 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
     Colors.pink,
     Colors.red,
     Colors.deepOrange,
-    Colors.amber,
-    Colors.lime,
+    Colors.amber.shade700,
     Colors.green,
   ];
   var colorPointer = -1;
@@ -49,16 +47,16 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
   void didChangeDependencies() {
     ItemProvider itemProvider =
         Provider.of<ItemProvider>(context, listen: false);
-    if (itemProvider.items.isEmpty) {
+    // if (itemProvider.items.isEmpty) {
+    setState(() {
+      _isLoading = true;
+    });
+    itemProvider.fetchAndSetItems().then((_) {
       setState(() {
-        _isLoading = true;
+        _isLoading = false;
       });
-      itemProvider.fetchAndSetItems().then((_) {
-        setState(() {
-          _isLoading = false;
-        });
-      });
-    }
+    });
+    // }
     super.didChangeDependencies();
   }
 
@@ -66,6 +64,7 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
   Widget build(BuildContext context) {
     ItemProvider itemProvider = Provider.of<ItemProvider>(context);
     final items = itemProvider.items;
+    _currentCategory = '';
     return RefreshIndicator(
       onRefresh: _refreshItems,
       backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
@@ -99,21 +98,27 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                     return Column(
                       key: ValueKey<String>(item.itemId!),
                       children: [
-                        if (categoryChanges && _showCategories)
+                        if (categoryChanges && itemProvider.showCategories)
                           ListTile(
                             // key: ValueKey('${items[i].itemId}separator'),
                             title: Text(
                               item.category,
-                              style: TextStyle(color: colors[colorPointer]),
+                              style: TextStyle(
+                                color: colors[colorPointer],
+                                fontSize: SizeConfig.blockSizeHorizontal * 6,
+                              ),
                             ),
                           ),
                         ListTile(
                           leading: CircleAvatar(
                             child: FittedBox(
-                              child: Text(
-                                item.category,
-                                style: const TextStyle(
-                                  color: Colors.white,
+                              child: Padding(
+                                padding: const EdgeInsets.all(3.0),
+                                child: Text(
+                                  item.category,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
