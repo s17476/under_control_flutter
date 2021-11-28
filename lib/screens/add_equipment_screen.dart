@@ -259,9 +259,9 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                     TextButton(
                       onPressed: _presentDayPicker,
                       child: Text(
-                        'Pick date',
+                        'Pick',
                         style: TextStyle(
-                          fontSize: SizeConfig.blockSizeVertical * 2.3,
+                          fontSize: SizeConfig.blockSizeHorizontal * 4,
                         ),
                       ),
                     ),
@@ -278,14 +278,14 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                     Text(
                       'Inspection status:',
                       style: TextStyle(
-                        fontSize: SizeConfig.blockSizeVertical * 2,
+                        fontSize: SizeConfig.blockSizeHorizontal * 4,
                         color: Theme.of(context).textTheme.headline6!.color,
                       ),
                     ),
                     DropdownButton<String>(
                       value: statusValue,
                       icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                      iconSize: SizeConfig.blockSizeVertical * 4,
+                      iconSize: SizeConfig.blockSizeHorizontal * 4,
                       alignment: Alignment.center,
                       elevation: 16,
                       style: TextStyle(
@@ -294,7 +294,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                             : statusValue == 'Needs attention'
                                 ? Colors.amber
                                 : Colors.red,
-                        fontSize: SizeConfig.blockSizeVertical * 2.3,
+                        fontSize: SizeConfig.blockSizeHorizontal * 4,
                       ),
                       underline: Container(height: 0),
                       onChanged: (String? newValue) {
@@ -328,19 +328,19 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                     Text(
                       'Inspections interval:',
                       style: TextStyle(
-                        fontSize: SizeConfig.blockSizeVertical * 2,
+                        fontSize: SizeConfig.blockSizeHorizontal * 4,
                         color: Theme.of(context).textTheme.headline6!.color,
                       ),
                     ),
                     DropdownButton<String>(
                       value: _inspectionInterval,
                       icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                      iconSize: SizeConfig.blockSizeVertical * 4,
+                      iconSize: SizeConfig.blockSizeHorizontal * 4,
                       alignment: Alignment.center,
                       elevation: 16,
                       style: TextStyle(
                         color: Colors.green,
-                        fontSize: SizeConfig.blockSizeVertical * 2.3,
+                        fontSize: SizeConfig.blockSizeHorizontal * 4,
                       ),
                       underline: Container(height: 0),
                       onChanged: (String? newValue) {
