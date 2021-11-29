@@ -31,10 +31,10 @@ class _AddCompanyScreenState extends State<AddCompanyScreen>
         _formKey.currentState!.save();
         Company company = Company(
           companyId: '',
-          name: this._name,
-          address: this._address,
-          postCode: this._postCode,
-          city: this._city,
+          name: _name,
+          address: _address,
+          postCode: _postCode,
+          city: _city,
         );
         await companyProvider.addNewCompany(context, company);
       }

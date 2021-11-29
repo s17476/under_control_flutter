@@ -64,6 +64,7 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
   Widget build(BuildContext context) {
     ItemProvider itemProvider = Provider.of<ItemProvider>(context);
     final items = itemProvider.items;
+    bool isExpired = false;
     _currentCategory = '';
     return RefreshIndicator(
       onRefresh: _refreshItems,
@@ -84,6 +85,21 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
               children: [
                 ...items.map(
                   (item) {
+                    // check if inspection has expired
+                    List<String> days = item.interval.split(' ');
+                    int duration;
+                    if (days[1] == 'week' || days[1] == 'weeks') {
+                      duration = int.parse(days[0]) * 7;
+                    } else if (days[1] == 'month' || days[1] == 'months') {
+                      duration = int.parse(days[0]) * 30;
+                    } else {
+                      duration = int.parse(days[0]) * 365;
+                    }
+///////////////////////////////////////////////////////////////////////////////////
+                    isExpired = DateTime.now()
+                        .subtract(Duration(
+                            days: duration)) //////////////////////////////
+                        .isAfter(item.lastInspection);
                     var categoryChanges = false;
                     if (_currentCategory != item.category) {
                       _currentCategory = item.category;
@@ -133,34 +149,44 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                             'Last inspection: ${item.lastInspection.day}/${item.lastInspection.month}/${item.lastInspection.year}',
                             style: const TextStyle(color: Colors.grey),
                           ),
-                          trailing: item.inspectionStatus ==
-                                  InspectionStatus.ok.index
+                          trailing: isExpired
                               ? Icon(
-                                  Icons.check_circle_outline_rounded,
-                                  color: Colors.green,
+                                  Icons.alarm_outlined,
+                                  color: Colors.red,
                                   size: SizeConfig.blockSizeVertical * 5,
                                 )
                               : item.inspectionStatus ==
-                                      InspectionStatus.failed.index
+                                      InspectionStatus.ok.index
                                   ? Icon(
-                                      Icons.clear_rounded,
-                                      color: Colors.red,
+                                      Icons.check_circle_outline_rounded,
+                                      color: Colors.green,
                                       size: SizeConfig.blockSizeVertical * 5,
                                     )
                                   : item.inspectionStatus ==
-                                          InspectionStatus.needsAttention.index
+                                          InspectionStatus.failed.index
                                       ? Icon(
-                                          Icons.warning_amber_rounded,
-                                          color: Colors.amber,
-                                          size:
-                                              SizeConfig.blockSizeVertical * 5,
-                                        )
-                                      : Icon(
-                                          Icons.alarm_outlined,
+                                          Icons.clear_rounded,
                                           color: Colors.red,
                                           size:
                                               SizeConfig.blockSizeVertical * 5,
-                                        ),
+                                        )
+                                      : item.inspectionStatus ==
+                                              InspectionStatus
+                                                  .needsAttention.index
+                                          ? Icon(
+                                              Icons.warning_amber_rounded,
+                                              color: Colors.amber,
+                                              size:
+                                                  SizeConfig.blockSizeVertical *
+                                                      5,
+                                            )
+                                          : Icon(
+                                              Icons.alarm_outlined,
+                                              color: Colors.red,
+                                              size:
+                                                  SizeConfig.blockSizeVertical *
+                                                      5,
+                                            ),
                         ),
                       ],
                     );

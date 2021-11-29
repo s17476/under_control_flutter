@@ -9,9 +9,10 @@ class Item {
   String producer;
   String model;
   String category;
+  String comments;
   List<Inspection> inspections;
   DateTime lastInspection;
-  int interval;
+  String interval;
   int inspectionStatus;
 
   Item({
@@ -20,6 +21,7 @@ class Item {
     required this.producer,
     required this.model,
     required this.category,
+    this.comments = '',
     required this.lastInspection,
     this.inspections = const [],
     required this.interval,

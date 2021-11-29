@@ -1,11 +1,11 @@
 class Inspection {
   DateTime date;
-  String comment;
+  String comments;
   int status;
 
   Inspection({
     required this.date,
-    required this.comment,
+    required this.comments,
     required this.status,
   });
 }

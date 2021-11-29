@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:intl/intl.dart';
+import 'package:under_control_flutter/models/item.dart';
+import 'package:under_control_flutter/providers/item_provider.dart';
 
 class AddEquipmentScreen extends StatefulWidget {
   const AddEquipmentScreen({Key? key}) : super(key: key);
@@ -16,13 +19,53 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
   final _formKey = GlobalKey<FormState>();
 
   DateTime? _lastInspection;
-  String statusValue = 'OK';
+  String _statusString = 'OK';
   String _inspectionInterval = '1 year';
   String _internalId = '';
   String _producer = '';
   String _model = '';
   String _category = '';
   String _comments = '';
+
+  Future<Item?> _addNewEquipment() async {
+    if (_formKey.currentState != null) {
+      final isValid = _formKey.currentState!.validate();
+      FocusScope.of(context).unfocus();
+
+      if (isValid) {
+        int statusValue;
+        if (_statusString == 'OK') {
+          statusValue = InspectionStatus.ok.index;
+        } else if (_statusString == 'Needs attention') {
+          statusValue = InspectionStatus.needsAttention.index;
+        } else {
+          statusValue = InspectionStatus.failed.index;
+        }
+        _formKey.currentState!.save();
+        Item item = Item(
+          internalId: _internalId,
+          producer: _producer,
+          model: _model,
+          category: _category,
+          lastInspection: _lastInspection!,
+          interval: _inspectionInterval,
+          inspectionStatus: statusValue,
+        );
+
+        // try to add data to DB and close current screen
+        //or show snackbar with error message
+        await Provider.of<ItemProvider>(context, listen: false)
+            .addNewItem(item)
+            .catchError((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Error while adding new equipment'),
+            ),
+          );
+        }).then((_) => Navigator.of(context).pop());
+      }
+    }
+  }
 
   void _presentDayPicker() {
     showDatePicker(
@@ -283,15 +326,15 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                       ),
                     ),
                     DropdownButton<String>(
-                      value: statusValue,
+                      value: _statusString,
                       icon: const Icon(Icons.keyboard_arrow_down_rounded),
                       iconSize: SizeConfig.blockSizeHorizontal * 4,
                       alignment: Alignment.center,
                       elevation: 16,
                       style: TextStyle(
-                        color: statusValue == 'OK'
+                        color: _statusString == 'OK'
                             ? Colors.green
-                            : statusValue == 'Needs attention'
+                            : _statusString == 'Needs attention'
                                 ? Colors.amber
                                 : Colors.red,
                         fontSize: SizeConfig.blockSizeHorizontal * 4,
@@ -299,7 +342,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                       underline: Container(height: 0),
                       onChanged: (String? newValue) {
                         setState(() {
-                          statusValue = newValue!;
+                          _statusString = newValue!;
                         });
                       },
                       dropdownColor:
@@ -333,6 +376,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                       ),
                     ),
                     DropdownButton<String>(
+                      borderRadius: BorderRadius.circular(10),
                       value: _inspectionInterval,
                       icon: const Icon(Icons.keyboard_arrow_down_rounded),
                       iconSize: SizeConfig.blockSizeHorizontal * 4,
@@ -370,7 +414,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
 
                 // save button
                 ElevatedButton(
-                  onPressed: () async {},
+                  onPressed: _addNewEquipment,
                   child: Text(
                     'Add equipment',
                     style: TextStyle(
