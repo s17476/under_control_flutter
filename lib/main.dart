@@ -9,9 +9,10 @@ import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/add_company_screen.dart';
-import 'package:under_control_flutter/screens/add_equipment_screen.dart';
+import 'package:under_control_flutter/screens/equipment/add_equipment_screen.dart';
 import 'package:under_control_flutter/screens/auth_screen.dart';
 import 'package:under_control_flutter/screens/choose_company_screen.dart';
+import 'package:under_control_flutter/screens/equipment/equipment_details_screen.dart';
 import 'package:under_control_flutter/screens/initialize_went_wrong_screen.dart';
 import 'package:under_control_flutter/screens/main_screen.dart';
 import 'package:under_control_flutter/widgets/loading_widget.dart';
@@ -158,6 +159,8 @@ class _AppState extends State<App> {
           ChooseCompanyScreen.routeName: (ctx) => const ChooseCompanyScreen(),
           AddCompanyScreen.routeName: (ctx) => const AddCompanyScreen(),
           AddEquipmentScreen.routeName: (ctx) => const AddEquipmentScreen(),
+          EquipmentDetailsScreen.routeName: (ctx) =>
+              const EquipmentDetailsScreen(),
         },
       ),
     );

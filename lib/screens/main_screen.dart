@@ -6,7 +6,7 @@ import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
-import 'package:under_control_flutter/screens/add_equipment_screen.dart';
+import 'package:under_control_flutter/screens/equipment/add_equipment_screen.dart';
 import 'package:under_control_flutter/widgets/bottom_navi_bar.dart';
 import 'package:under_control_flutter/widgets/main_drawer.dart';
 
@@ -135,34 +135,16 @@ class _MainScreenState extends State<MainScreen> {
                   IconButton(
                     onPressed: () {
                       Navigator.of(context)
-                          .pushNamed(AddEquipmentScreen.routeName)
+                          .push(_createRute(() => const AddEquipmentScreen()))
                           .then((value) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Item successcul added'),
-                          ),
-                        );
+                        if (value != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Item successcul added'),
+                            ),
+                          );
+                        }
                       });
-                      // try {
-                      //   Provider.of<ItemProvider>(context, listen: false)
-                      //       .addNewItem(
-                      //     Item(
-                      //       internalId: 'B1',
-                      //       producer: 'Bosh',
-                      //       model: 'Turbo1000',
-                      //       category: 'power tool',
-                      //       lastInspection: DateTime.now(),
-                      //       interval: 12,
-                      //       inspectionStatus: InspectionStatus.ok.index,
-                      //     ),
-                      //   );
-                      // } catch (error) {
-                      //   ScaffoldMessenger.of(context).showSnackBar(
-                      //     SnackBar(
-                      //       content: Text(error as String),
-                      //     ),
-                      //   );
-                      // }
                     },
                     icon: Icon(
                       Icons.add,
@@ -188,5 +170,23 @@ class _MainScreenState extends State<MainScreen> {
         selectedPageIndex: _selectedPageIndex,
       ),
     );
+  }
+
+  Route<Object?> _createRute(Widget Function() widgetConstructor) {
+    return PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) =>
+            widgetConstructor(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          const begin = Offset(0.0, -1.0);
+          const end = Offset.zero;
+
+          final tween = Tween(begin: begin, end: end)
+              .chain(CurveTween(curve: Curves.easeIn));
+
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        });
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/screens/calendar_screen.dart';
 import 'package:under_control_flutter/screens/dash_screen.dart';
-import 'package:under_control_flutter/screens/equipment_screen.dart';
+import 'package:under_control_flutter/screens/equipment/equipment_screen.dart';
 import 'package:under_control_flutter/screens/overview_screen.dart';
 import 'package:under_control_flutter/screens/tasks_screen.dart';
 

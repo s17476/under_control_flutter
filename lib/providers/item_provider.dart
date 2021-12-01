@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/item.dart';
 
@@ -176,5 +177,26 @@ class ItemProvider with ChangeNotifier {
       },
     );
     return batch.commit();
+  }
+
+  Future<void> deleteItem(BuildContext context, String? itemId) async {
+    await FirebaseFirestore.instance
+        .collection('companies')
+        .doc(user!.companyId)
+        .collection('items')
+        .doc(itemId)
+        .delete()
+        .then((_) {
+      _items.removeWhere((element) => element.itemId == itemId);
+      notifyListeners();
+      Navigator.of(context).pop(true);
+    }).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to delete item!"),
+        ),
+      );
+      return error;
+    });
   }
 }
