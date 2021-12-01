@@ -19,6 +19,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
   final _formKey = GlobalKey<FormState>();
 
   DateTime? _lastInspection;
+  DateTime? _nextInspection;
   String _statusString = 'OK';
   String _inspectionInterval = '1 year';
   String _internalId = '';
@@ -42,12 +43,31 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
           statusValue = InspectionStatus.failed.index;
         }
         _formKey.currentState!.save();
+
+        List<String> duration = _inspectionInterval.split(' ');
+        if (duration[1] == 'week' || duration[1] == 'weeks') {
+          _nextInspection = DateTime(
+            _lastInspection!.year,
+            _lastInspection!.month,
+            _lastInspection!.day + (int.parse(duration[0]) * 7),
+          );
+        } else if (duration[1] == 'month' || duration[1] == 'months') {
+          _nextInspection = DateTime(
+              _lastInspection!.year,
+              _lastInspection!.month + int.parse(duration[0]),
+              _lastInspection!.day);
+        } else {
+          _nextInspection = DateTime(_lastInspection!.year + 1,
+              _lastInspection!.month, _lastInspection!.day);
+        }
+
         Item item = Item(
           internalId: _internalId,
           producer: _producer,
           model: _model,
           category: _category,
           lastInspection: _lastInspection!,
+          nextInspection: _nextInspection!,
           interval: _inspectionInterval,
           inspectionStatus: statusValue,
         );
@@ -56,13 +76,15 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
         //or show snackbar with error message
         await Provider.of<ItemProvider>(context, listen: false)
             .addNewItem(item)
+            .then((_) => Navigator.of(context).pop(true))
             .catchError((_) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Error while adding new equipment'),
             ),
           );
-        }).then((_) => Navigator.of(context).pop());
+          Navigator.of(context).pop();
+        });
       }
     }
   }
@@ -118,321 +140,324 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
           ),
           duration: const Duration(milliseconds: 400),
           curve: Curves.easeInOut,
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.handyman,
-                  size: SizeConfig.blockSizeHorizontal * 20,
-                  color: Theme.of(context).primaryColor,
-                ),
-                SizedBox(
-                  height: SizeConfig.blockSizeVertical * 3,
-                ),
-                // internal id
-                TextFormField(
-                  key: const ValueKey('internalId'),
-                  keyboardType: TextInputType.name,
-                  textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: SizeConfig.blockSizeHorizontal * 1,
-                      horizontal: SizeConfig.blockSizeHorizontal * 5,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).splashColor,
-                    hintText: 'Internal id',
-                  ),
-                  validator: (val) {
-                    if (val!.length < 4) {
-                      return 'Min. 4 characters';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _internalId = value!;
-                  },
-                ),
-                SizedBox(
-                  height: SizeConfig.blockSizeVertical * 3,
-                ),
-                // producer
-                TextFormField(
-                  key: const ValueKey('producer'),
-                  keyboardType: TextInputType.name,
-                  textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: SizeConfig.blockSizeHorizontal * 1,
-                      horizontal: SizeConfig.blockSizeHorizontal * 5,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).splashColor,
-                    hintText: 'Producer',
-                  ),
-                  validator: (val) {
-                    if (val!.length < 3) {
-                      return 'Producer to short';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _producer = value!;
-                  },
-                ),
-                SizedBox(
-                  height: SizeConfig.blockSizeVertical * 3,
-                ),
-                // model
-                TextFormField(
-                  key: const ValueKey('model'),
-                  keyboardType: TextInputType.name,
-                  textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: SizeConfig.blockSizeHorizontal * 1,
-                      horizontal: SizeConfig.blockSizeHorizontal * 5,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).splashColor,
-                    hintText: 'Model',
-                  ),
-                  validator: (val) {
-                    if (val!.length < 3) {
-                      return 'Model to short';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _model = value!;
-                  },
-                ),
-                SizedBox(
-                  height: SizeConfig.blockSizeVertical * 3,
-                ),
-                //catergory
-                TextFormField(
-                  key: const ValueKey('category'),
-                  keyboardType: TextInputType.name,
-                  textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: SizeConfig.blockSizeHorizontal * 1,
-                      horizontal: SizeConfig.blockSizeHorizontal * 5,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).splashColor,
-                    hintText: 'Category - ex. power tools, machine',
-                  ),
-                  validator: (val) {
-                    if (val!.length < 2) {
-                      return 'Categoty to short';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _category = value!;
-                  },
-                ),
-                SizedBox(
-                  height: SizeConfig.blockSizeVertical * 3,
-                ),
-                // comments
-                TextFormField(
-                  maxLines: null,
-                  // expands: true,
-                  key: const ValueKey('comments'),
-                  keyboardType: TextInputType.multiline,
-                  // textInputAction: TextInputAction.next,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(
-                      vertical: SizeConfig.blockSizeHorizontal * 1,
-                      horizontal: SizeConfig.blockSizeHorizontal * 5,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide.none,
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).splashColor,
-                    hintText: 'Comments',
-                  ),
-                  validator: (val) {
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _comments = value!;
-                  },
-                ),
-                SizedBox(
-                  height: SizeConfig.blockSizeVertical * 1,
-                ),
-                // last inspection - date picker
-                Row(
+          child: Column(
+            children: [
+              Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Expanded(
-                      child: Text(
-                        choosenDate,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: SizeConfig.blockSizeHorizontal * 4,
-                          color: Theme.of(context).textTheme.headline6!.color,
-                        ),
-                      ),
+                    Icon(
+                      Icons.handyman,
+                      size: SizeConfig.blockSizeHorizontal * 20,
+                      color: Theme.of(context).primaryColor,
                     ),
-                    SizedBox(width: SizeConfig.blockSizeHorizontal * 3),
-                    TextButton(
-                      onPressed: _presentDayPicker,
-                      child: Text(
-                        'Pick',
-                        style: TextStyle(
-                          fontSize: SizeConfig.blockSizeHorizontal * 4,
+                    SizedBox(
+                      height: SizeConfig.blockSizeVertical * 3,
+                    ),
+                    // internal id
+                    TextFormField(
+                      key: const ValueKey('internalId'),
+                      keyboardType: TextInputType.name,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: SizeConfig.blockSizeHorizontal * 1,
+                          horizontal: SizeConfig.blockSizeHorizontal * 5,
                         ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).splashColor,
+                        hintText: 'Internal id',
                       ),
+                      validator: (val) {
+                        if (val!.length < 4) {
+                          return 'Min. 4 characters';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _internalId = value!;
+                      },
+                    ),
+                    SizedBox(
+                      height: SizeConfig.blockSizeVertical * 3,
+                    ),
+                    // producer
+                    TextFormField(
+                      key: const ValueKey('producer'),
+                      keyboardType: TextInputType.name,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: SizeConfig.blockSizeHorizontal * 1,
+                          horizontal: SizeConfig.blockSizeHorizontal * 5,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).splashColor,
+                        hintText: 'Producer',
+                      ),
+                      validator: (val) {
+                        if (val!.length < 3) {
+                          return 'Producer to short';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _producer = value!;
+                      },
+                    ),
+                    SizedBox(
+                      height: SizeConfig.blockSizeVertical * 3,
+                    ),
+                    // model
+                    TextFormField(
+                      key: const ValueKey('model'),
+                      keyboardType: TextInputType.name,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: SizeConfig.blockSizeHorizontal * 1,
+                          horizontal: SizeConfig.blockSizeHorizontal * 5,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).splashColor,
+                        hintText: 'Model',
+                      ),
+                      validator: (val) {
+                        if (val!.length < 3) {
+                          return 'Model to short';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _model = value!;
+                      },
+                    ),
+                    SizedBox(
+                      height: SizeConfig.blockSizeVertical * 3,
+                    ),
+                    //catergory
+                    TextFormField(
+                      key: const ValueKey('category'),
+                      keyboardType: TextInputType.name,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: SizeConfig.blockSizeHorizontal * 1,
+                          horizontal: SizeConfig.blockSizeHorizontal * 5,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).splashColor,
+                        hintText: 'Category - ex. power tools, machine',
+                      ),
+                      validator: (val) {
+                        if (val!.length < 2) {
+                          return 'Categoty to short';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _category = value!;
+                      },
+                    ),
+                    SizedBox(
+                      height: SizeConfig.blockSizeVertical * 3,
+                    ),
+                    // comments
+                    TextFormField(
+                      maxLines: null,
+                      // expands: true,
+                      key: const ValueKey('comments'),
+                      keyboardType: TextInputType.multiline,
+                      // textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: SizeConfig.blockSizeHorizontal * 1,
+                          horizontal: SizeConfig.blockSizeHorizontal * 5,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).splashColor,
+                        hintText: 'Comments',
+                      ),
+                      validator: (val) {
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _comments = value!;
+                      },
+                    ),
+                    SizedBox(
+                      height: SizeConfig.blockSizeVertical * 1,
                     ),
                   ],
                 ),
-                // SizedBox(
-                //   height: SizeConfig.blockSizeVertical * 1,
-                // ),
-
-                // status
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                      'Inspection status:',
+              ),
+              // last inspection - date picker
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      choosenDate,
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: SizeConfig.blockSizeHorizontal * 4,
                         color: Theme.of(context).textTheme.headline6!.color,
                       ),
                     ),
-                    DropdownButton<String>(
-                      value: _statusString,
-                      icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                      iconSize: SizeConfig.blockSizeHorizontal * 4,
-                      alignment: Alignment.center,
-                      elevation: 16,
+                  ),
+                  SizedBox(width: SizeConfig.blockSizeHorizontal * 3),
+                  TextButton(
+                    onPressed: _presentDayPicker,
+                    child: Text(
+                      'Pick',
                       style: TextStyle(
-                        color: _statusString == 'OK'
-                            ? Colors.green
-                            : _statusString == 'Needs attention'
-                                ? Colors.amber
-                                : Colors.red,
                         fontSize: SizeConfig.blockSizeHorizontal * 4,
                       ),
-                      underline: Container(height: 0),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _statusString = newValue!;
-                        });
-                      },
-                      dropdownColor:
-                          Theme.of(context).appBarTheme.backgroundColor,
-                      items: <String>[
-                        'OK',
-                        'Needs attention',
-                        'Failed',
-                      ].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
                     ),
-                  ],
-                ),
-                // SizedBox(
-                //   height: SizeConfig.blockSizeVertical * 3,
-                // ),
+                  ),
+                ],
+              ),
+              // SizedBox(
+              //   height: SizeConfig.blockSizeVertical * 1,
+              // ),
 
-                // inspection interval
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                      'Inspections interval:',
-                      style: TextStyle(
-                        fontSize: SizeConfig.blockSizeHorizontal * 4,
-                        color: Theme.of(context).textTheme.headline6!.color,
-                      ),
-                    ),
-                    DropdownButton<String>(
-                      borderRadius: BorderRadius.circular(10),
-                      value: _inspectionInterval,
-                      icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                      iconSize: SizeConfig.blockSizeHorizontal * 4,
-                      alignment: Alignment.center,
-                      elevation: 16,
-                      style: TextStyle(
-                        color: Colors.green,
-                        fontSize: SizeConfig.blockSizeHorizontal * 4,
-                      ),
-                      underline: Container(height: 0),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _inspectionInterval = newValue!;
-                        });
-                      },
-                      dropdownColor:
-                          Theme.of(context).appBarTheme.backgroundColor,
-                      items: <String>[
-                        '1 year',
-                        '6 months',
-                        '3 months',
-                        '1 month',
-                      ].map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: SizeConfig.blockSizeVertical * 3,
-                ),
-
-                // save button
-                ElevatedButton(
-                  onPressed: _addNewEquipment,
-                  child: Text(
-                    'Add equipment',
+              // status
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    'Inspection status:',
                     style: TextStyle(
-                      fontSize: SizeConfig.blockSizeHorizontal * 5.5,
+                      fontSize: SizeConfig.blockSizeHorizontal * 4,
+                      color: Theme.of(context).textTheme.headline6!.color,
                     ),
                   ),
-                  style: ElevatedButton.styleFrom(
-                    primary: Theme.of(context).primaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
+                  DropdownButton<String>(
+                    value: _statusString,
+                    icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                    iconSize: SizeConfig.blockSizeHorizontal * 4,
+                    alignment: Alignment.center,
+                    elevation: 16,
+                    style: TextStyle(
+                      color: _statusString == 'OK'
+                          ? Colors.green
+                          : _statusString == 'Needs attention'
+                              ? Colors.amber
+                              : Colors.red,
+                      fontSize: SizeConfig.blockSizeHorizontal * 4,
+                    ),
+                    underline: Container(height: 0),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _statusString = newValue!;
+                      });
+                    },
+                    dropdownColor:
+                        Theme.of(context).appBarTheme.backgroundColor,
+                    items: <String>[
+                      'OK',
+                      'Needs attention',
+                      'Failed',
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              // SizedBox(
+              //   height: SizeConfig.blockSizeVertical * 3,
+              // ),
+
+              // inspection interval
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Text(
+                    'Inspections interval:',
+                    style: TextStyle(
+                      fontSize: SizeConfig.blockSizeHorizontal * 4,
+                      color: Theme.of(context).textTheme.headline6!.color,
                     ),
                   ),
+                  DropdownButton<String>(
+                    borderRadius: BorderRadius.circular(10),
+                    value: _inspectionInterval,
+                    icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                    iconSize: SizeConfig.blockSizeHorizontal * 4,
+                    alignment: Alignment.center,
+                    elevation: 16,
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: SizeConfig.blockSizeHorizontal * 4,
+                    ),
+                    underline: Container(height: 0),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _inspectionInterval = newValue!;
+                      });
+                    },
+                    dropdownColor:
+                        Theme.of(context).appBarTheme.backgroundColor,
+                    items: <String>[
+                      '1 year',
+                      '6 months',
+                      '3 months',
+                      '1 month',
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              SizedBox(
+                height: SizeConfig.blockSizeVertical * 0.5,
+              ),
+              // save button
+              ElevatedButton(
+                onPressed: _addNewEquipment,
+                child: Text(
+                  'Add equipment',
+                  style: TextStyle(
+                    fontSize: SizeConfig.blockSizeHorizontal * 5.5,
+                  ),
                 ),
-                SizedBox(
-                  height: SizeConfig.blockSizeVertical * 3,
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30.0),
+                  ),
                 ),
-              ],
-            ),
+              ),
+              SizedBox(
+                height: SizeConfig.blockSizeVertical * 3,
+              ),
+            ],
           ),
         ),
       ),

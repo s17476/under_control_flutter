@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:under_control_flutter/models/inspection.dart';
 
 enum InspectionStatus { ok, needsAttention, failed, expired }
@@ -12,6 +11,7 @@ class Item {
   String comments;
   List<Inspection> inspections;
   DateTime lastInspection;
+  DateTime nextInspection;
   String interval;
   int inspectionStatus;
 
@@ -23,6 +23,7 @@ class Item {
     required this.category,
     this.comments = '',
     required this.lastInspection,
+    required this.nextInspection,
     this.inspections = const [],
     required this.interval,
     required this.inspectionStatus,

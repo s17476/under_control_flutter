@@ -135,7 +135,14 @@ class _MainScreenState extends State<MainScreen> {
                   IconButton(
                     onPressed: () {
                       Navigator.of(context)
-                          .pushNamed(AddEquipmentScreen.routeName);
+                          .pushNamed(AddEquipmentScreen.routeName)
+                          .then((value) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Item successcul added'),
+                          ),
+                        );
+                      });
                       // try {
                       //   Provider.of<ItemProvider>(context, listen: false)
                       //       .addNewItem(
