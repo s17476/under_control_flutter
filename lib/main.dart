@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
+import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/add_company_screen.dart';
 import 'package:under_control_flutter/screens/equipment/add_equipment_screen.dart';
 import 'package:under_control_flutter/screens/auth_screen.dart';
 import 'package:under_control_flutter/screens/choose_company_screen.dart';
+import 'package:under_control_flutter/screens/equipment/edit_equipment_screen.dart';
 import 'package:under_control_flutter/screens/equipment/equipment_details_screen.dart';
 import 'package:under_control_flutter/screens/initialize_went_wrong_screen.dart';
 import 'package:under_control_flutter/screens/main_screen.dart';
@@ -60,9 +62,9 @@ class _AppState extends State<App> {
       scaffoldBackgroundColor: Colors.white12,
       primaryColor: Colors.green,
       backgroundColor: Colors.grey,
-      cardColor: Colors.white24,
+      cardColor: Colors.black87,
       splashColor: Colors.white12,
-      shadowColor: Colors.white24,
+      shadowColor: Colors.black87,
       hintColor: Colors.white54,
       bottomNavigationBarTheme:
           Theme.of(context).bottomNavigationBarTheme.copyWith(
@@ -88,6 +90,11 @@ class _AppState extends State<App> {
         ChangeNotifierProxyProvider<UserProvider, ItemProvider>(
           create: (ctx) => ItemProvider(),
           update: (ctx, user, item) => ItemProvider.user(user: user.user),
+        ),
+        ChangeNotifierProxyProvider<UserProvider, InspectionProvider>(
+          create: (ctx) => InspectionProvider(),
+          update: (ctx, user, inspection) =>
+              InspectionProvider.user(user: user.user),
         ),
       ],
       child: MaterialApp(
@@ -159,6 +166,7 @@ class _AppState extends State<App> {
           ChooseCompanyScreen.routeName: (ctx) => const ChooseCompanyScreen(),
           AddCompanyScreen.routeName: (ctx) => const AddCompanyScreen(),
           AddEquipmentScreen.routeName: (ctx) => const AddEquipmentScreen(),
+          EditEquipmentScreen.routeName: (ctx) => const EditEquipmentScreen(),
           EquipmentDetailsScreen.routeName: (ctx) =>
               const EquipmentDetailsScreen(),
         },

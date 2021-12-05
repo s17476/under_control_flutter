@@ -5,83 +5,60 @@ import 'package:intl/intl.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 
-class AddEquipmentScreen extends StatefulWidget {
-  const AddEquipmentScreen({Key? key}) : super(key: key);
+class EditEquipmentScreen extends StatefulWidget {
+  const EditEquipmentScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/add_equipment';
+  static const routeName = '/edit_equipment';
 
   @override
-  _AddEquipmentScreenState createState() => _AddEquipmentScreenState();
+  _EditEquipmentScreenState createState() => _EditEquipmentScreenState();
 }
 
-class _AddEquipmentScreenState extends State<AddEquipmentScreen>
+class _EditEquipmentScreenState extends State<EditEquipmentScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  late Item _item; ////////////////
 
-  DateTime? _lastInspection;
-  DateTime? _nextInspection;
-  String _statusString = 'OK';
-  String _inspectionInterval = '1 year';
   String _internalId = '';
   String _producer = '';
   String _model = '';
   String _category = '';
   String _comments = '';
 
-  Future<Item?> _addNewEquipment() async {
+  @override
+  void didChangeDependencies() {
+    _item = ModalRoute.of(context)!.settings.arguments as Item;
+    super.didChangeDependencies();
+  }
+
+  Future<Item?> _editEquipment() async {
     if (_formKey.currentState != null) {
       final isValid = _formKey.currentState!.validate();
       FocusScope.of(context).unfocus();
 
       if (isValid) {
-        int statusValue;
-        if (_statusString == 'OK') {
-          statusValue = InspectionStatus.ok.index;
-        } else if (_statusString == 'Needs attention') {
-          statusValue = InspectionStatus.needsAttention.index;
-        } else {
-          statusValue = InspectionStatus.failed.index;
-        }
         _formKey.currentState!.save();
 
-        List<String> duration = _inspectionInterval.split(' ');
-        if (duration[1] == 'week' || duration[1] == 'weeks') {
-          _nextInspection = DateTime(
-            _lastInspection!.year,
-            _lastInspection!.month,
-            _lastInspection!.day + (int.parse(duration[0]) * 7),
-          );
-        } else if (duration[1] == 'month' || duration[1] == 'months') {
-          _nextInspection = DateTime(
-              _lastInspection!.year,
-              _lastInspection!.month + int.parse(duration[0]),
-              _lastInspection!.day);
-        } else {
-          _nextInspection = DateTime(_lastInspection!.year + 1,
-              _lastInspection!.month, _lastInspection!.day);
-        }
-
         Item item = Item(
+          itemId: _item.itemId,
           internalId: _internalId,
           producer: _producer,
           model: _model,
           category: _category,
           comments: _comments,
-          lastInspection: _lastInspection!,
-          nextInspection: _nextInspection!,
-          interval: _inspectionInterval,
-          inspectionStatus: statusValue,
+          lastInspection: _item.lastInspection,
+          nextInspection: _item.nextInspection,
+          interval: _item.interval,
+          inspectionStatus: _item.inspectionStatus,
         );
 
-        // try to add data to DB and close current screen
-        //or show snackbar with error message
         await Provider.of<ItemProvider>(context, listen: false)
-            .addNewItem(item)
+            .updateItem(item)
             .then((_) => Navigator.of(context).pop(true))
             .catchError((_) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Error while adding new equipment'),
+              content: Text('Error while updating equipment'),
             ),
           );
           Navigator.of(context).pop();
@@ -90,44 +67,8 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
     }
   }
 
-  void _presentDayPicker() {
-    showDatePicker(
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.green,
-              surface: Colors.black,
-              onSurface: Colors.white70,
-            ),
-            dialogBackgroundColor: Colors.grey.shade900,
-          ),
-          child: child ?? const Text(''),
-        );
-      },
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2019),
-      lastDate: DateTime.now(),
-    ).then((value) {
-      if (value == null) {
-        return;
-      }
-      setState(() {
-        _lastInspection = value;
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    String choosenDate;
-
-    _lastInspection ??= DateTime.now();
-
-    choosenDate = 'Inspection date: ' +
-        DateFormat('dd/MMM/yyyy').format(_lastInspection!);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit equipment'),
@@ -158,6 +99,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                     ),
                     // internal id
                     TextFormField(
+                      initialValue: _item.internalId,
                       key: const ValueKey('internalId'),
                       keyboardType: TextInputType.name,
                       textInputAction: TextInputAction.next,
@@ -172,8 +114,14 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         ),
                         filled: true,
                         fillColor: Theme.of(context).splashColor,
-                        hintText: 'Internal id',
+                        labelText: 'Internal id',
+                        labelStyle: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        // focusColor: Colors.green,
+                        // hoverColor: Colors.green,
                       ),
+                      // cursorColor: Theme.of(context).primaryColor,
                       validator: (val) {
                         if (val!.length < 4) {
                           return 'Min. 4 characters';
@@ -189,10 +137,14 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                     ),
                     // producer
                     TextFormField(
+                      initialValue: _item.producer,
                       key: const ValueKey('producer'),
                       keyboardType: TextInputType.name,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
+                        labelStyle: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                        ),
                         contentPadding: EdgeInsets.symmetric(
                           vertical: SizeConfig.blockSizeHorizontal * 1,
                           horizontal: SizeConfig.blockSizeHorizontal * 5,
@@ -203,7 +155,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         ),
                         filled: true,
                         fillColor: Theme.of(context).splashColor,
-                        hintText: 'Producer',
+                        labelText: 'Producer',
                       ),
                       validator: (val) {
                         if (val!.length < 3) {
@@ -220,10 +172,14 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                     ),
                     // model
                     TextFormField(
+                      initialValue: _item.model,
                       key: const ValueKey('model'),
                       keyboardType: TextInputType.name,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
+                        labelStyle: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                        ),
                         contentPadding: EdgeInsets.symmetric(
                           vertical: SizeConfig.blockSizeHorizontal * 1,
                           horizontal: SizeConfig.blockSizeHorizontal * 5,
@@ -234,7 +190,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         ),
                         filled: true,
                         fillColor: Theme.of(context).splashColor,
-                        hintText: 'Model',
+                        labelText: 'Model',
                       ),
                       validator: (val) {
                         if (val!.length < 3) {
@@ -251,10 +207,14 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                     ),
                     //catergory
                     TextFormField(
+                      initialValue: _item.category,
                       key: const ValueKey('category'),
                       keyboardType: TextInputType.name,
                       textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
+                        labelStyle: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                        ),
                         contentPadding: EdgeInsets.symmetric(
                           vertical: SizeConfig.blockSizeHorizontal * 1,
                           horizontal: SizeConfig.blockSizeHorizontal * 5,
@@ -265,7 +225,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         ),
                         filled: true,
                         fillColor: Theme.of(context).splashColor,
-                        hintText: 'Category - ex. power tools, machine',
+                        labelText: 'Category - ex. power tools, machine',
                       ),
                       validator: (val) {
                         if (val!.length < 2) {
@@ -284,10 +244,14 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                     TextFormField(
                       maxLines: null,
                       // expands: true,
+                      initialValue: _item.comments,
                       key: const ValueKey('comments'),
                       keyboardType: TextInputType.multiline,
                       // textInputAction: TextInputAction.next,
                       decoration: InputDecoration(
+                        labelStyle: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                        ),
                         contentPadding: EdgeInsets.symmetric(
                           vertical: SizeConfig.blockSizeHorizontal * 1,
                           horizontal: SizeConfig.blockSizeHorizontal * 5,
@@ -298,7 +262,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         ),
                         filled: true,
                         fillColor: Theme.of(context).splashColor,
-                        hintText: 'Comments',
+                        labelText: 'Comments',
                       ),
                       validator: (val) {
                         return null;
@@ -313,140 +277,15 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                   ],
                 ),
               ),
-              // last inspection - date picker
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      choosenDate,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: SizeConfig.blockSizeHorizontal * 4,
-                        color: Theme.of(context).textTheme.headline6!.color,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: SizeConfig.blockSizeHorizontal * 3),
-                  TextButton(
-                    onPressed: _presentDayPicker,
-                    child: Text(
-                      'Pick',
-                      style: TextStyle(
-                        fontSize: SizeConfig.blockSizeHorizontal * 4,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              // SizedBox(
-              //   height: SizeConfig.blockSizeVertical * 1,
-              // ),
 
-              // status
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    'Inspection status:',
-                    style: TextStyle(
-                      fontSize: SizeConfig.blockSizeHorizontal * 4,
-                      color: Theme.of(context).textTheme.headline6!.color,
-                    ),
-                  ),
-                  DropdownButton<String>(
-                    value: _statusString,
-                    icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                    iconSize: SizeConfig.blockSizeHorizontal * 4,
-                    alignment: Alignment.center,
-                    elevation: 16,
-                    style: TextStyle(
-                      color: _statusString == 'OK'
-                          ? Colors.green
-                          : _statusString == 'Needs attention'
-                              ? Colors.amber
-                              : Colors.red,
-                      fontSize: SizeConfig.blockSizeHorizontal * 4,
-                    ),
-                    underline: Container(height: 0),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _statusString = newValue!;
-                      });
-                    },
-                    dropdownColor:
-                        Theme.of(context).appBarTheme.backgroundColor,
-                    items: <String>[
-                      'OK',
-                      'Needs attention',
-                      'Failed',
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-              // SizedBox(
-              //   height: SizeConfig.blockSizeVertical * 3,
-              // ),
-
-              // inspection interval
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    'Inspections interval:',
-                    style: TextStyle(
-                      fontSize: SizeConfig.blockSizeHorizontal * 4,
-                      color: Theme.of(context).textTheme.headline6!.color,
-                    ),
-                  ),
-                  DropdownButton<String>(
-                    borderRadius: BorderRadius.circular(10),
-                    value: _inspectionInterval,
-                    icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                    iconSize: SizeConfig.blockSizeHorizontal * 4,
-                    alignment: Alignment.center,
-                    elevation: 16,
-                    style: TextStyle(
-                      color: Colors.green,
-                      fontSize: SizeConfig.blockSizeHorizontal * 4,
-                    ),
-                    underline: Container(height: 0),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        _inspectionInterval = newValue!;
-                      });
-                    },
-                    dropdownColor:
-                        Theme.of(context).appBarTheme.backgroundColor,
-                    items: <String>[
-                      '2 years',
-                      '1 year',
-                      '6 months',
-                      '3 months',
-                      '1 month',
-                      '2 weeks',
-                      '1 week',
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
               SizedBox(
-                height: SizeConfig.blockSizeVertical * 0.5,
+                height: SizeConfig.blockSizeVertical * 2,
               ),
               // save button
               ElevatedButton(
-                onPressed: _addNewEquipment,
+                onPressed: _editEquipment,
                 child: Text(
-                  'Add equipment',
+                  'Save changes',
                   style: TextStyle(
                     fontSize: SizeConfig.blockSizeHorizontal * 5.5,
                   ),

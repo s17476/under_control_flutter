@@ -78,8 +78,33 @@ class ItemProvider with ChangeNotifier {
     );
   }
 
+  // updateItemInDb
+  Future<void> updateItem(Item item) async {
+    await FirebaseFirestore.instance
+        .collection('companies')
+        .doc(user!.companyId)
+        .collection('items')
+        .doc(item.itemId)
+        .update({
+      'internalId': item.internalId,
+      'producer': item.producer,
+      'model': item.model,
+      'category': item.category.toUpperCase(),
+      'comments': item.comments,
+    }).then((_) {
+      var editedItem =
+          _items.indexWhere((element) => element.itemId == item.itemId);
+      _items.removeAt(editedItem);
+      _items.insert(editedItem, item);
+      notifyListeners();
+    }).catchError(
+      (e) => throw Exception('Connection error. Please try later...'),
+    );
+  }
+
   // fetch data from DB
   Future<void> fetchAndSetItems() async {
+    // print('fetch');
     List<Item> tmpItems = [];
     if (_showCategories) {
       await FirebaseFirestore.instance
@@ -136,18 +161,24 @@ class ItemProvider with ChangeNotifier {
         return _items;
       });
     }
+
     // check if inspection has expired
     List<String> updatedItems = [];
     for (Item item in _items) {
+      // print(item.nextInspection.isBefore(DateTime.now()) &&
+      //     (item.inspectionStatus == InspectionStatus.ok.index ||
+      //         item.inspectionStatus == InspectionStatus.needsAttention.index));
       if (item.nextInspection.isBefore(DateTime.now()) &&
           (item.inspectionStatus == InspectionStatus.ok.index ||
               item.inspectionStatus == InspectionStatus.needsAttention.index)) {
+        // print('expired');
         item.inspectionStatus = InspectionStatus.expired.index;
         updatedItems.add(item.itemId!);
         if (!_showCategories) {
           int index =
               _items.indexWhere((element) => element.itemId == item.itemId);
           Item expiredItem = _items[index];
+
           _items.removeAt(index);
           _items.insert(!_descending ? _items.length : 0, expiredItem);
         }
@@ -155,8 +186,9 @@ class ItemProvider with ChangeNotifier {
     }
     // update expired status
     if (updatedItems.isNotEmpty) {
-      _updateInspectionStatus(updatedItems, InspectionStatus.expired);
+      await _updateInspectionStatus(updatedItems, InspectionStatus.expired);
     }
+    // notifyListeners();
   }
 
   Future<void> _updateInspectionStatus(
@@ -179,21 +211,32 @@ class ItemProvider with ChangeNotifier {
     return batch.commit();
   }
 
+  //delete item from DB
   Future<void> deleteItem(BuildContext context, String? itemId) async {
-    await FirebaseFirestore.instance
+    WriteBatch batch = FirebaseFirestore.instance.batch();
+    final itemRef = FirebaseFirestore.instance
         .collection('companies')
         .doc(user!.companyId)
         .collection('items')
-        .doc(itemId)
-        .delete()
-        .then((_) {
+        .doc(itemId);
+
+    // delete items from subcollection
+    await itemRef.collection('inspections').get().then((querySnapshot) {
+      for (var element in querySnapshot.docs) {
+        batch.delete(element.reference);
+      }
+    });
+
+    batch.delete(itemRef);
+
+    await batch.commit().then((_) {
       _items.removeWhere((element) => element.itemId == itemId);
       notifyListeners();
       Navigator.of(context).pop(true);
     }).catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Failed to delete item!"),
+          content: Text("Failed to delete item"),
         ),
       );
       return error;

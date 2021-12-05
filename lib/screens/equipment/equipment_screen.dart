@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/screens/equipment/equipment_details_screen.dart';
+import 'package:under_control_flutter/widgets/status_icon.dart';
 
 class EquipmentScreen extends StatefulWidget {
   const EquipmentScreen({
@@ -45,18 +47,7 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
 
   @override
   void didChangeDependencies() {
-    ItemProvider itemProvider =
-        Provider.of<ItemProvider>(context, listen: false);
-    // if (itemProvider.items.isEmpty) {
-    setState(() {
-      _isLoading = true;
-    });
-    itemProvider.fetchAndSetItems().then((_) {
-      setState(() {
-        _isLoading = false;
-      });
-    });
-    // }
+    _refreshItems();
     super.didChangeDependencies();
   }
 
@@ -156,41 +147,14 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                                   style: Theme.of(context).textTheme.headline6,
                                 ),
                                 subtitle: Text(
-                                  'Last inspection: ${item.lastInspection.day}/${item.lastInspection.month}/${item.lastInspection.year}',
+                                  'Next inspection: ${DateFormat('dd/MMM/yyyy').format(item.nextInspection)}',
                                   style: const TextStyle(color: Colors.grey),
                                 ),
-                                trailing: item.inspectionStatus ==
-                                        InspectionStatus.ok.index
-                                    ? Icon(
-                                        Icons.check_circle_outline_rounded,
-                                        color: Colors.green,
-                                        size: SizeConfig.blockSizeVertical * 5,
-                                      )
-                                    : item.inspectionStatus ==
-                                            InspectionStatus.failed.index
-                                        ? Icon(
-                                            Icons.clear_rounded,
-                                            color: Colors.red,
-                                            size: SizeConfig.blockSizeVertical *
-                                                5,
-                                          )
-                                        : item.inspectionStatus ==
-                                                InspectionStatus
-                                                    .needsAttention.index
-                                            ? Icon(
-                                                Icons.warning_amber_rounded,
-                                                color: Colors.amber,
-                                                size: SizeConfig
-                                                        .blockSizeVertical *
-                                                    5,
-                                              )
-                                            : Icon(
-                                                Icons.alarm_outlined,
-                                                color: Colors.red,
-                                                size: SizeConfig
-                                                        .blockSizeVertical *
-                                                    5,
-                                              ),
+                                trailing: StatusIcon(
+                                  item: item,
+                                  size: 5,
+                                  textSize: 0,
+                                ),
                               ),
                             ),
                           ],
