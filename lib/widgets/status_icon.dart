@@ -5,18 +5,18 @@ import 'package:under_control_flutter/models/item.dart';
 class StatusIcon extends StatelessWidget {
   const StatusIcon(
       {Key? key,
-      required this.item,
+      required this.inspectionStatus,
       required this.size,
       required this.textSize})
       : super(key: key);
 
-  final Item item;
+  final int inspectionStatus;
   final int size;
   final int textSize;
 
   @override
   Widget build(BuildContext context) {
-    return item.inspectionStatus == InspectionStatus.ok.index
+    return inspectionStatus == InspectionStatus.ok.index
         ? Column(
             children: [
               Icon(
@@ -33,7 +33,7 @@ class StatusIcon extends StatelessWidget {
                 ),
             ],
           )
-        : item.inspectionStatus == InspectionStatus.failed.index
+        : inspectionStatus == InspectionStatus.failed.index
             ? Column(
                 children: [
                   Icon(
@@ -50,7 +50,7 @@ class StatusIcon extends StatelessWidget {
                     ),
                 ],
               )
-            : item.inspectionStatus == InspectionStatus.needsAttention.index
+            : inspectionStatus == InspectionStatus.needsAttention.index
                 ? Column(
                     children: [
                       Icon(

@@ -146,12 +146,28 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                                   '${item.producer}  ${item.model}',
                                   style: Theme.of(context).textTheme.headline6,
                                 ),
-                                subtitle: Text(
-                                  'Next inspection: ${DateFormat('dd/MMM/yyyy').format(item.nextInspection)}',
-                                  style: const TextStyle(color: Colors.grey),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Internal ID: ${item.internalId}',
+                                      style: TextStyle(
+                                        color: Theme.of(context).dividerColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Next inspection: ${DateFormat('dd/MMM/yyyy').format(item.nextInspection)}',
+                                      style: TextStyle(
+                                        color: item.inspectionStatus ==
+                                                InspectionStatus.expired.index
+                                            ? Theme.of(context).errorColor
+                                            : Theme.of(context).dividerColor,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 trailing: StatusIcon(
-                                  item: item,
+                                  inspectionStatus: item.inspectionStatus,
                                   size: 5,
                                   textSize: 0,
                                 ),

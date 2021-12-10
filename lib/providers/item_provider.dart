@@ -1,7 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/item.dart';
@@ -10,12 +7,39 @@ class ItemProvider with ChangeNotifier {
   List<Item> _items = [];
   bool _showCategories = true;
   bool _descending = false;
+  Map<InspectionStatus, int> _inspectionsStatus = {};
 
   AppUser? user;
 
   ItemProvider();
 
   ItemProvider.user({this.user});
+
+  Map<InspectionStatus, int> get inspectionsStatus {
+    print(' keys:  ${_inspectionsStatus.keys}');
+    return _inspectionsStatus;
+  }
+
+  Future<void> fetchInspectionsStatus() async {
+    Map<InspectionStatus, int> statusMap = {};
+    for (var i = 0; i < InspectionStatus.values.length; i++) {
+      await FirebaseFirestore.instance
+          .collection('companies')
+          .doc(user!.companyId)
+          .collection('items')
+          .where("inspectionStatus",
+              isEqualTo: InspectionStatus.values[i].index)
+          .get()
+          .then((QuerySnapshot querySnapshot) => statusMap.putIfAbsent(
+              InspectionStatus.values[i], () => querySnapshot.size))
+          .catchError(
+            (e) => throw Exception('Connection error. Please try later...'),
+          );
+    }
+    print(statusMap);
+    _inspectionsStatus = statusMap;
+    notifyListeners();
+  }
 
   bool get showCategories => _showCategories;
 
@@ -104,7 +128,7 @@ class ItemProvider with ChangeNotifier {
 
   // fetch data from DB
   Future<void> fetchAndSetItems() async {
-    // print('fetch');
+    print('fetch');
     List<Item> tmpItems = [];
     if (_showCategories) {
       await FirebaseFirestore.instance

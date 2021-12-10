@@ -62,10 +62,11 @@ class _AppState extends State<App> {
       scaffoldBackgroundColor: Colors.white12,
       primaryColor: Colors.green,
       backgroundColor: Colors.grey,
-      cardColor: Colors.black87,
+      cardColor: Colors.black26,
       splashColor: Colors.white12,
       shadowColor: Colors.black87,
       hintColor: Colors.white54,
+      dividerColor: Colors.grey,
       bottomNavigationBarTheme:
           Theme.of(context).bottomNavigationBarTheme.copyWith(
                 backgroundColor: Colors.black,

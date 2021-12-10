@@ -81,6 +81,9 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
           fontSize: SizeConfig.blockSizeHorizontal * 4.5,
           color: Theme.of(context).primaryColor,
         );
+    final expiredTextStyle = textStyle.copyWith(
+      color: Theme.of(context).errorColor,
+    );
     final labelTextStyle = Theme.of(context)
         .textTheme
         .headline6!
@@ -142,73 +145,76 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: Text(
-                            'Internal ID:',
-                            style: labelTextStyle,
+                    SizedBox(
+                      width: SizeConfig.blockSizeHorizontal * 60,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              'Internal ID:',
+                              style: labelTextStyle,
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: Text(
-                            item.internalId,
-                            style: textStyle,
+                          Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              item.internalId,
+                              style: textStyle,
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: Text(
-                            'Producer:',
-                            style: labelTextStyle,
+                          Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              'Producer:',
+                              style: labelTextStyle,
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: Text(
-                            item.producer,
-                            style: textStyle,
+                          Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              item.producer,
+                              style: textStyle,
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: Text(
-                            'Model:',
-                            style: labelTextStyle,
+                          Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              'Model:',
+                              style: labelTextStyle,
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: Text(
-                            item.model,
-                            style: textStyle,
+                          Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              item.model,
+                              style: textStyle,
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: Text(
-                            'Category:',
-                            style: labelTextStyle,
+                          Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              'Category:',
+                              style: labelTextStyle,
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: Text(
-                            item.category,
-                            style: textStyle,
+                          Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              item.category,
+                              style: textStyle,
+                            ),
                           ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(3.0),
-                          child: Text(
-                            'Comments:',
-                            style: labelTextStyle,
+                          Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Text(
+                              'Comments:',
+                              style: labelTextStyle,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     Column(
                       children: [
@@ -253,13 +259,16 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                           child: Text(
                             DateFormat('dd/MMM/yyyy')
                                 .format(item.nextInspection),
-                            style: textStyle,
+                            style: item.inspectionStatus ==
+                                    InspectionStatus.expired.index
+                                ? expiredTextStyle
+                                : textStyle,
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: StatusIcon(
-                            item: item,
+                            inspectionStatus: item.inspectionStatus,
                             size:
                                 (SizeConfig.blockSizeHorizontal * 1.5).toInt(),
                             textSize:
