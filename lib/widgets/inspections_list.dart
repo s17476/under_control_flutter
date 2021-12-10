@@ -69,7 +69,7 @@ class _InspectionsListState extends State<InspectionsList> {
         ),
 
         AnimatedContainer(
-          duration: const Duration(milliseconds: 500),
+          duration: const Duration(milliseconds: 300),
           height: showInspections ? 100 : 0,
           color: Colors.white12,
           child: ListView(children: [
