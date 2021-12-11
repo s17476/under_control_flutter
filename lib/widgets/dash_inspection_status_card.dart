@@ -42,21 +42,9 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: EdgeInsets.only(
-            left: SizeConfig.blockSizeHorizontal * 5,
-            top: SizeConfig.blockSizeHorizontal * 3,
-            bottom: SizeConfig.blockSizeHorizontal,
-          ),
-          child: Text(
-            'Equipment status',
-            textAlign: TextAlign.start,
-            style: Theme.of(context).textTheme.headline6?.copyWith(
-                fontSize: SizeConfig.blockSizeHorizontal * 4,
-                color: Theme.of(context).primaryColor),
-          ),
-        ),
         Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           elevation: 10,
           margin: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 4),
           child: Container(
@@ -64,6 +52,14 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
             padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 2),
             child: Column(
               children: [
+                Text(
+                  'Equipment status',
+                  textAlign: TextAlign.start,
+                  style: Theme.of(context).textTheme.headline6?.copyWith(
+                      fontSize: SizeConfig.blockSizeHorizontal * 4,
+                      color: Theme.of(context).primaryColor),
+                ),
+                const Divider(),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
@@ -138,7 +134,6 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
                     ],
                   ),
                 ),
-                Divider(),
                 Text('hehe'),
               ],
             ),

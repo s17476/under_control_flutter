@@ -6,10 +6,12 @@ class DashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: const [
-        DashInspectionStatusCard(),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        children: const [
+          DashInspectionStatusCard(),
+        ],
+      ),
     );
   }
 }
