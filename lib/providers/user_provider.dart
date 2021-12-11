@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/company.dart';
-import 'package:under_control_flutter/screens/choose_company_screen.dart';
+import 'package:under_control_flutter/screens/start/choose_company_screen.dart';
 
 class UserProvider with ChangeNotifier {
   AppUser? _user;

@@ -138,6 +138,8 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
                     ],
                   ),
                 ),
+                Divider(),
+                Text('hehe'),
               ],
             ),
           ),

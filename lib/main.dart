@@ -9,15 +9,15 @@ import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
-import 'package:under_control_flutter/screens/add_company_screen.dart';
+import 'package:under_control_flutter/screens/start/add_company_screen.dart';
 import 'package:under_control_flutter/screens/equipment/add_equipment_screen.dart';
-import 'package:under_control_flutter/screens/auth_screen.dart';
-import 'package:under_control_flutter/screens/choose_company_screen.dart';
+import 'package:under_control_flutter/screens/start/auth_screen.dart';
+import 'package:under_control_flutter/screens/start/choose_company_screen.dart';
 import 'package:under_control_flutter/screens/equipment/edit_equipment_screen.dart';
 import 'package:under_control_flutter/screens/equipment/equipment_details_screen.dart';
-import 'package:under_control_flutter/screens/initialize_went_wrong_screen.dart';
+import 'package:under_control_flutter/screens/start/initialize_went_wrong_screen.dart';
 import 'package:under_control_flutter/screens/main_screen.dart';
-import 'package:under_control_flutter/widgets/loading_widget.dart';
+import 'package:under_control_flutter/screens/start/loading_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -152,15 +152,17 @@ class _AppState extends State<App> {
                         });
                       }
                     }
-                  } else if (!userSnapshot.hasData) {
+                  } else if (!userSnapshot.hasData &&
+                      userSnapshot.connectionState != ConnectionState.waiting) {
+                    // print('auth        ' + userSnapshot.connectionState.name);
                     return const AuthScreen();
                   }
-                  return const LoadingWidget();
+                  return const LoadingScreen();
                 },
               );
             }
             //waiting for Firebase initialization
-            return const LoadingWidget();
+            return const LoadingScreen();
           },
         ),
         routes: {

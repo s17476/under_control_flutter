@@ -146,7 +146,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                      width: SizeConfig.blockSizeHorizontal * 60,
+                      width: SizeConfig.blockSizeHorizontal * 50,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
