@@ -93,12 +93,11 @@ class _AppState extends State<App> {
         ChangeNotifierProvider(create: (ctx) => CompanyProvider()),
         ChangeNotifierProxyProvider<UserProvider, ItemProvider>(
           create: (ctx) => ItemProvider(),
-          update: (ctx, user, item) => ItemProvider.user(user: user.user),
+          update: (ctx, user, item) => item!..update(user.user),
         ),
         ChangeNotifierProxyProvider<UserProvider, InspectionProvider>(
           create: (ctx) => InspectionProvider(),
-          update: (ctx, user, inspection) =>
-              InspectionProvider.user(user: user.user),
+          update: (ctx, user, inspection) => inspection!..updateUser(user.user),
         ),
       ],
       child: MaterialApp(

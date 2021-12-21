@@ -3,11 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
+import 'package:under_control_flutter/providers/inspection_provider.dart';
+import 'package:under_control_flutter/providers/item_provider.dart';
+import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/widgets/logo_widget.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({Key? key}) : super(key: key);
+
+  // logout function calls clear on all providers to reset all data
+  // it results from optimization in terms of
+  // the number of connections to the database
+  void logout(BuildContext context, UserProvider userProvider) {
+    Provider.of<CompanyProvider>(context, listen: false).clear();
+    Provider.of<InspectionProvider>(context, listen: false).clear();
+    Provider.of<ItemProvider>(context, listen: false).clear();
+    userProvider.signout();
+    // Provider.of<TaskProvider>(context, listen: false).clear;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +114,9 @@ class MainDrawer extends StatelessWidget {
                         vertical: SizeConfig.blockSizeHorizontal * 2,
                       ),
                       child: TextButton.icon(
-                        onPressed: userProvider.signout,
+                        onPressed: () {
+                          logout(context, userProvider);
+                        },
                         icon: Icon(
                           Icons.logout,
                           color: Theme.of(context).textTheme.headline1!.color,

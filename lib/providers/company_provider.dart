@@ -14,6 +14,10 @@ class CompanyProvider with ChangeNotifier {
         city: _company!.city,
       );
 
+  void clear() {
+    _company = null;
+  }
+
   Future<QuerySnapshot> getAllCompanies() {
     return FirebaseFirestore.instance
         .collection('companies')

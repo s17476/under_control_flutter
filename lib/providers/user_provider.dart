@@ -204,10 +204,11 @@ class UserProvider with ChangeNotifier {
   }
 
   void signout() {
+    FirebaseAuth.instance.signOut();
+    _user = null;
     _isLoading = false;
     _hasData = false;
     notifyListeners();
-    FirebaseAuth.instance.signOut();
   }
 
   Stream<User?> authStateChanges() {

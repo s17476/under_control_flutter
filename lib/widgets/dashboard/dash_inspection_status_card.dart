@@ -4,7 +4,7 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
-import 'package:under_control_flutter/widgets/dash_inspection_status_item.dart';
+import 'package:under_control_flutter/widgets/dashboard/dash_inspection_status_item.dart';
 import 'package:under_control_flutter/widgets/status_icon.dart';
 
 class DashInspectionStatusCard extends StatefulWidget {
@@ -18,15 +18,14 @@ class DashInspectionStatusCard extends StatefulWidget {
 class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
   @override
   void initState() {
-    Provider.of<ItemProvider>(context, listen: false).fetchInspectionsStatus();
+    initProviders();
     super.initState();
   }
 
-  // @override
-  // void didChangeDependencies() {
-  //   Provider.of<ItemProvider>(context, listen: false).fetchInspectionsStatus();
-  //   super.didChangeDependencies();
-  // }
+  Future<void> initProviders() async {
+    await Provider.of<ItemProvider>(context, listen: false)
+        .fetchInspectionsStatus();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -134,12 +133,42 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
                     ],
                   ),
                 ),
-                Text('hehe'),
+                Container(
+                  padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 3),
+                  alignment: Alignment.centerRight,
+                  child: makeComment(inspectionsStatus),
+                ),
               ],
             ),
           ),
         ),
       ],
+    );
+  }
+
+  Text makeComment(Map<InspectionStatus, int> inspectionsStatus) {
+    String comment;
+    Color commentColor;
+    if (inspectionsStatus[InspectionStatus.expired] != null) {
+      comment = "Some inspections are out of date.";
+      commentColor = Colors.red;
+    } else if (inspectionsStatus[InspectionStatus.failed] != null) {
+      comment = "Some inspections failed.";
+      commentColor = Colors.red;
+    } else if (inspectionsStatus[InspectionStatus.needsAttention] != null) {
+      comment = "Some inspections are out of date.";
+      commentColor = Colors.amber;
+    } else {
+      comment = "All inspections are OK. Well done.";
+      commentColor = Colors.green;
+    }
+
+    return Text(
+      comment,
+      style: Theme.of(context).textTheme.headline6?.copyWith(
+            fontSize: SizeConfig.blockSizeHorizontal * 4,
+            color: commentColor,
+          ),
     );
   }
 }

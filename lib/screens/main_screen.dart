@@ -71,28 +71,25 @@ class _MainScreenState extends State<MainScreen> {
         controller: _scrollController,
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return [
+            // app bar
             SliverAppBar(
               title: Text(
                 BottomNaviBar.tabs[_selectedPageIndex]['title'] as String,
               ),
               actions: [
-                if (_selectedPageIndex != 1)
+                // chat icon in dashboard screen
+                if (_selectedPageIndex == 2)
                   IconButton(onPressed: () {}, icon: const Icon(Icons.chat)),
+                // show by category icon in assets screen
                 if (_selectedPageIndex == 1)
                   IconButton(
                     onPressed: () {
                       final itemProvider =
                           Provider.of<ItemProvider>(context, listen: false);
-                      // if (itemProvider.showCategories) {
                       itemProvider
                         ..setShowCategories = false
                         ..toggleDescendning()
                         ..fetchAndSetItems();
-                      // }
-
-                      // setState(() {
-                      //   _selectedPageIndex = 1;
-                      // });
                     },
                     icon: const Icon(Icons.checklist_rtl),
                   ),
@@ -102,13 +99,15 @@ class _MainScreenState extends State<MainScreen> {
                           ? 4
                           : 1,
                 ),
-                if (_selectedPageIndex != 1)
+                // avatar in dashboard screen
+                if (_selectedPageIndex == 2)
                   CircleAvatar(
                     backgroundColor:
                         Theme.of(context).appBarTheme.backgroundColor,
                     backgroundImage: NetworkImage(userProvider.user!.userImage),
                     maxRadius: SizeConfig.blockSizeHorizontal * 4,
                   ),
+                // show by status button in assets screen
                 if (_selectedPageIndex == 1)
                   IconButton(
                     onPressed: () {
@@ -130,22 +129,28 @@ class _MainScreenState extends State<MainScreen> {
                           : 1,
                 ),
 
-                // show add button for task and equipment screen
-                if (_selectedPageIndex == 1)
+                // show add button in tasks and assets screen
+                if (_selectedPageIndex == 1 || _selectedPageIndex == 0)
                   IconButton(
-                    onPressed: () {
-                      Navigator.of(context)
-                          .push(_createRute(() => const AddEquipmentScreen()))
-                          .then((value) {
-                        if (value != null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Item successcul added'),
-                            ),
-                          );
-                        }
-                      });
-                    },
+                    onPressed:
+                        // in assets screen
+                        _selectedPageIndex == 1
+                            ? () {
+                                Navigator.of(context)
+                                    .push(_createRute(
+                                        () => const AddEquipmentScreen()))
+                                    .then((value) {
+                                  if (value != null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Item successcul added'),
+                                      ),
+                                    );
+                                  }
+                                });
+                              }
+                            // in tasks screen
+                            : null,
                     icon: Icon(
                       Icons.add,
                       size: SizeConfig.blockSizeVertical * 5,

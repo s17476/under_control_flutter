@@ -28,12 +28,16 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
   String _category = '';
   String _comments = '';
 
+  // add new asset
   Future<Item?> _addNewEquipment() async {
     if (_formKey.currentState != null) {
+      // validate user input
       final isValid = _formKey.currentState!.validate();
       FocusScope.of(context).unfocus();
 
+      // if user is valid
       if (isValid) {
+        // set inspection status
         int statusValue;
         if (_statusString == 'OK') {
           statusValue = InspectionStatus.ok.index;
@@ -44,6 +48,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
         }
         _formKey.currentState!.save();
 
+        // set inspections interval
         List<String> duration = _inspectionInterval.split(' ');
         if (duration[1] == 'week' || duration[1] == 'weeks') {
           _nextInspection = DateTime(
@@ -61,6 +66,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
               _lastInspection!.month, _lastInspection!.day);
         }
 
+        // create new asset
         Item item = Item(
           internalId: _internalId,
           producer: _producer,

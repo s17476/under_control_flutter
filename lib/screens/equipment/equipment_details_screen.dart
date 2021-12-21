@@ -137,8 +137,22 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
         children: [
           Container(
             padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 4),
-            color: Theme.of(context).popupMenuTheme.color,
             width: double.infinity,
+            decoration: BoxDecoration(
+              color: Theme.of(context).appBarTheme.backgroundColor,
+              // color: Colors.black,
+              borderRadius: const BorderRadius.only(
+                bottomRight: Radius.circular(30.0),
+                bottomLeft: Radius.circular(30.0),
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.grey,
+                  offset: Offset(0.0, 1.0),
+                  blurRadius: 6.0,
+                ),
+              ],
+            ),
             child: Column(
               children: [
                 Row(
@@ -294,6 +308,74 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                   ),
                 ),
               ],
+            ),
+          ),
+          // add new inspection button
+          Container(
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.only(
+              top: SizeConfig.blockSizeHorizontal * 5,
+              left: SizeConfig.blockSizeHorizontal * 4,
+            ),
+            child: TextButton.icon(
+              label: Text(
+                "Add new inspection",
+                style:
+                    TextStyle(fontSize: SizeConfig.blockSizeHorizontal * 4.5),
+              ),
+              onPressed: () {
+                print("add new inspection");
+              },
+              icon: Container(
+                // width: SizeConfig.blockSizeHorizontal * 14.5,
+                alignment: Alignment.topRight,
+                child: Stack(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: SizeConfig.blockSizeHorizontal * 4),
+                      child: Icon(
+                        Icons.add,
+                        size: SizeConfig.blockSizeHorizontal * 4.5,
+                      ),
+                    ),
+                    Icon(
+                      Icons.search,
+                      size: SizeConfig.blockSizeHorizontal * 7,
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // add new task
+          Container(
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.only(
+              top: SizeConfig.blockSizeHorizontal,
+              left: SizeConfig.blockSizeHorizontal * 4,
+            ),
+            child: TextButton.icon(
+              label: Text(
+                "Add new task",
+                style:
+                    TextStyle(fontSize: SizeConfig.blockSizeHorizontal * 4.5),
+              ),
+              onPressed: () {
+                print("add new task");
+              },
+              icon: Container(
+                padding: EdgeInsets.only(
+                  left: SizeConfig.blockSizeHorizontal * 1,
+                  right: SizeConfig.blockSizeHorizontal * 1.5,
+                ),
+                // width: SizeConfig.blockSizeHorizontal * 14.5,
+                alignment: Alignment.topRight,
+                child: Icon(
+                  Icons.add_task,
+                  size: SizeConfig.blockSizeHorizontal * 6,
+                ),
+              ),
             ),
           ),
           InspectionsList(context: context, item: item),

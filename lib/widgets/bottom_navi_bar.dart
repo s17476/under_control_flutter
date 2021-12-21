@@ -4,7 +4,7 @@ import 'package:under_control_flutter/screens/calendar_screen.dart';
 import 'package:under_control_flutter/screens/dash_screen.dart';
 import 'package:under_control_flutter/screens/equipment/equipment_screen.dart';
 import 'package:under_control_flutter/screens/overview_screen.dart';
-import 'package:under_control_flutter/screens/tasks_screen.dart';
+import 'package:under_control_flutter/screens/tasks/tasks_screen.dart';
 
 class BottomNaviBar extends StatelessWidget {
   const BottomNaviBar(

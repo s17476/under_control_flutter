@@ -7,18 +7,28 @@ import 'package:under_control_flutter/models/item.dart';
 
 class InspectionProvider with ChangeNotifier {
   InspectionProvider();
-  InspectionProvider.user({this.user});
+
+  // InspectionProvider.user({this.user});
 
   List<Inspection> _inspections = [];
-  AppUser? user;
+  AppUser? _user;
 
   List<Inspection> get inspections => _inspections;
+
+  void clear() {
+    _user = null;
+    _inspections = [];
+  }
+
+  void updateUser(AppUser? user) {
+    this._user = user;
+  }
 
   Future<void> fetchByItem(Item item) async {
     List<Inspection> tmpInspections = [];
     await FirebaseFirestore.instance
         .collection('companies')
-        .doc(user!.companyId)
+        .doc(_user!.companyId)
         .collection('items')
         .doc(item.itemId)
         .collection('inspections')
