@@ -103,7 +103,7 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Failed inspection',
+                        'Inspection failed',
                         style: cardTextStyle,
                       ),
                       DashInspectionStatusItem(
@@ -158,9 +158,12 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
     } else if (inspectionsStatus[InspectionStatus.needsAttention] != null) {
       comment = "Some inspections are out of date.";
       commentColor = Colors.amber;
-    } else {
+    } else if (inspectionsStatus[InspectionStatus.ok] != null) {
       comment = "All inspections are OK. Well done.";
       commentColor = Colors.green;
+    } else {
+      comment = "No assets found.";
+      commentColor = Colors.grey;
     }
 
     return Text(

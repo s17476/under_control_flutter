@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:under_control_flutter/widgets/dashboard/dash_inspection_status_card.dart';
+import 'package:under_control_flutter/widgets/dashboard/dash_task_status_card.dart';
 
 class DashScreen extends StatelessWidget {
   const DashScreen({Key? key}) : super(key: key);
@@ -10,6 +11,7 @@ class DashScreen extends StatelessWidget {
       child: Column(
         children: const [
           DashInspectionStatusCard(),
+          DashTaskStatusCard(),
         ],
       ),
     );

@@ -10,6 +10,8 @@ class TaskProvider with ChangeNotifier {
 
   Map<String, List<Task>> _tasks = {};
 
+  List<Task> _upcomingTasks = [];
+
   TaskExecutor calendarExecutor = TaskExecutor.company;
 
   TaskProvider();
@@ -27,9 +29,31 @@ class TaskProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  List<Task> get upcomingTasks => _upcomingTasks;
+
   TaskExecutor get executor => calendarExecutor;
 
   Map<String, List<Task>> get getAllTasks => _tasks;
+
+  Future<List<Task>> fetchAndGetUpcomingTasks() async {
+    var keys = _tasks.keys.toList();
+    DateFormat format = DateFormat("dd/MM/yyyy");
+    var dates = keys.map((e) => format.parse(e)).toList();
+    dates = dates..sort((a, b) => a.compareTo(b));
+    var formatedKeys =
+        dates.map((e) => DateFormat('dd/MM/yyyy').format(e)).toList();
+    int count = 0;
+    List<Task> result = [];
+    for (var i = 0; i < formatedKeys.length && count < 5; i++) {
+      for (var j = 0; j < _tasks[formatedKeys[i]]!.length && count < 5; j++) {
+        result.add(_tasks[formatedKeys[i]]![j]);
+        count++;
+      }
+    }
+    _upcomingTasks = result;
+
+    return _upcomingTasks;
+  }
 
   Future<void> fetchAndSetTasks() async {
     Map<String, List<Task>> tmpTasks = {};
@@ -41,7 +65,7 @@ class TaskProvider with ChangeNotifier {
         .then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         final date = DateTime.parse(doc['date']);
-        final stringDate = DateFormat('dd/MMM/yyyy').format(date);
+        final stringDate = DateFormat('dd/MM/yyyy').format(date);
         final reminderDate = doc['reminderDate'] != null
             ? DateTime.parse(doc['reminderDate'])
             : null;
@@ -52,6 +76,8 @@ class TaskProvider with ChangeNotifier {
           date: date,
           reminderDate: reminderDate,
           executor: TaskExecutor.values[doc['executor']],
+          executorId: doc['executorId'],
+          userId: doc['userId'],
           itemId: doc['itemId'],
           description: doc['description'],
           comments: doc['comments'],
@@ -66,6 +92,8 @@ class TaskProvider with ChangeNotifier {
         }
       }
       _tasks = tmpTasks;
+      print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+      print(tmpTasks.length);
       notifyListeners();
     });
   }
@@ -83,6 +111,8 @@ class TaskProvider with ChangeNotifier {
       'date': task.date.toIso8601String(),
       'reminderDate': task.reminderDate?.toIso8601String(),
       'executor': task.executor.index,
+      'executorId': task.executorId,
+      'userId': task.userId,
       'itemId': task.itemId,
       'description': task.description,
       'comments': task.comments,
@@ -95,6 +125,8 @@ class TaskProvider with ChangeNotifier {
         date: task.date,
         reminderDate: task.reminderDate,
         executor: task.executor,
+        executorId: task.executorId,
+        userId: task.userId,
         itemId: task.itemId,
         description: task.description,
         comments: task.comments,
@@ -102,7 +134,7 @@ class TaskProvider with ChangeNotifier {
         type: task.type,
         images: task.images,
       );
-      final date = DateFormat('dd/MMM/yyyy').format(tmpTask.date);
+      final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
       if (_tasks.containsKey(date)) {
         _tasks[date]!.add(tmpTask);
       } else {

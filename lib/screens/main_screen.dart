@@ -28,7 +28,7 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedPageIndex = 2;
 
   String dropdownValue = "Company";
-  List<String> dropdownItems = ['Company', 'User', 'All'];
+  List<String> dropdownItems = ['Company', 'Mine', 'All'];
 
   @override
   initState() {
@@ -158,19 +158,22 @@ class _MainScreenState extends State<MainScreen> {
                                 });
                               }
                             // in tasks screen
-                            //TODO
+                            //TODO uuuuuuuuuuuuuuuuussssssssssseeeeeeeeeeeerrrrrrrrrrr
                             : () {
                                 Provider.of<TaskProvider>(context,
                                         listen: false)
                                     .addTask(
                                   Task(
-                                    title: "title reair",
+                                    title: 'title reaireee',
                                     date: DateTime.now(),
-                                    description: "description",
-                                    comments: "comments",
-                                    executor: TaskExecutor.user,
+                                    description:
+                                        'descriptionfdsg sdg dsg  sdfg dsfg dgfsdsg dsgfh hggfd hdgf h fdh fg hfdg h fdg h gdfhdfhdfh dfh dfh ',
+                                    comments: 'comments',
+                                    executor: TaskExecutor.company,
+                                    userId: userProvider.user!.userId,
                                     status: TaskStatus.planned,
                                     type: TaskType.reparation,
+                                    itemId: '8ltQaK3lxRfBmBL3vUba',
                                   ),
                                 );
                               },
@@ -184,7 +187,7 @@ class _MainScreenState extends State<MainScreen> {
                   width: SizeConfig.blockSizeHorizontal * 4,
                 ),
                 // show in calendar
-                if (_selectedPageIndex == 3)
+                if (_selectedPageIndex == 3 || _selectedPageIndex == 0)
                   Padding(
                     padding: EdgeInsets.only(
                       top: SizeConfig.safeBlockHorizontal * 1.5,

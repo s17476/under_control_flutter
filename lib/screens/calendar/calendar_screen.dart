@@ -2,10 +2,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter/material.dart';
-import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
-import 'package:under_control_flutter/widgets/calendar/calendar_event_list.dart';
+import 'package:under_control_flutter/widgets/calendar_event_list/calendar_events_list.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({Key? key}) : super(key: key);
@@ -39,7 +38,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   List<Task> _getEventsForDay(DateTime day) {
-    final date = DateFormat('dd/MMM/yyyy').format(day);
+    final date = DateFormat('dd/MM/yyyy').format(day);
 
     List<Task> shownEvents;
     if (_eventList[date] != null) {
@@ -47,7 +46,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
         shownEvents = _eventList[date]!.where((event) {
           return event.executor == executor;
         }).toList();
-        print(shownEvents.length);
+        print('to show ${shownEvents.length}');
       } else {
         shownEvents = _eventList[date]!;
       }
@@ -78,9 +77,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("build .....................................");
     TaskProvider taskProvider = Provider.of<TaskProvider>(context);
     _eventList = taskProvider.getAllTasks;
+    print(
+        "build ..................................... ${_eventList.keys}, $_selectedDay");
     executor = Provider.of<TaskProvider>(context).executor;
     _selectedEvents.value = _getEventsForDay(_selectedDay!);
     return Column(

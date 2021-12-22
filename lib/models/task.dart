@@ -12,6 +12,8 @@ class Task {
   DateTime date;
   DateTime? reminderDate;
   TaskExecutor executor;
+  String? executorId;
+  String userId;
   String? itemId;
   String description;
   String comments;
@@ -25,6 +27,8 @@ class Task {
     required this.date,
     this.reminderDate,
     required this.executor,
+    this.executorId,
+    required this.userId,
     this.itemId,
     required this.description,
     required this.comments,
