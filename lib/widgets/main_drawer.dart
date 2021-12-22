@@ -19,8 +19,8 @@ class MainDrawer extends StatelessWidget {
     Provider.of<CompanyProvider>(context, listen: false).clear();
     Provider.of<InspectionProvider>(context, listen: false).clear();
     Provider.of<ItemProvider>(context, listen: false).clear();
+    Provider.of<TaskProvider>(context, listen: false).clear;
     userProvider.signout();
-    // Provider.of<TaskProvider>(context, listen: false).clear;
   }
 
   @override

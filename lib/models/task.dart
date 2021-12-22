@@ -1,15 +1,22 @@
 import 'dart:io';
 
+enum TaskStatus { planned, started, completed }
+
+enum TaskType { event, inspection, reparation, maintenance }
+
+enum TaskExecutor { company, user, all }
+
 class Task {
   String? taskId;
   String title;
   DateTime date;
   DateTime? reminderDate;
-  String? executor;
+  TaskExecutor executor;
   String? itemId;
   String description;
   String comments;
-  int status;
+  TaskStatus status;
+  TaskType type;
   List<File>? images;
 
   Task({
@@ -17,11 +24,12 @@ class Task {
     required this.title,
     required this.date,
     this.reminderDate,
-    this.executor,
+    required this.executor,
     this.itemId,
     required this.description,
     required this.comments,
     required this.status,
+    required this.type,
     this.images,
   });
 

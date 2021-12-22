@@ -3,8 +3,10 @@ import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
+import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
+import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/equipment/add_equipment_screen.dart';
 import 'package:under_control_flutter/widgets/bottom_navi_bar.dart';
@@ -25,9 +27,15 @@ class _MainScreenState extends State<MainScreen> {
 
   int _selectedPageIndex = 2;
 
+  String dropdownValue = "Company";
+  List<String> dropdownItems = ['Company', 'User', 'All'];
+
   @override
   initState() {
     super.initState();
+
+    // initialize providers
+    Provider.of<TaskProvider>(context, listen: false).fetchAndSetTasks();
 
     //hide and show bottom navigation bar while scrolling
     _isBottomNavBarVisible = true;
@@ -150,7 +158,22 @@ class _MainScreenState extends State<MainScreen> {
                                 });
                               }
                             // in tasks screen
-                            : null,
+                            //TODO
+                            : () {
+                                Provider.of<TaskProvider>(context,
+                                        listen: false)
+                                    .addTask(
+                                  Task(
+                                    title: "title reair",
+                                    date: DateTime.now(),
+                                    description: "description",
+                                    comments: "comments",
+                                    executor: TaskExecutor.user,
+                                    status: TaskStatus.planned,
+                                    type: TaskType.reparation,
+                                  ),
+                                );
+                              },
                     icon: Icon(
                       Icons.add,
                       size: SizeConfig.blockSizeVertical * 5,
@@ -160,6 +183,48 @@ class _MainScreenState extends State<MainScreen> {
                 SizedBox(
                   width: SizeConfig.blockSizeHorizontal * 4,
                 ),
+                // show in calendar
+                if (_selectedPageIndex == 3)
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: SizeConfig.safeBlockHorizontal * 1.5,
+                      right: SizeConfig.blockSizeHorizontal * 3,
+                    ),
+                    child: DropdownButton<String>(
+                      alignment: AlignmentDirectional.center,
+                      underline: Container(),
+                      icon: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: Theme.of(context).primaryIconTheme.color,
+                      ),
+                      value: dropdownValue,
+                      // style: TextStyle(color: Colors.white),
+                      items: dropdownItems.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Center(
+                            child: Text(
+                              value,
+                              // textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          dropdownValue = newValue!;
+                        });
+                        Provider.of<TaskProvider>(context, listen: false)
+                                .executor =
+                            TaskExecutor
+                                .values[dropdownItems.indexOf(dropdownValue)];
+                      },
+                      dropdownColor: Colors.black,
+                    ),
+                  )
               ],
               pinned: false,
               floating: true,

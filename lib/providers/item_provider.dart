@@ -26,7 +26,7 @@ class ItemProvider with ChangeNotifier {
     _inspectionsStatus = {};
   }
 
-  void update(AppUser? user) {
+  void updateUser(AppUser? user) {
     _user = user;
   }
 

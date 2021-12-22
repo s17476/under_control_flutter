@@ -1,7 +1,11 @@
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter/material.dart';
+import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/task.dart';
+import 'package:under_control_flutter/providers/task_provider.dart';
+import 'package:under_control_flutter/widgets/calendar/calendar_event_list.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({Key? key}) : super(key: key);
@@ -14,13 +18,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  var executor = TaskExecutor.company;
+
+  Map<String, List<Task>> _eventList = {};
 
   late final ValueNotifier<List<Task>> _selectedEvents;
 
   @override
   void initState() {
     super.initState();
-
+    _eventList = Provider.of<TaskProvider>(context, listen: false).getAllTasks;
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
   }
@@ -31,19 +38,25 @@ class _CalendarScreenState extends State<CalendarScreen> {
     super.dispose();
   }
 
-////////////////////////////////////////////////fix
   List<Task> _getEventsForDay(DateTime day) {
-    // Implementation example
-    return [
-      Task(
-        title: "tytuł",
-        date: DateTime.now(),
-        description: "opis",
-        comments: "komentarz",
-        status: 0,
-      )
-    ];
-    //  ?? [];
+    final date = DateFormat('dd/MMM/yyyy').format(day);
+
+    List<Task> shownEvents;
+    if (_eventList[date] != null) {
+      if (executor != TaskExecutor.all) {
+        shownEvents = _eventList[date]!.where((event) {
+          return event.executor == executor;
+        }).toList();
+        print(shownEvents.length);
+      } else {
+        shownEvents = _eventList[date]!;
+      }
+    } else {
+      shownEvents = [];
+    }
+
+    // print("getevents $date, ${_eventList[date]}");
+    return shownEvents..sort((a, b) => a.type.index.compareTo(b.type.index));
   }
 
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
@@ -52,18 +65,32 @@ class _CalendarScreenState extends State<CalendarScreen> {
         _selectedDay = selectedDay;
         _focusedDay = focusedDay;
       });
+    }
+  }
 
-      _selectedEvents.value = _getEventsForDay(selectedDay);
+  void _onFormatChanged(format) {
+    if (_calendarFormat != format) {
+      setState(() {
+        _calendarFormat = format;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    print("build .....................................");
+    TaskProvider taskProvider = Provider.of<TaskProvider>(context);
+    _eventList = taskProvider.getAllTasks;
+    executor = Provider.of<TaskProvider>(context).executor;
+    _selectedEvents.value = _getEventsForDay(_selectedDay!);
     return Column(
       children: [
         TableCalendar(
           firstDay: DateTime.utc(2010, 10, 16),
           lastDay: DateTime.utc(2030, 3, 14),
+          eventLoader: (day) {
+            return _getEventsForDay(day);
+          },
           focusedDay: _focusedDay,
           calendarFormat: _calendarFormat,
           headerStyle: HeaderStyle(
@@ -81,23 +108,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
           selectedDayPredicate: (day) {
             return isSameDay(_selectedDay, day);
           },
-          onDaySelected: (selectedDay, focusedDay) {
-            if (!isSameDay(_selectedDay, selectedDay)) {
-              setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-              });
-              print("selected $selectedDay");
-              print("focused $focusedDay");
-            }
-          },
-          onFormatChanged: (format) {
-            if (_calendarFormat != format) {
-              setState(() {
-                _calendarFormat = format;
-              });
-            }
-          },
+          onDaySelected: _onDaySelected,
+          onFormatChanged: _onFormatChanged,
           onPageChanged: (focusedDay) {
             _focusedDay = focusedDay;
           },
@@ -144,9 +156,35 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 style: TextStyle(color: Theme.of(context).splashColor),
               ));
             },
+            markerBuilder: (context, day, events) {
+              return events.isNotEmpty
+                  ? Positioned(
+                      right: 3,
+                      top: 3,
+                      child: Container(
+                        padding: const EdgeInsets.all(2.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: Theme.of(context).appBarTheme.backgroundColor,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          events.length.toString(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    )
+                  : null;
+            },
           ),
         ),
-        Text(_focusedDay.toString())
+        CalendarEventsList(selectedEvents: _selectedEvents),
       ],
     );
   }

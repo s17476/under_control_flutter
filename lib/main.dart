@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
+import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/start/add_company_screen.dart';
 import 'package:under_control_flutter/screens/equipment/add_equipment_screen.dart';
@@ -93,11 +94,15 @@ class _AppState extends State<App> {
         ChangeNotifierProvider(create: (ctx) => CompanyProvider()),
         ChangeNotifierProxyProvider<UserProvider, ItemProvider>(
           create: (ctx) => ItemProvider(),
-          update: (ctx, user, item) => item!..update(user.user),
+          update: (ctx, user, item) => item!..updateUser(user.user),
         ),
         ChangeNotifierProxyProvider<UserProvider, InspectionProvider>(
           create: (ctx) => InspectionProvider(),
           update: (ctx, user, inspection) => inspection!..updateUser(user.user),
+        ),
+        ChangeNotifierProxyProvider<UserProvider, TaskProvider>(
+          create: (ctx) => TaskProvider(),
+          update: (ctx, user, task) => task!..updateUser(user.user),
         ),
       ],
       child: MaterialApp(
