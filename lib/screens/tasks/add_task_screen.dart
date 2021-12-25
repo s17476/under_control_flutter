@@ -188,7 +188,8 @@ class _AddTaskScreenState extends State<AddTaskScreen>
   @override
   Widget build(BuildContext context) {
     allAssets = Provider.of<ItemProvider>(context).items;
-    allAssets.add(
+    allAssets.insert(
+      0,
       Item(
         itemId: '',
         internalId: '',
@@ -253,8 +254,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                       decoration: InputDecoration(
                         labelText: '  Task type',
                         labelStyle: TextStyle(
-                          color:
-                              darkTheme[dropdownItems.indexOf(dropdownValue)],
+                          color: Theme.of(context).appBarTheme.foregroundColor,
                           fontSize: 20,
                         ),
                         enabledBorder: OutlineInputBorder(
@@ -318,8 +318,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                       decoration: InputDecoration(
                         labelText: '  Asset',
                         labelStyle: TextStyle(
-                          color:
-                              darkTheme[dropdownItems.indexOf(dropdownValue)],
+                          color: Theme.of(context).appBarTheme.foregroundColor,
                           fontSize: 20,
                         ),
                         enabledBorder: OutlineInputBorder(
@@ -383,8 +382,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                       decoration: InputDecoration(
                         labelText: 'Task title',
                         labelStyle: TextStyle(
-                          color:
-                              darkTheme[dropdownItems.indexOf(dropdownValue)],
+                          color: Theme.of(context).appBarTheme.foregroundColor,
                           fontSize: 20,
                         ),
                         contentPadding: EdgeInsets.symmetric(
@@ -397,7 +395,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         ),
                         filled: true,
                         fillColor: Theme.of(context).splashColor,
-                        hintText: 'Task title',
+                        // hintText: 'Task title',
                       ),
                       validator: (val) {
                         if (val!.length < 4) {
@@ -425,8 +423,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                       decoration: InputDecoration(
                         labelText: 'Task description',
                         labelStyle: TextStyle(
-                          color:
-                              darkTheme[dropdownItems.indexOf(dropdownValue)],
+                          color: Theme.of(context).appBarTheme.foregroundColor,
                           fontSize: 20,
                         ),
                         contentPadding: EdgeInsets.symmetric(
@@ -439,7 +436,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         ),
                         filled: true,
                         fillColor: Theme.of(context).splashColor,
-                        hintText: 'Task description',
+                        // hintText: 'Task description',
                       ),
                       validator: (val) {
                         return null;
@@ -463,8 +460,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                       decoration: InputDecoration(
                         labelText: '  Task executor type',
                         labelStyle: TextStyle(
-                          color:
-                              darkTheme[dropdownItems.indexOf(dropdownValue)],
+                          color: Theme.of(context).appBarTheme.foregroundColor,
                           fontSize: 20,
                         ),
                         enabledBorder: OutlineInputBorder(
@@ -523,7 +519,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           labelText: '  Task executor',
                           labelStyle: TextStyle(
                             color:
-                                darkTheme[dropdownItems.indexOf(dropdownValue)],
+                                Theme.of(context).appBarTheme.foregroundColor,
                             fontSize: 20,
                           ),
                           enabledBorder: OutlineInputBorder(

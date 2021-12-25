@@ -28,7 +28,7 @@ class TaskProvider with ChangeNotifier {
     _user = user;
   }
 
-  void set executor(TaskExecutor taskExecutor) {
+  set executor(TaskExecutor taskExecutor) {
     calendarExecutor = taskExecutor;
     notifyListeners();
   }
@@ -165,23 +165,23 @@ class TaskProvider with ChangeNotifier {
       'nextDate': task.nextDate?.toIso8601String(),
       'taskInterval': task.taskInterval,
       'executor': task.executor.index,
-      'executorId': task.executorId,
+      'executorId': _user!.userId,
       'userId': task.userId,
       'itemId': task.itemId,
       'description': task.description,
-      'comments': task.comments,
-      'status': task.status.index,
+      'comments': 'Rapid Complete',
+      'status': TaskStatus.completed.index,
       'type': task.type.index,
       'images': task.images,
     }).then((autoreneratedId) {
-      tmpTask = Task(
+      undoTask = Task(
         taskId: autoreneratedId.id,
         title: task.title,
         date: task.date,
         nextDate: task.nextDate,
         taskInterval: task.taskInterval,
         executor: task.executor,
-        executorId: task.executorId,
+        executorId: task.userId,
         userId: task.userId,
         itemId: task.itemId,
         description: task.description,
@@ -190,7 +190,23 @@ class TaskProvider with ChangeNotifier {
         type: task.type,
         images: task.images,
       );
-      undoTask = tmpTask;
+      tmpTask = Task(
+        taskId: autoreneratedId.id,
+        title: task.title,
+        date: task.date,
+        nextDate: task.nextDate,
+        taskInterval: task.taskInterval,
+        executor: task.executor,
+        executorId: _user!.userId,
+        userId: task.userId,
+        itemId: task.itemId,
+        description: task.description,
+        comments: 'Rapid Complete',
+        status: TaskStatus.completed,
+        type: task.type,
+        images: task.images,
+      );
+
       final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
       if (_tasksArchive.containsKey(date)) {
         _tasksArchive[date]!.add(tmpTask);

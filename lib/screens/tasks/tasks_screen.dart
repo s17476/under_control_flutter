@@ -39,6 +39,7 @@ class _TasksScreenState extends State<TasksScreen> {
   ];
 
   Map<String, List<Task>> _tasks = {};
+  var executor = TaskExecutor.all;
 
   @override
   void initState() {
@@ -96,17 +97,37 @@ class _TasksScreenState extends State<TasksScreen> {
   @override
   Widget build(BuildContext context) {
     TaskProvider taskProvider = Provider.of<TaskProvider>(context);
+    executor = taskProvider.executor;
     _tasks = taskProvider.getAllTasks;
+
+    Map<String, List<Task>> filteredTasks = {};
+
     final keys = _tasks.keys.toList();
 
-    return _tasks.isNotEmpty
+    if (executor == TaskExecutor.all) {
+      filteredTasks = _tasks;
+    } else {
+      for (var key in keys) {
+        for (var task in _tasks[key]!) {
+          if (task.executor == executor) {
+            if (filteredTasks.containsKey(key)) {
+              filteredTasks[key]!.add(task);
+            } else {
+              filteredTasks[key] = [task];
+            }
+          }
+        }
+      }
+    }
+
+    return filteredTasks.isNotEmpty
         ? ListView.builder(
             shrinkWrap: true,
             padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal),
             itemCount: keys.toList().length,
-            itemBuilder: (context, index) {
+            itemBuilder: (ctx, index) {
               List<Widget> listItems = [];
-              for (var task in _tasks[keys.toList()[index]]!) {
+              for (var task in filteredTasks[keys.toList()[index]]!) {
                 listItems.add(Dismissible(
                   key: Key(task.taskId!),
                   confirmDismiss: (direction) async {
@@ -271,8 +292,8 @@ class _TasksScreenState extends State<TasksScreen> {
               );
             },
           )
-        : Center(
-            child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor));
+        : const Center(
+            child: Text('You don\'t have any active tasks. Add some!'),
+          );
   }
 }
