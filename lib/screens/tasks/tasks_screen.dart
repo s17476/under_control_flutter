@@ -4,6 +4,8 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 
+import 'task_details_screen.dart';
+
 class TasksScreen extends StatefulWidget {
   const TasksScreen({Key? key}) : super(key: key);
 
@@ -205,72 +207,86 @@ class _TasksScreenState extends State<TasksScreen> {
                       size: SizeConfig.blockSizeHorizontal * 20,
                     ),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 3.0,
-                      horizontal: 8.0,
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Container(
-                        // height: 50,
-                        color: Theme.of(context).splashColor,
-                        child: Row(
-                          children: <Widget>[
-                            Container(
-                              color: darkTheme[task.type.index]!,
-                              width: SizeConfig.blockSizeHorizontal * 15,
-                              height: SizeConfig.blockSizeHorizontal * 20,
-                              child: Icon(
-                                eventIcons[task.type.index],
+                  child: GestureDetector(
+                    onTap: () => Navigator.of(context)
+                        .pushNamed(TaskDetailsScreen.routeName, arguments: task)
+                        .then((value) {
+                      if (value != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Item deleted'),
+                          ),
+                        );
+                      }
+                    }),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 3.0,
+                        horizontal: 8.0,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15),
+                        child: Container(
+                          // height: 50,
+                          color: Theme.of(context).splashColor,
+                          child: Row(
+                            children: <Widget>[
+                              Container(
+                                color: darkTheme[task.type.index]!,
+                                width: SizeConfig.blockSizeHorizontal * 15,
+                                height: SizeConfig.blockSizeHorizontal * 20,
+                                child: Icon(
+                                  eventIcons[task.type.index],
+                                  color: Colors.white,
+                                  size: SizeConfig.blockSizeHorizontal * 9,
+                                ),
+                              ),
+                              SizedBox(
+                                  width: SizeConfig.blockSizeHorizontal * 3),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      task.title,
+                                      style: TextStyle(
+                                        fontSize:
+                                            SizeConfig.blockSizeHorizontal * 4,
+                                        // fontWeight: FontWeight.w400,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    if (task.description != '')
+                                      SizedBox(
+                                        height: SizeConfig.blockSizeHorizontal,
+                                      ),
+                                    if (task.description != '')
+                                      Text(
+                                        task.description,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Theme.of(context).hintColor,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                statusIcons[task.status.index],
                                 color: Colors.white,
                                 size: SizeConfig.blockSizeHorizontal * 9,
                               ),
-                            ),
-                            SizedBox(width: SizeConfig.blockSizeHorizontal * 3),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    task.title,
-                                    style: TextStyle(
-                                      fontSize:
-                                          SizeConfig.blockSizeHorizontal * 4,
-                                      // fontWeight: FontWeight.w400,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  if (task.description != '')
-                                    SizedBox(
-                                      height: SizeConfig.blockSizeHorizontal,
-                                    ),
-                                  if (task.description != '')
-                                    Text(
-                                      task.description,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: Theme.of(context).hintColor,
-                                      ),
-                                    ),
-                                ],
+                              const SizedBox(
+                                width: 5,
                               ),
-                            ),
-                            Icon(
-                              statusIcons[task.status.index],
-                              color: Colors.white,
-                              size: SizeConfig.blockSizeHorizontal * 9,
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            Icon(Icons.arrow_forward_ios,
-                                color: Theme.of(context).primaryColor),
-                            const SizedBox(
-                              width: 5,
-                            ),
-                          ],
+                              Icon(Icons.arrow_forward_ios,
+                                  color: Theme.of(context).primaryColor),
+                              const SizedBox(
+                                width: 5,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
