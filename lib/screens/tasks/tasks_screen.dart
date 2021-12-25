@@ -231,14 +231,17 @@ class _TasksScreenState extends State<TasksScreen> {
                           color: Theme.of(context).splashColor,
                           child: Row(
                             children: <Widget>[
-                              Container(
-                                color: darkTheme[task.type.index]!,
-                                width: SizeConfig.blockSizeHorizontal * 15,
-                                height: SizeConfig.blockSizeHorizontal * 20,
-                                child: Icon(
-                                  eventIcons[task.type.index],
-                                  color: Colors.white,
-                                  size: SizeConfig.blockSizeHorizontal * 9,
+                              Hero(
+                                tag: task.taskId!,
+                                child: Container(
+                                  color: darkTheme[task.type.index]!,
+                                  width: SizeConfig.blockSizeHorizontal * 16,
+                                  height: SizeConfig.blockSizeHorizontal * 18,
+                                  child: Icon(
+                                    eventIcons[task.type.index],
+                                    color: Colors.white,
+                                    size: SizeConfig.blockSizeHorizontal * 12,
+                                  ),
                                 ),
                               ),
                               SizedBox(

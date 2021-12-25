@@ -129,7 +129,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
           nextDate: nextDate,
           taskInterval: _taskInterval,
           executor: taskExecutor,
-          executorId: userId,
+          executorId: executorId,
           userId:
               Provider.of<UserProvider>(context, listen: false).user!.userId,
           itemId: selectedItemId,
@@ -204,8 +204,9 @@ class _AddTaskScreenState extends State<AddTaskScreen>
     );
 
     allUsers = Provider.of<UserProvider>(context).allUsersInCompany;
-    selectedUser = Provider.of<UserProvider>(context).user;
-    userDropdownValue = selectedUser!.userName;
+    selectedUser ??= selectedUser = Provider.of<UserProvider>(context).user;
+    userDropdownValue =
+        Provider.of<UserProvider>(context, listen: false).user!.userName;
     String choosenDate;
 
     _taskDate ??= DateTime.now();
@@ -536,12 +537,15 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           fillColor: Theme.of(context).splashColor,
                         ),
                         dropdownColor: Colors.grey.shade800,
-                        value: selectedUser!.userId,
+                        value: Provider.of<UserProvider>(context, listen: false)
+                            .user!
+                            .userId,
                         onChanged: (String? newValue) {
                           setState(() {
                             selectedUser = allUsers.firstWhere(
                                 (element) => element!.userId == newValue);
                           });
+                          print('user ${selectedUser!.userId}');
                           print('user ${selectedUser!.userName}');
                         },
                         items: allUsers.map((AppUser? user) {

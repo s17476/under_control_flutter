@@ -29,7 +29,12 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedPageIndex = 2;
 
   String dropdownValue = "All";
-  List<String> dropdownItems = ['Shared', 'Company', 'Mine', 'All'];
+  List<String> dropdownItems = [
+    'Shared',
+    'Company',
+    'Mine',
+    'All',
+  ];
 
   @override
   initState() {

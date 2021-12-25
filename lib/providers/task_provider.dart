@@ -102,6 +102,7 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<void> addTask(Task task) async {
+    print('add task executor id  ${task.executorId}');
     Task tmpTask;
     // get taskss referance
     final tasksRef = FirebaseFirestore.instance

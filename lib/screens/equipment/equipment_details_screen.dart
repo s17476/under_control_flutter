@@ -89,7 +89,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
         .headline6!
         .copyWith(fontSize: SizeConfig.blockSizeHorizontal * 3);
     // Item item = ModalRoute.of(context)!.settings.arguments as Item;
-    var showTasks = false;
+    // var showTasks = false;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Details'),
