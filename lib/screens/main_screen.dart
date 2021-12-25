@@ -9,6 +9,7 @@ import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/equipment/add_equipment_screen.dart';
+import 'package:under_control_flutter/screens/tasks/add_task_screen.dart';
 import 'package:under_control_flutter/widgets/bottom_navi_bar.dart';
 import 'package:under_control_flutter/widgets/main_drawer.dart';
 
@@ -27,8 +28,8 @@ class _MainScreenState extends State<MainScreen> {
 
   int _selectedPageIndex = 2;
 
-  String dropdownValue = "Company";
-  List<String> dropdownItems = ['Company', 'Mine', 'All'];
+  String dropdownValue = "All";
+  List<String> dropdownItems = ['Shared', 'Company', 'Mine', 'All'];
 
   @override
   initState() {
@@ -36,6 +37,9 @@ class _MainScreenState extends State<MainScreen> {
 
     // initialize providers
     Provider.of<TaskProvider>(context, listen: false).fetchAndSetTasks();
+    Provider.of<ItemProvider>(context, listen: false)
+      ..fetchAndSetItems()
+      ..fetchInspectionsStatus();
 
     //hide and show bottom navigation bar while scrolling
     _isBottomNavBarVisible = true;
@@ -160,22 +164,18 @@ class _MainScreenState extends State<MainScreen> {
                             // in tasks screen
                             //TODO uuuuuuuuuuuuuuuuussssssssssseeeeeeeeeeeerrrrrrrrrrr
                             : () {
-                                Provider.of<TaskProvider>(context,
-                                        listen: false)
-                                    .addTask(
-                                  Task(
-                                    title: 'title reaireee',
-                                    date: DateTime.now(),
-                                    description:
-                                        'descriptionfdsg sdg dsg  sdfg dsfg dgfsdsg dsgfh hggfd hdgf h fdh fg hfdg h fdg h gdfhdfhdfh dfh dfh ',
-                                    comments: 'comments',
-                                    executor: TaskExecutor.company,
-                                    userId: userProvider.user!.userId,
-                                    status: TaskStatus.planned,
-                                    type: TaskType.reparation,
-                                    itemId: '8ltQaK3lxRfBmBL3vUba',
-                                  ),
-                                );
+                                Navigator.of(context)
+                                    .push(_createRute(
+                                        () => const AddTaskScreen()))
+                                    .then((value) {
+                                  if (value != null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Task successcul added'),
+                                      ),
+                                    );
+                                  }
+                                });
                               },
                     icon: Icon(
                       Icons.add,

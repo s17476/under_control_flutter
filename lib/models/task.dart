@@ -2,15 +2,16 @@ import 'dart:io';
 
 enum TaskStatus { planned, started, completed }
 
-enum TaskType { event, inspection, reparation, maintenance }
+enum TaskType { maintenance, event, inspection, reparation }
 
-enum TaskExecutor { company, user, all }
+enum TaskExecutor { shared, company, user, all }
 
 class Task {
   String? taskId;
   String title;
   DateTime date;
-  DateTime? reminderDate;
+  DateTime? nextDate;
+  String? taskInterval;
   TaskExecutor executor;
   String? executorId;
   String userId;
@@ -25,7 +26,8 @@ class Task {
     this.taskId,
     required this.title,
     required this.date,
-    this.reminderDate,
+    this.nextDate,
+    this.taskInterval,
     required this.executor,
     this.executorId,
     required this.userId,

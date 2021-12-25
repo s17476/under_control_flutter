@@ -61,9 +61,12 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
               _lastInspection!.year,
               _lastInspection!.month + int.parse(duration[0]),
               _lastInspection!.day);
-        } else {
-          _nextInspection = DateTime(_lastInspection!.year + 1,
-              _lastInspection!.month, _lastInspection!.day);
+        } else if (duration[1] == 'year' || duration[1] == 'years') {
+          _nextInspection = DateTime(
+            _lastInspection!.year + int.parse(duration[0]),
+            _lastInspection!.month,
+            _lastInspection!.day,
+          );
         }
 
         // create new asset

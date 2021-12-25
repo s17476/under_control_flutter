@@ -16,16 +16,16 @@ class DashInspectionStatusCard extends StatefulWidget {
 }
 
 class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
-  @override
-  void initState() {
-    initProviders();
-    super.initState();
-  }
+  // @override
+  // void initState() {
+  //   initProviders();
+  //   super.initState();
+  // }
 
-  Future<void> initProviders() async {
-    await Provider.of<ItemProvider>(context, listen: false)
-        .fetchInspectionsStatus();
-  }
+  // Future<void> initProviders() async {
+  //   await Provider.of<ItemProvider>(context, listen: false)
+  //       .fetchInspectionsStatus();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +42,7 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Card(
+          color: Theme.of(context).splashColor,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           elevation: 10,

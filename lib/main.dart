@@ -20,6 +20,7 @@ import 'package:under_control_flutter/screens/equipment/equipment_details_screen
 import 'package:under_control_flutter/screens/start/initialize_went_wrong_screen.dart';
 import 'package:under_control_flutter/screens/main_screen.dart';
 import 'package:under_control_flutter/screens/start/loading_screen.dart';
+import 'package:under_control_flutter/screens/tasks/add_task_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -179,6 +180,7 @@ class _AppState extends State<App> {
           EditEquipmentScreen.routeName: (ctx) => const EditEquipmentScreen(),
           EquipmentDetailsScreen.routeName: (ctx) =>
               const EquipmentDetailsScreen(),
+          AddTaskScreen.routeName: (ctx) => const AddTaskScreen(),
         },
       ),
     );

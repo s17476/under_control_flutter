@@ -37,7 +37,7 @@ class ItemProvider with ChangeNotifier {
           .collection('companies')
           .doc(_user!.companyId)
           .collection('items')
-          .where("inspectionStatus",
+          .where('inspectionStatus',
               isEqualTo: InspectionStatus.values[i].index)
           .get()
           .then((QuerySnapshot querySnapshot) => statusMap.putIfAbsent(
@@ -46,7 +46,7 @@ class ItemProvider with ChangeNotifier {
             (e) => throw Exception('Connection error. Please try later...'),
           );
     }
-    print("ftech $statusMap");
+    // print("ftech $statusMap");
     _inspectionsStatus = statusMap;
     notifyListeners();
   }
@@ -143,7 +143,7 @@ class ItemProvider with ChangeNotifier {
 
   // fetch data from DB
   Future<void> fetchAndSetItems() async {
-    print('fetch');
+    // print('fetch');
     List<Item> tmpItems = [];
     if (_showCategories) {
       await FirebaseFirestore.instance

@@ -9,10 +9,14 @@ class TaskProvider with ChangeNotifier {
   AppUser? _user;
 
   Map<String, List<Task>> _tasks = {};
+  Map<String, List<Task>> _tasksArchive = {};
+
+  Task? undoTask;
+  BuildContext? undoContext;
 
   List<Task> _upcomingTasks = [];
 
-  TaskExecutor calendarExecutor = TaskExecutor.company;
+  TaskExecutor calendarExecutor = TaskExecutor.all;
 
   TaskProvider();
 
@@ -61,20 +65,21 @@ class TaskProvider with ChangeNotifier {
         .collection('companies')
         .doc(_user!.companyId)
         .collection('tasks')
+        .orderBy('date', descending: false)
         .get()
         .then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         final date = DateTime.parse(doc['date']);
         final stringDate = DateFormat('dd/MM/yyyy').format(date);
-        final reminderDate = doc['reminderDate'] != null
-            ? DateTime.parse(doc['reminderDate'])
-            : null;
+        final nextDate =
+            doc['nextDate'] != null ? DateTime.parse(doc['nextDate']) : null;
 
         final tmpTask = Task(
           taskId: doc.id,
           title: doc['title'],
           date: date,
-          reminderDate: reminderDate,
+          nextDate: nextDate,
+          taskInterval: doc['taskInterval'],
           executor: TaskExecutor.values[doc['executor']],
           executorId: doc['executorId'],
           userId: doc['userId'],
@@ -92,8 +97,6 @@ class TaskProvider with ChangeNotifier {
         }
       }
       _tasks = tmpTasks;
-      print('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
-      print(tmpTasks.length);
       notifyListeners();
     });
   }
@@ -109,7 +112,8 @@ class TaskProvider with ChangeNotifier {
     await tasksRef.add({
       'title': task.title,
       'date': task.date.toIso8601String(),
-      'reminderDate': task.reminderDate?.toIso8601String(),
+      'nextDate': task.nextDate?.toIso8601String(),
+      'taskInterval': task.taskInterval,
       'executor': task.executor.index,
       'executorId': task.executorId,
       'userId': task.userId,
@@ -121,9 +125,11 @@ class TaskProvider with ChangeNotifier {
       'images': task.images,
     }).then((autoreneratedId) {
       tmpTask = Task(
+        taskId: autoreneratedId.id,
         title: task.title,
         date: task.date,
-        reminderDate: task.reminderDate,
+        nextDate: task.nextDate,
+        taskInterval: task.taskInterval,
         executor: task.executor,
         executorId: task.executorId,
         userId: task.userId,
@@ -140,7 +146,128 @@ class TaskProvider with ChangeNotifier {
       } else {
         _tasks[date] = [tmpTask];
       }
+      print('added task');
       notifyListeners();
     });
+  }
+
+  Future<void> addToArchive(Task task) async {
+    Task tmpTask;
+    // get taskss referance
+    final tasksRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(_user!.companyId)
+        .collection('archive');
+
+    await tasksRef.add({
+      'title': task.title,
+      'date': task.date.toIso8601String(),
+      'nextDate': task.nextDate?.toIso8601String(),
+      'taskInterval': task.taskInterval,
+      'executor': task.executor.index,
+      'executorId': task.executorId,
+      'userId': task.userId,
+      'itemId': task.itemId,
+      'description': task.description,
+      'comments': task.comments,
+      'status': task.status.index,
+      'type': task.type.index,
+      'images': task.images,
+    }).then((autoreneratedId) {
+      tmpTask = Task(
+        taskId: autoreneratedId.id,
+        title: task.title,
+        date: task.date,
+        nextDate: task.nextDate,
+        taskInterval: task.taskInterval,
+        executor: task.executor,
+        executorId: task.executorId,
+        userId: task.userId,
+        itemId: task.itemId,
+        description: task.description,
+        comments: task.comments,
+        status: task.status,
+        type: task.type,
+        images: task.images,
+      );
+      undoTask = tmpTask;
+      final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
+      if (_tasksArchive.containsKey(date)) {
+        _tasksArchive[date]!.add(tmpTask);
+      } else {
+        _tasksArchive[date] = [tmpTask];
+      }
+      notifyListeners();
+    });
+  }
+
+  Future<bool> deleteTask(BuildContext context, Task task) async {
+    var response = true;
+    await FirebaseFirestore.instance
+        .collection('companies')
+        .doc(_user!.companyId)
+        .collection('tasks')
+        .doc(task.taskId)
+        .delete()
+        .then((_) {
+      final key = DateFormat('dd/MM/yyyy').format(task.date);
+      _tasks[key]!.removeWhere((element) => element.taskId == task.taskId);
+      if (_tasks[key]!.isEmpty) {
+        _tasks.remove(key);
+      }
+      notifyListeners();
+    }).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to delete item"),
+        ),
+      );
+    });
+    return response;
+  }
+
+  Future<bool> deleteFromTaskArchive(BuildContext context, Task task) async {
+    var response = true;
+    await FirebaseFirestore.instance
+        .collection('companies')
+        .doc(_user!.companyId)
+        .collection('archive')
+        .doc(task.taskId)
+        .delete()
+        .then((_) {
+      final key = DateFormat('dd/MM/yyyy').format(task.date);
+      _tasksArchive[key]!
+          .removeWhere((element) => element.taskId == task.taskId);
+      if (_tasksArchive[key]!.isEmpty) {
+        _tasksArchive.remove(key);
+      }
+      notifyListeners();
+    }).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to delete item"),
+        ),
+      );
+    });
+    return response;
+  }
+
+  Future<bool> rapidComplete(BuildContext context, Task task) async {
+    undoContext = context;
+
+    var response = false;
+    await addToArchive(task).then(
+        (_) => deleteTask(context, task).then((value) => response = value));
+    print('rapid      $undoTask');
+    return response;
+  }
+
+  Future<bool> undoRapidComplete() async {
+    print('undo      $undoTask');
+    var response = false;
+    await addTask(undoTask!).then((value) =>
+        deleteFromTaskArchive(undoContext!, undoTask!)
+            .then((value) => response = value));
+    return response;
   }
 }

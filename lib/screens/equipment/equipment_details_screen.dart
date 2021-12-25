@@ -43,7 +43,6 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
               child: Text(
                 'No',
                 style: TextStyle(
-                  color: Theme.of(context).errorColor,
                   fontSize: SizeConfig.blockSizeVertical * 2.5,
                 ),
               ),
@@ -55,6 +54,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
               child: Text(
                 'Yes',
                 style: TextStyle(
+                  color: Theme.of(context).errorColor,
                   fontSize: SizeConfig.blockSizeVertical * 2.5,
                 ),
               ),
@@ -147,7 +147,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
               ),
               boxShadow: const [
                 BoxShadow(
-                  color: Colors.grey,
+                  // color: Colors.grey,
                   offset: Offset(0.0, 1.0),
                   blurRadius: 6.0,
                 ),

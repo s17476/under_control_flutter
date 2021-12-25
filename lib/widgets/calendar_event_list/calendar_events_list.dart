@@ -9,22 +9,22 @@ class CalendarEventsList extends StatelessWidget {
   }) : super(key: key);
 
   final List<Color?> darkTheme = const [
+    Colors.green,
     Colors.blue,
     Colors.indigo,
     Colors.red,
-    Colors.green,
   ];
 
   final List<IconData> eventIcons = const [
+    Icons.health_and_safety_outlined,
     Icons.event,
     Icons.search_outlined,
     Icons.handyman_outlined,
-    Icons.health_and_safety_outlined,
   ];
 
   final List<IconData> statusIcons = const [
     Icons.pending_actions_outlined,
-    Icons.pending_outlined,
+    Icons.pause_outlined,
     Icons.done,
   ];
 
@@ -80,14 +80,18 @@ class CalendarEventsList extends StatelessWidget {
                                       ),
                                       overflow: TextOverflow.ellipsis,
                                     ),
-                                    SizedBox(
-                                        height: SizeConfig.blockSizeHorizontal),
-                                    Text(
-                                      value[index].description,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                          color: Theme.of(context).hintColor),
-                                    ),
+                                    if (value[index].description != '')
+                                      SizedBox(
+                                        height: SizeConfig.blockSizeHorizontal,
+                                      ),
+                                    if (value[index].description != '')
+                                      Text(
+                                        value[index].description,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Theme.of(context).hintColor,
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ),

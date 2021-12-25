@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
+import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/widgets/calendar_event_list/calendar_events_list.dart';
 
 class CalendarScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  var executor = TaskExecutor.company;
+  var executor = TaskExecutor.all;
 
   Map<String, List<Task>> _eventList = {};
 
@@ -42,11 +43,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
     List<Task> shownEvents;
     if (_eventList[date] != null) {
-      if (executor != TaskExecutor.all) {
+      if (executor == TaskExecutor.company) {
         shownEvents = _eventList[date]!.where((event) {
           return event.executor == executor;
         }).toList();
-        print('to show ${shownEvents.length}');
+        // print('to show ${shownEvents.length}');
+      } else if (executor == TaskExecutor.shared) {
+        shownEvents = _eventList[date]!.where((event) {
+          return event.executor == executor;
+        }).toList();
+        // print('to show ${shownEvents.length}');
+      } else if (executor == TaskExecutor.user) {
+        shownEvents = _eventList[date]!.where((event) {
+          return (event.executor == executor &&
+              event.executorId ==
+                  Provider.of<UserProvider>(context).user!.userId);
+        }).toList();
+        // print('to show ${shownEvents.length}');
       } else {
         shownEvents = _eventList[date]!;
       }

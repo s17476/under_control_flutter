@@ -11,6 +11,7 @@ import 'package:under_control_flutter/screens/start/choose_company_screen.dart';
 
 class UserProvider with ChangeNotifier {
   AppUser? _user;
+  List<AppUser?> _allUsersInCompany = [];
   var _isLoading = false;
   var _hasData = false;
   final _firebaseAuth = FirebaseAuth.instance;
@@ -35,6 +36,31 @@ class UserProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
 
   bool get hasData => _hasData;
+
+  List<AppUser?> get allUsersInCompany => [..._allUsersInCompany];
+
+  // initialize users in company
+  Future<void> initializeCompanyUsers() async {
+    List<AppUser?> tmpUsers = [];
+    await FirebaseFirestore.instance
+        .collection('users')
+        .where('companyId', isEqualTo: _user?.companyId)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        tmpUsers.add(AppUser.company(
+          userId: doc.id,
+          email: doc['email'],
+          userName: doc['userName'],
+          userImage: doc['imgUrl'],
+          company: doc['company'],
+          companyId: doc['companyId'],
+        ));
+      }
+    });
+    _allUsersInCompany = tmpUsers;
+    notifyListeners();
+  }
 
   // initialize user
   Future<AppUser?> initializeUser(

@@ -13,18 +13,18 @@ class DashTaskStatusCard extends StatefulWidget {
 }
 
 class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
-  final List<IconData> eventIcons = const [
-    Icons.event,
-    Icons.search_outlined,
-    Icons.handyman_outlined,
-    Icons.health_and_safety_outlined,
-  ];
-
   final List<Color?> darkTheme = const [
+    Colors.green,
     Colors.blue,
     Colors.indigo,
     Colors.red,
-    Colors.green,
+  ];
+
+  final List<IconData> eventIcons = const [
+    Icons.health_and_safety_outlined,
+    Icons.event,
+    Icons.search_outlined,
+    Icons.handyman_outlined,
   ];
 
   @override
@@ -38,6 +38,7 @@ class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Card(
+          color: Theme.of(context).splashColor,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           elevation: 10,
@@ -66,8 +67,9 @@ class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
                     if (snapshot.data != null) {
                       final tasks = snapshot.data as List<Task>;
                       if (tasks.isEmpty) {
-                        return Text(
-                            'You don\'t have any active tasks. Add some!');
+                        return const Text(
+                          'You don\'t have any active tasks. Add some!',
+                        );
                       }
                       final List<Widget> widgets = [];
                       for (var task in tasks) {
@@ -76,10 +78,13 @@ class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                task.title,
-                                overflow: TextOverflow.ellipsis,
-                                style: cardTextStyle,
+                              SizedBox(
+                                width: SizeConfig.blockSizeHorizontal * 60,
+                                child: Text(
+                                  task.title,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: cardTextStyle,
+                                ),
                               ),
                               Row(
                                 children: [
