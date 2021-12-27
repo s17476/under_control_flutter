@@ -29,10 +29,9 @@ class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle cardTextStyle = Theme.of(context)
-        .textTheme
-        .headline6!
-        .copyWith(fontSize: SizeConfig.blockSizeHorizontal * 4);
+    TextStyle cardTextStyle = Theme.of(context).textTheme.headline6!.copyWith(
+        fontSize: SizeConfig.blockSizeHorizontal * 4,
+        color: Theme.of(context).appBarTheme.foregroundColor);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,8 +82,8 @@ class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
                           DateTime.now().day - 1,
                         );
                         final statusColor = taskDate.isAfter(nowDate)
-                            ? Theme.of(context).hintColor
-                            : Theme.of(context).errorColor;
+                            ? Theme.of(context).appBarTheme.foregroundColor
+                            : Colors.red;
                         widgets.add(Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(

@@ -220,12 +220,12 @@ class CalendarEventsList extends StatelessWidget {
                                       width:
                                           SizeConfig.blockSizeHorizontal * 15,
                                       height:
-                                          SizeConfig.blockSizeHorizontal * 15,
+                                          SizeConfig.blockSizeHorizontal * 17,
                                       child: Icon(
                                         eventIcons[value[index].type.index],
                                         color: Colors.white,
                                         size:
-                                            SizeConfig.blockSizeHorizontal * 9,
+                                            SizeConfig.blockSizeHorizontal * 10,
                                       ),
                                     ),
                                   ),

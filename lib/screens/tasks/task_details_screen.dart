@@ -7,6 +7,7 @@ import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
+import 'package:under_control_flutter/widgets/task/task_complete.dart';
 
 class TaskDetailsScreen extends StatefulWidget {
   const TaskDetailsScreen({Key? key}) : super(key: key);
@@ -17,11 +18,15 @@ class TaskDetailsScreen extends StatefulWidget {
   State<TaskDetailsScreen> createState() => _TaskDetailsScreenState();
 }
 
-class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
+class _TaskDetailsScreenState extends State<TaskDetailsScreen>
+    with SingleTickerProviderStateMixin {
+  final _formKey = GlobalKey<FormState>();
+
   late Task task;
 
-  String executorName = '';
-  String creatorName = '';
+  String _executorName = '';
+  String _creatorName = '';
+  bool _isInEditMode = false;
 
   final List<Color?> darkTheme = const [
     Colors.green,
@@ -30,45 +35,94 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     Colors.red,
   ];
 
-  final List<IconData> eventIcons = const [
+  final List<IconData> _eventIcons = const [
     Icons.health_and_safety_outlined,
     Icons.event,
     Icons.search_outlined,
     Icons.handyman_outlined,
   ];
 
-  final List<IconData> statusIcons = const [
+  final List<IconData> _statusIcons = const [
     Icons.pending_actions_outlined,
     Icons.pause_outlined,
     Icons.done,
   ];
 
-  final List<String> statusText = const [
+  final List<String> _statusText = const [
     'Pending',
     'In progress',
     'Completed',
   ];
 
-  final List<String> taskTypes = const [
+  final List<String> _taskTypes = const [
     'Maintenance',
     'Event',
     'Inspection',
     'Reparation',
   ];
 
-  final List<String> executorType = [
+  final List<String> _executorType = [
     'Shared',
     'Company',
     'User',
     'All',
   ];
 
+  AnimationController? _animationController;
+  Animation<Offset>? _userSlideAnimation;
+  Animation<Offset>? _slideAnimation;
+  Animation<double>? _opacityAnimation;
+  Animation<double>? _opacityAnimationBackward;
+
+  @override
+  void initState() {
+    super.initState();
+    //initialize animations controllers
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _userSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, -0.5),
+      end: const Offset(0, 0),
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController!,
+        curve: Curves.linear,
+      ),
+    );
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, -0.5),
+      end: const Offset(0, 0),
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController!,
+        curve: Curves.linear,
+      ),
+    );
+    _opacityAnimation = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
+      parent: _animationController!,
+      curve: Curves.easeIn,
+    ));
+    _opacityAnimationBackward =
+        Tween(begin: 1.0, end: 0.0).animate(CurvedAnimation(
+      parent: _animationController!,
+      curve: Curves.easeIn,
+    ));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _animationController!.dispose();
+  }
+
   Future<void> _getExecutorName() async {
     await Provider.of<UserProvider>(context)
         .getUserById(context, task.executorId!)
         .then((value) {
       setState(() {
-        executorName = value!.userName;
+        _executorName = value!.userName;
       });
     });
   }
@@ -78,7 +132,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         .getUserById(context, task.userId)
         .then((value) {
       setState(() {
-        creatorName = value!.userName;
+        _creatorName = value!.userName;
       });
     });
   }
@@ -129,13 +183,69 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
+  // toggle view / edit mode
+  void _toggleEditMode() => setState(() {
+        _isInEditMode = !_isInEditMode;
+      });
+
+//TODO
+  void _completeTask(bool completed) {
+    if (_formKey.currentState != null) {
+      // validate user input
+      final isValid = _formKey.currentState!.validate();
+      if (isValid) {
+        _formKey.currentState!.save();
+
+        if (task.taskInterval != 'No') {
+          // set inspections interval
+          List<String> duration = task.taskInterval!.split(' ');
+          if (duration[1] == 'week' || duration[1] == 'weeks') {
+            task.nextDate = DateTime(
+              task.date.year,
+              task.date.month,
+              task.date.day + (int.parse(duration[0]) * 7),
+            );
+          } else if (duration[1] == 'month' || duration[1] == 'months') {
+            task.nextDate = DateTime(task.date.year,
+                task.date.month + int.parse(duration[0]), task.date.day);
+          } else if (duration[1] == 'year' || duration[1] == 'years') {
+            task.nextDate = DateTime(task.date.year + int.parse(duration[0]),
+                task.date.month, task.date.day);
+          }
+        }
+        task.executorId =
+            Provider.of<UserProvider>(context, listen: false).user!.userId;
+        print(
+            'completeTask ${task.taskInterval}  date ${DateFormat('dd/MM/yyyy').format(task.date)}');
+        print('${task.comments}');
+      }
+    }
+  }
+
   @override
   void didChangeDependencies() {
-    task = ModalRoute.of(context)!.settings.arguments as Task;
-    if (task.executorId != null && executorName == '') {
+    var tmpTask = ModalRoute.of(context)!.settings.arguments as Task;
+    task = Task(
+      title: tmpTask.title,
+      date: tmpTask.date,
+      executor: tmpTask.executor,
+      userId: tmpTask.userId,
+      description: tmpTask.description,
+      comments: tmpTask.comments,
+      status: tmpTask.status,
+      type: tmpTask.type,
+      executorId: tmpTask.executorId,
+      images: tmpTask.images,
+      itemId: tmpTask.itemId,
+      location: tmpTask.location,
+      nextDate: tmpTask.nextDate,
+      taskId: tmpTask.taskId,
+      taskInterval: tmpTask.taskInterval,
+    );
+    if (task.executorId != null && _executorName == '') {
       _getExecutorName();
     }
-    if (creatorName == '') {
+    if (_creatorName == '') {
       _getCreatorName();
     }
     super.didChangeDependencies();
@@ -184,13 +294,25 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             ),
           ),
           // done appbar button
-          IconButton(
-            onPressed: () {}, //TODO
-            icon: Icon(
-              Icons.done,
-              color: Theme.of(context).primaryColor,
+          if (_isInEditMode)
+            IconButton(
+              onPressed: () => _completeTask(false),
+              icon: Icon(
+                Icons.save,
+                color: Theme.of(context).primaryColor,
+              ),
             ),
-          ),
+          // SizedBox(
+          //   width: SizeConfig.blockSizeHorizontal * 3,
+          // ),
+          if (_isInEditMode)
+            IconButton(
+              onPressed: () => _completeTask(true),
+              icon: Icon(
+                Icons.done,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
           SizedBox(
             width: SizeConfig.blockSizeHorizontal * 3,
           ),
@@ -223,7 +345,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                         tag: task.taskId!,
                         child: Container(
                           child: Icon(
-                            eventIcons[task.type.index],
+                            _eventIcons[task.type.index],
                             size: SizeConfig.blockSizeHorizontal * 20,
                             color:
                                 Theme.of(context).appBarTheme.foregroundColor,
@@ -254,7 +376,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                               style: labelTextStyle,
                             ),
                             Text(
-                              taskTypes[task.type.index],
+                              _taskTypes[task.type.index],
                               style: textStyle,
                             ),
                             Text(
@@ -278,18 +400,19 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                     child: Column(
                       children: [
                         Icon(
-                          statusIcons[task.status.index],
+                          _statusIcons[task.status.index],
                           color: Colors.white,
                           size: SizeConfig.blockSizeHorizontal * 10,
                         ),
-                        Text(statusText[task.status.index]),
+                        Text(_statusText[task.status.index]),
                       ],
                     ),
                   ),
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 16.0, top: 16.0),
+                padding:
+                    const EdgeInsets.only(left: 16.0, top: 16.0, right: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -399,7 +522,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                             height: 1,
                           ),
                           Text(
-                            executorType[task.executor.index],
+                            _executorType[task.executor.index],
                             style: textStyle,
                           ),
                         ],
@@ -419,7 +542,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                             height: 1,
                           ),
                           Text(
-                            executorName,
+                            _executorName,
                             style: textStyle,
                           ),
                         ],
@@ -482,10 +605,110 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                           height: 1,
                         ),
                         Text(
-                          creatorName,
+                          _creatorName,
                           style: textStyle,
                         ),
                       ],
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16, bottom: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          // complete / cancel button
+                          TextButton.icon(
+                            onPressed: () {
+                              FocusScope.of(context).unfocus();
+                              _toggleEditMode();
+                              if (_isInEditMode) {
+                                _animationController!.forward();
+                              } else {
+                                _animationController!.reverse();
+                              }
+                            },
+                            icon: _isInEditMode
+                                ? Icon(
+                                    Icons.cancel,
+                                    size: SizeConfig.blockSizeHorizontal * 6,
+                                    color: Theme.of(context).errorColor,
+                                  )
+                                : Icon(
+                                    Icons.keyboard_arrow_down_outlined,
+                                    size: SizeConfig.blockSizeHorizontal * 8,
+                                  ),
+                            label: Text(
+                              _isInEditMode ? 'Cancel' : 'Complete the task',
+                              style: textStyle.copyWith(
+                                color: Theme.of(context)
+                                    .appBarTheme
+                                    .backgroundColor,
+                                fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                              ),
+                            ),
+                          ),
+                          //save task button
+                          if (_isInEditMode)
+                            TextButton.icon(
+                              onPressed: () => _completeTask(false),
+                              icon: Icon(
+                                Icons.save,
+                                size: SizeConfig.blockSizeHorizontal * 6,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                              label: Text(
+                                'Save',
+                                style: textStyle.copyWith(
+                                  color: Theme.of(context)
+                                      .appBarTheme
+                                      .backgroundColor,
+                                  fontSize:
+                                      SizeConfig.blockSizeHorizontal * 4.5,
+                                ),
+                              ),
+                            ),
+                          //complete task button
+                          if (_isInEditMode)
+                            TextButton.icon(
+                              onPressed: () => _completeTask(true),
+                              icon: Icon(
+                                Icons.done,
+                                size: SizeConfig.blockSizeHorizontal * 6,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                              label: Text(
+                                'Complete',
+                                style: textStyle.copyWith(
+                                  color: Theme.of(context)
+                                      .appBarTheme
+                                      .backgroundColor,
+                                  fontSize:
+                                      SizeConfig.blockSizeHorizontal * 4.5,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+
+                    Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          //name field
+                          FadeTransition(
+                            opacity: _opacityAnimation!,
+                            child: SlideTransition(
+                              position: _userSlideAnimation!,
+                              child: task.type != TaskType.inspection
+                                  ? TaskComplete(
+                                      task: task,
+                                    )
+                                  : null,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

@@ -29,10 +29,10 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
 
   @override
   Widget build(BuildContext context) {
-    TextStyle cardTextStyle = Theme.of(context)
-        .textTheme
-        .headline6!
-        .copyWith(fontSize: SizeConfig.blockSizeHorizontal * 4);
+    TextStyle cardTextStyle = Theme.of(context).textTheme.headline6!.copyWith(
+          fontSize: SizeConfig.blockSizeHorizontal * 4,
+          color: Theme.of(context).appBarTheme.foregroundColor,
+        );
     UserProvider userProvider = Provider.of<UserProvider>(context);
     ItemProvider itemProvider = Provider.of<ItemProvider>(context);
     Map<InspectionStatus, int> inspectionsStatus =
