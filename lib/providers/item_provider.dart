@@ -92,6 +92,7 @@ class ItemProvider with ChangeNotifier {
       'producer': item.producer,
       'model': item.model,
       'category': item.category.toUpperCase(),
+      'location': item.location,
       'comments': item.comments,
       'inspectionStatus': item.inspectionStatus,
       'nextInspection': item.nextInspection.toIso8601String(),
@@ -129,6 +130,7 @@ class ItemProvider with ChangeNotifier {
       'producer': item.producer,
       'model': item.model,
       'category': item.category.toUpperCase(),
+      'location': item.location,
       'comments': item.comments,
     }).then((_) {
       var editedItem =
@@ -161,6 +163,7 @@ class ItemProvider with ChangeNotifier {
               producer: doc['producer'],
               model: doc['model'],
               category: doc['category'],
+              location: doc['location'],
               comments: doc['comments'],
               lastInspection: DateTime.parse(doc['lastInspection']),
               nextInspection: DateTime.parse(doc['nextInspection']),
@@ -188,6 +191,7 @@ class ItemProvider with ChangeNotifier {
               producer: doc['producer'],
               model: doc['model'],
               category: doc['category'],
+              location: doc['location'],
               comments: doc['comments'],
               lastInspection: DateTime.parse(doc['lastInspection']),
               nextInspection: DateTime.parse(doc['nextInspection']),

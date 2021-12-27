@@ -126,6 +126,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
 
   @override
   Widget build(BuildContext context) {
+    var isLoading = Provider.of<UserProvider>(context).isLoading;
+    print(isLoading);
     SizeConfig.init(context);
     return SingleChildScrollView(
       child: AnimatedPadding(
@@ -151,7 +153,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                           top: SizeConfig.blockSizeVertical * 4.7,
                         ),
                         child: const Logo(
-                          greenLettersSize: 16,
+                          greenLettersSize: 15,
                           whitheLettersSize: 10,
                         ),
                       ),
@@ -317,7 +319,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                 position: _slideAnimation!,
                 child: ElevatedButton(
                   onPressed: _trySubmit,
-                  child: Provider.of<UserProvider>(context).isLoading
+                  child: isLoading
                       ? Padding(
                           padding: EdgeInsets.all(SizeConfig.blockSizeVertical),
                           child: SizedBox(
@@ -362,7 +364,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                       // _fieldHeight = 0;
                     }
                   },
-                  child: Provider.of<UserProvider>(context).isLoading
+                  child: isLoading
                       ? SizedBox(
                           child: const CircularProgressIndicator(
                             color: Colors.white,

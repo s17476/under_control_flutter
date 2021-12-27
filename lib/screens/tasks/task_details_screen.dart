@@ -205,7 +205,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             end: Alignment.bottomCenter,
             colors: [
               Colors.black,
-              Colors.white10,
+              Colors.grey,
             ],
           ),
         ),
@@ -322,6 +322,20 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                           ),
                           Text(
                             '${asset.producer} ${asset.model} ${asset.internalId}',
+                            style: textStyle,
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            'Location',
+                            style: labelTextStyle,
+                          ),
+                          const SizedBox(
+                            height: 1,
+                          ),
+                          Text(
+                            task.location!,
                             style: textStyle,
                           ),
                         ],

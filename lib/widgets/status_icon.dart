@@ -5,11 +5,13 @@ import 'package:under_control_flutter/models/item.dart';
 class StatusIcon extends StatelessWidget {
   const StatusIcon(
       {Key? key,
+      required this.heroTag,
       required this.inspectionStatus,
       required this.size,
       required this.textSize})
       : super(key: key);
 
+  final String heroTag;
   final int inspectionStatus;
   final int size;
   final int textSize;
@@ -19,10 +21,13 @@ class StatusIcon extends StatelessWidget {
     return inspectionStatus == InspectionStatus.ok.index
         ? Column(
             children: [
-              Icon(
-                Icons.check_circle_outline_rounded,
-                color: Colors.green,
-                size: SizeConfig.blockSizeVertical * size,
+              Hero(
+                tag: heroTag,
+                child: Icon(
+                  Icons.check_circle_outline_rounded,
+                  color: Colors.green,
+                  size: SizeConfig.blockSizeHorizontal * size,
+                ),
               ),
               if (textSize != 0)
                 const Text(
@@ -36,10 +41,13 @@ class StatusIcon extends StatelessWidget {
         : inspectionStatus == InspectionStatus.failed.index
             ? Column(
                 children: [
-                  Icon(
-                    Icons.clear_rounded,
-                    color: Colors.red,
-                    size: SizeConfig.blockSizeVertical * size,
+                  Hero(
+                    tag: heroTag,
+                    child: Icon(
+                      Icons.clear_rounded,
+                      color: Colors.red,
+                      size: SizeConfig.blockSizeHorizontal * size,
+                    ),
                   ),
                   if (textSize != 0)
                     const Text(
@@ -53,10 +61,13 @@ class StatusIcon extends StatelessWidget {
             : inspectionStatus == InspectionStatus.needsAttention.index
                 ? Column(
                     children: [
-                      Icon(
-                        Icons.warning_amber_rounded,
-                        color: Colors.amber,
-                        size: SizeConfig.blockSizeVertical * size,
+                      Hero(
+                        tag: heroTag,
+                        child: Icon(
+                          Icons.warning_amber_rounded,
+                          color: Colors.amber,
+                          size: SizeConfig.blockSizeHorizontal * size,
+                        ),
                       ),
                       if (textSize != 0)
                         const Text(
@@ -69,10 +80,13 @@ class StatusIcon extends StatelessWidget {
                   )
                 : Column(
                     children: [
-                      Icon(
-                        Icons.alarm_outlined,
-                        color: Colors.red,
-                        size: SizeConfig.blockSizeVertical * size,
+                      Hero(
+                        tag: heroTag,
+                        child: Icon(
+                          Icons.alarm_outlined,
+                          color: Colors.red,
+                          size: SizeConfig.blockSizeHorizontal * size,
+                        ),
                       ),
                       if (textSize != 0)
                         const Text(

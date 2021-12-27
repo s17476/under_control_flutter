@@ -27,9 +27,9 @@ class BottomNaviBar extends StatelessWidget {
       'background': 'assets/slivers/main_screen.jpg',
     },
     {
-      'page': EquipmentScreen(),
-      'title': 'Equipment',
-      'icon': Icon(Icons.handyman),
+      'page': CalendarScreen(),
+      'title': 'Calendar',
+      'icon': Icon(Icons.today),
       'background': 'assets/slivers/main_screen.jpg',
     },
     {
@@ -39,9 +39,9 @@ class BottomNaviBar extends StatelessWidget {
       'background': 'assets/slivers/dash_screen.jpg',
     },
     {
-      'page': CalendarScreen(),
-      'title': 'Calendar',
-      'icon': Icon(Icons.today),
+      'page': EquipmentScreen(),
+      'title': 'Assets',
+      'icon': Icon(Icons.handyman),
       'background': 'assets/slivers/main_screen.jpg',
     },
     {

@@ -16,6 +16,7 @@ class Task {
   String? executorId;
   String userId;
   String? itemId;
+  String? location;
   String description;
   String comments;
   TaskStatus status;
@@ -32,6 +33,7 @@ class Task {
     this.executorId,
     required this.userId,
     this.itemId,
+    this.location,
     required this.description,
     required this.comments,
     required this.status,

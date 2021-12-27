@@ -78,8 +78,8 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final textStyle = Theme.of(context).textTheme.headline6!.copyWith(
-          fontSize: SizeConfig.blockSizeHorizontal * 4.5,
-          color: Theme.of(context).primaryColor,
+        // fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+        // color: Theme.of(context).primaryColor,
         );
     final expiredTextStyle = textStyle.copyWith(
       color: Theme.of(context).errorColor,
@@ -93,6 +93,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Details'),
+        iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
         actions: [
           IconButton(
             onPressed: () => Navigator.of(context)
@@ -106,7 +107,8 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                 );
               }
             }),
-            icon: const Icon(Icons.edit),
+            icon: Icon(Icons.edit,
+                color: Theme.of(context).appBarTheme.foregroundColor),
           ),
           SizedBox(
             width: SizeConfig.blockSizeHorizontal * 2,
@@ -132,28 +134,28 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
           ),
         ],
       ),
-      body: Column(
-        // mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 4),
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Theme.of(context).appBarTheme.backgroundColor,
-              // color: Colors.black,
-              borderRadius: const BorderRadius.only(
-                bottomRight: Radius.circular(30.0),
-                bottomLeft: Radius.circular(30.0),
-              ),
-              boxShadow: const [
-                BoxShadow(
-                  // color: Colors.grey,
-                  offset: Offset(0.0, 1.0),
-                  blurRadius: 6.0,
-                ),
-              ],
-            ),
-            child: Column(
+      body: Container(
+        padding: const EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 8,
+        ),
+        width: SizeConfig.blockSizeHorizontal * 100,
+        height: SizeConfig.blockSizeVertical * 100,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black,
+              Colors.grey,
+            ],
+          ),
+        ),
+        child: Column(
+          // mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Column(
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -165,65 +167,79 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.all(3.0),
+                            padding: const EdgeInsets.all(1.0),
                             child: Text(
-                              'Internal ID:',
+                              'Internal ID',
                               style: labelTextStyle,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(3.0),
+                            padding: const EdgeInsets.all(1.0),
                             child: Text(
                               item.internalId,
                               style: textStyle,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(3.0),
+                            padding: const EdgeInsets.all(1.0),
                             child: Text(
-                              'Producer:',
+                              'Producer',
                               style: labelTextStyle,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(3.0),
+                            padding: const EdgeInsets.all(1.0),
                             child: Text(
                               item.producer,
                               style: textStyle,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(3.0),
+                            padding: const EdgeInsets.all(1.0),
                             child: Text(
-                              'Model:',
+                              'Model',
                               style: labelTextStyle,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(3.0),
+                            padding: const EdgeInsets.all(1.0),
                             child: Text(
                               item.model,
                               style: textStyle,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(3.0),
+                            padding: const EdgeInsets.all(1.0),
                             child: Text(
-                              'Category:',
+                              'Category',
                               style: labelTextStyle,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(3.0),
+                            padding: const EdgeInsets.all(1.0),
                             child: Text(
                               item.category,
                               style: textStyle,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(3.0),
+                            padding: const EdgeInsets.all(1.0),
                             child: Text(
-                              'Comments:',
+                              'Location',
+                              style: labelTextStyle,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(1.0),
+                            child: Text(
+                              item.location,
+                              style: textStyle,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(1.0),
+                            child: Text(
+                              'Comments',
                               style: labelTextStyle,
                             ),
                           ),
@@ -233,28 +249,28 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                     Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(3.0),
+                          padding: const EdgeInsets.all(1.0),
                           child: Text(
-                            'Inspection every:',
+                            'Inspection every',
                             style: labelTextStyle,
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(3.0),
+                          padding: const EdgeInsets.all(1.0),
                           child: Text(
                             item.interval,
                             style: textStyle,
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(3.0),
+                          padding: const EdgeInsets.all(1.0),
                           child: Text(
-                            'Last inspection:',
+                            'Last inspection',
                             style: labelTextStyle,
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(3.0),
+                          padding: const EdgeInsets.all(1.0),
                           child: Text(
                             DateFormat('dd/MMM/yyyy')
                                 .format(item.lastInspection),
@@ -262,14 +278,14 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(3.0),
+                          padding: const EdgeInsets.all(1.0),
                           child: Text(
-                            'Next inspection:',
+                            'Next inspection',
                             style: labelTextStyle,
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(3.0),
+                          padding: const EdgeInsets.all(1.0),
                           child: Text(
                             DateFormat('dd/MMM/yyyy')
                                 .format(item.nextInspection),
@@ -282,11 +298,10 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: StatusIcon(
+                            heroTag: item.itemId!,
                             inspectionStatus: item.inspectionStatus,
-                            size:
-                                (SizeConfig.blockSizeHorizontal * 1.5).toInt(),
-                            textSize:
-                                (SizeConfig.blockSizeHorizontal * 1.5).toInt(),
+                            size: 20,
+                            textSize: 7,
                           ),
                         ),
                       ],
@@ -309,77 +324,77 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                 ),
               ],
             ),
-          ),
-          // add new inspection button
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: EdgeInsets.only(
-              top: SizeConfig.blockSizeHorizontal * 5,
-              left: SizeConfig.blockSizeHorizontal * 4,
-            ),
-            child: TextButton.icon(
-              label: Text(
-                "Add new inspection",
-                style:
-                    TextStyle(fontSize: SizeConfig.blockSizeHorizontal * 4.5),
+            // add new inspection button
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.only(
+                top: SizeConfig.blockSizeHorizontal * 5,
+                left: SizeConfig.blockSizeHorizontal * 4,
               ),
-              onPressed: () {
-                print("add new inspection");
-              },
-              icon: Container(
-                // width: SizeConfig.blockSizeHorizontal * 14.5,
-                alignment: Alignment.topRight,
-                child: Stack(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                          left: SizeConfig.blockSizeHorizontal * 4),
-                      child: Icon(
-                        Icons.add,
-                        size: SizeConfig.blockSizeHorizontal * 4.5,
+              child: TextButton.icon(
+                label: Text(
+                  "Add new inspection",
+                  style:
+                      TextStyle(fontSize: SizeConfig.blockSizeHorizontal * 4.5),
+                ),
+                onPressed: () {
+                  print("add new inspection");
+                },
+                icon: Container(
+                  // width: SizeConfig.blockSizeHorizontal * 14.5,
+                  alignment: Alignment.topRight,
+                  child: Stack(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: SizeConfig.blockSizeHorizontal * 4),
+                        child: Icon(
+                          Icons.add,
+                          size: SizeConfig.blockSizeHorizontal * 4.5,
+                        ),
                       ),
-                    ),
-                    Icon(
-                      Icons.search,
-                      size: SizeConfig.blockSizeHorizontal * 7,
-                    )
-                  ],
+                      Icon(
+                        Icons.search,
+                        size: SizeConfig.blockSizeHorizontal * 7,
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          // add new task
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: EdgeInsets.only(
-              top: SizeConfig.blockSizeHorizontal,
-              left: SizeConfig.blockSizeHorizontal * 4,
-            ),
-            child: TextButton.icon(
-              label: Text(
-                "Add new task",
-                style:
-                    TextStyle(fontSize: SizeConfig.blockSizeHorizontal * 4.5),
+            // add new task
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.only(
+                top: SizeConfig.blockSizeHorizontal,
+                left: SizeConfig.blockSizeHorizontal * 4,
               ),
-              onPressed: () {
-                print("add new task");
-              },
-              icon: Container(
-                padding: EdgeInsets.only(
-                  left: SizeConfig.blockSizeHorizontal * 1,
-                  right: SizeConfig.blockSizeHorizontal * 1.5,
+              child: TextButton.icon(
+                label: Text(
+                  "Add new task",
+                  style:
+                      TextStyle(fontSize: SizeConfig.blockSizeHorizontal * 4.5),
                 ),
-                // width: SizeConfig.blockSizeHorizontal * 14.5,
-                alignment: Alignment.topRight,
-                child: Icon(
-                  Icons.add_task,
-                  size: SizeConfig.blockSizeHorizontal * 6,
+                onPressed: () {
+                  print("add new task");
+                },
+                icon: Container(
+                  padding: EdgeInsets.only(
+                    left: SizeConfig.blockSizeHorizontal * 1,
+                    right: SizeConfig.blockSizeHorizontal * 1.5,
+                  ),
+                  // width: SizeConfig.blockSizeHorizontal * 14.5,
+                  alignment: Alignment.topRight,
+                  child: Icon(
+                    Icons.add_task,
+                    size: SizeConfig.blockSizeHorizontal * 6,
+                  ),
                 ),
               ),
             ),
-          ),
-          InspectionsList(context: context, item: item),
-        ],
+            InspectionsList(context: context, item: item),
+          ],
+        ),
       ),
     );
   }

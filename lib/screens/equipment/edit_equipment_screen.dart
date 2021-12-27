@@ -23,6 +23,7 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
   String _producer = '';
   String _model = '';
   String _category = '';
+  String _location = '';
   String _comments = '';
 
   @override
@@ -45,6 +46,7 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
           producer: _producer,
           model: _model,
           category: _category,
+          location: _location,
           comments: _comments,
           lastInspection: _item.lastInspection,
           nextInspection: _item.nextInspection,
@@ -71,7 +73,14 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit equipment'),
+        title: const Text('Edit asset'),
+        iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+        actions: [
+          IconButton(onPressed: _editEquipment, icon: const Icon(Icons.save)),
+          SizedBox(
+            width: SizeConfig.blockSizeHorizontal * 3,
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: AnimatedPadding(
@@ -240,6 +249,41 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                     SizedBox(
                       height: SizeConfig.blockSizeVertical * 3,
                     ),
+                    //location
+                    TextFormField(
+                      initialValue: _item.location,
+                      key: const ValueKey('location'),
+                      keyboardType: TextInputType.name,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        labelStyle: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: SizeConfig.blockSizeHorizontal * 1,
+                          horizontal: SizeConfig.blockSizeHorizontal * 5,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).splashColor,
+                        labelText: 'Asset location',
+                      ),
+                      validator: (val) {
+                        if (val!.length < 2) {
+                          return 'Asset to short';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _location = value!;
+                      },
+                    ),
+                    SizedBox(
+                      height: SizeConfig.blockSizeVertical * 3,
+                    ),
                     // comments
                     TextFormField(
                       maxLines: null,
@@ -282,24 +326,24 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                 height: SizeConfig.blockSizeVertical * 2,
               ),
               // save button
-              ElevatedButton(
-                onPressed: _editEquipment,
-                child: Text(
-                  'Save changes',
-                  style: TextStyle(
-                    fontSize: SizeConfig.blockSizeHorizontal * 5.5,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: SizeConfig.blockSizeVertical * 3,
-              ),
+              // ElevatedButton(
+              //   onPressed: _editEquipment,
+              //   child: Text(
+              //     'Save changes',
+              //     style: TextStyle(
+              //       fontSize: SizeConfig.blockSizeHorizontal * 5.5,
+              //     ),
+              //   ),
+              //   style: ElevatedButton.styleFrom(
+              //     primary: Theme.of(context).primaryColor,
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(30.0),
+              //     ),
+              //   ),
+              // ),
+              // SizedBox(
+              //   height: SizeConfig.blockSizeVertical * 3,
+              // ),
             ],
           ),
         ),

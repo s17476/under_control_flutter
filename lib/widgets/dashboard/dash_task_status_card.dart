@@ -73,6 +73,18 @@ class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
                       }
                       final List<Widget> widgets = [];
                       for (var task in tasks) {
+                        // if task date is after today date change date text color
+                        final dateFormat = DateFormat('dd/MM/yyyy');
+                        final taskDate =
+                            dateFormat.parse(dateFormat.format(task.date));
+                        final nowDate = DateTime(
+                          DateTime.now().year,
+                          DateTime.now().month,
+                          DateTime.now().day - 1,
+                        );
+                        final statusColor = taskDate.isAfter(nowDate)
+                            ? Theme.of(context).hintColor
+                            : Theme.of(context).errorColor;
                         widgets.add(Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Row(
@@ -91,13 +103,16 @@ class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
                                   Text(
                                     DateFormat('dd/MMM').format(task.date),
                                     overflow: TextOverflow.ellipsis,
-                                    style: cardTextStyle,
+                                    style: cardTextStyle.copyWith(
+                                        color: statusColor),
                                   ),
                                   SizedBox(
                                     width: SizeConfig.blockSizeHorizontal,
                                   ),
-                                  Icon(eventIcons[task.type.index],
-                                      color: darkTheme[task.type.index]),
+                                  Icon(
+                                    eventIcons[task.type.index],
+                                    color: darkTheme[task.type.index],
+                                  ),
                                 ],
                               )
                             ],

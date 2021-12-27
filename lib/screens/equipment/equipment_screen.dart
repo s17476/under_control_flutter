@@ -167,8 +167,9 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                                   ],
                                 ),
                                 trailing: StatusIcon(
+                                  heroTag: item.itemId!,
                                   inspectionStatus: item.inspectionStatus,
-                                  size: 5,
+                                  size: 12,
                                   textSize: 0,
                                 ),
                               ),

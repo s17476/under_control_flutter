@@ -11,8 +11,8 @@ class TaskProvider with ChangeNotifier {
   Map<String, List<Task>> _tasks = {};
   Map<String, List<Task>> _tasksArchive = {};
 
-  Task? undoTask;
-  BuildContext? undoContext;
+  Task? _undoTask;
+  BuildContext? _undoContext;
 
   List<Task> _upcomingTasks = [];
 
@@ -61,13 +61,14 @@ class TaskProvider with ChangeNotifier {
 
   Future<void> fetchAndSetTasks() async {
     Map<String, List<Task>> tmpTasks = {};
-    await FirebaseFirestore.instance
+    final taskRef = FirebaseFirestore.instance
         .collection('companies')
         .doc(_user!.companyId)
         .collection('tasks')
         .orderBy('date', descending: false)
-        .get()
-        .then((QuerySnapshot querySnapshot) {
+        .get();
+
+    await taskRef.then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
         final date = DateTime.parse(doc['date']);
         final stringDate = DateFormat('dd/MM/yyyy').format(date);
@@ -84,6 +85,7 @@ class TaskProvider with ChangeNotifier {
           executorId: doc['executorId'],
           userId: doc['userId'],
           itemId: doc['itemId'],
+          location: doc['location'],
           description: doc['description'],
           comments: doc['comments'],
           status: TaskStatus.values[doc['status']],
@@ -119,6 +121,7 @@ class TaskProvider with ChangeNotifier {
       'executorId': task.executorId,
       'userId': task.userId,
       'itemId': task.itemId,
+      'location': task.location,
       'description': task.description,
       'comments': task.comments,
       'status': task.status.index,
@@ -135,6 +138,7 @@ class TaskProvider with ChangeNotifier {
         executorId: task.executorId,
         userId: task.userId,
         itemId: task.itemId,
+        location: task.location,
         description: task.description,
         comments: task.comments,
         status: task.status,
@@ -169,13 +173,14 @@ class TaskProvider with ChangeNotifier {
       'executorId': _user!.userId,
       'userId': task.userId,
       'itemId': task.itemId,
+      'location': task.location,
       'description': task.description,
       'comments': 'Rapid Complete',
       'status': TaskStatus.completed.index,
       'type': task.type.index,
       'images': task.images,
     }).then((autoreneratedId) {
-      undoTask = Task(
+      _undoTask = Task(
         taskId: autoreneratedId.id,
         title: task.title,
         date: task.date,
@@ -185,6 +190,7 @@ class TaskProvider with ChangeNotifier {
         executorId: task.userId,
         userId: task.userId,
         itemId: task.itemId,
+        location: task.location,
         description: task.description,
         comments: task.comments,
         status: task.status,
@@ -201,6 +207,7 @@ class TaskProvider with ChangeNotifier {
         executorId: _user!.userId,
         userId: task.userId,
         itemId: task.itemId,
+        location: task.location,
         description: task.description,
         comments: 'Rapid Complete',
         status: TaskStatus.completed,
@@ -270,20 +277,20 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<bool> rapidComplete(BuildContext context, Task task) async {
-    undoContext = context;
+    _undoContext = context;
 
     var response = false;
     await addToArchive(task).then(
         (_) => deleteTask(context, task).then((value) => response = value));
-    print('rapid      $undoTask');
+    print('rapid      $_undoTask');
     return response;
   }
 
   Future<bool> undoRapidComplete() async {
-    print('undo      $undoTask');
+    print('undo      $_undoTask');
     var response = false;
-    await addTask(undoTask!).then((value) =>
-        deleteFromTaskArchive(undoContext!, undoTask!)
+    await addTask(_undoTask!).then((value) =>
+        deleteFromTaskArchive(_undoContext!, _undoTask!)
             .then((value) => response = value));
     return response;
   }

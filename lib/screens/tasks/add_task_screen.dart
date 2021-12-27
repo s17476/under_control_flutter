@@ -83,6 +83,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
       TaskExecutor taskExecutor;
       String? userId;
       String? selectedItemId;
+      String? selectedLocation;
 
       if (isValid) {
         if (executorDropdown == 'Specific user') {
@@ -121,6 +122,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
 
         if (selectedAsset?.itemId != '') {
           selectedItemId = selectedAsset?.itemId;
+          selectedLocation = selectedAsset?.location;
         }
 
         Task task = Task(
@@ -133,6 +135,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
           userId:
               Provider.of<UserProvider>(context, listen: false).user!.userId,
           itemId: selectedItemId,
+          location: selectedLocation,
           description: _taskDescription,
           comments: '',
           status: TaskStatus.planned,
@@ -196,6 +199,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
         producer: '',
         model: '',
         category: '',
+        location: '',
         lastInspection: DateTime.now(),
         nextInspection: DateTime.now(),
         interval: '',
@@ -217,6 +221,13 @@ class _AddTaskScreenState extends State<AddTaskScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create new task'),
+        iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+        actions: [
+          IconButton(onPressed: _addNewTask, icon: const Icon(Icons.save)),
+          SizedBox(
+            width: SizeConfig.blockSizeHorizontal * 3,
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: AnimatedPadding(
@@ -545,8 +556,8 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                             selectedUser = allUsers.firstWhere(
                                 (element) => element!.userId == newValue);
                           });
-                          print('user ${selectedUser!.userId}');
-                          print('user ${selectedUser!.userName}');
+                          // print('user ${selectedUser!.userId}');
+                          // print('user ${selectedUser!.userName}');
                         },
                         items: allUsers.map((AppUser? user) {
                           return DropdownMenuItem<String>(
@@ -567,9 +578,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           );
                         }).toList(),
                       ),
-                    SizedBox(
-                      height: SizeConfig.blockSizeVertical * 3,
-                    ),
 
                     // execution date - date picker
                     Row(
@@ -657,26 +665,26 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                       height: SizeConfig.blockSizeVertical * 0.5,
                     ),
                     // save button
-                    ElevatedButton(
-                      //TODO
-                      onPressed: _addNewTask,
-                      child: Text(
-                        'Create task',
-                        style: TextStyle(
-                          fontSize: SizeConfig.blockSizeHorizontal * 5.5,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        primary:
-                            darkTheme[dropdownItems.indexOf(dropdownValue)],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: SizeConfig.blockSizeVertical * 3,
-                    ),
+                    // ElevatedButton(
+                    //   //TODO
+                    //   onPressed: _addNewTask,
+                    //   child: Text(
+                    //     'Create task',
+                    //     style: TextStyle(
+                    //       fontSize: SizeConfig.blockSizeHorizontal * 5.5,
+                    //     ),
+                    //   ),
+                    //   style: ElevatedButton.styleFrom(
+                    //     primary:
+                    //         darkTheme[dropdownItems.indexOf(dropdownValue)],
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(30.0),
+                    //     ),
+                    //   ),
+                    // ),
+                    // SizedBox(
+                    //   height: SizeConfig.blockSizeVertical * 3,
+                    // ),
                   ],
                 ),
               ),

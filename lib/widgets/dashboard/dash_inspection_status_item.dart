@@ -34,8 +34,9 @@ class DashInspectionStatusItem extends StatelessWidget {
                 style: style,
               ),
               StatusIcon(
+                heroTag: '',
                 inspectionStatus: status.index,
-                size: 3,
+                size: 7,
                 textSize: 0,
               ),
             ],

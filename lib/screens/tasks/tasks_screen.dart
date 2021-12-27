@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/task.dart';
@@ -110,12 +111,14 @@ class _TasksScreenState extends State<TasksScreen> {
       filteredTasks = _tasks;
     } else {
       for (var key in keys) {
-        for (var task in _tasks[key]!) {
-          if (task.executor == executor) {
-            if (filteredTasks.containsKey(key)) {
-              filteredTasks[key]!.add(task);
-            } else {
-              filteredTasks[key] = [task];
+        if (_tasks[key] != null) {
+          for (var task in _tasks[key]!) {
+            if (task.executor == executor) {
+              if (filteredTasks.containsKey(key)) {
+                filteredTasks[key]!.add(task);
+              } else {
+                filteredTasks[key] = [task];
+              }
             }
           }
         }
@@ -126,186 +129,223 @@ class _TasksScreenState extends State<TasksScreen> {
         ? ListView.builder(
             shrinkWrap: true,
             padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal),
-            itemCount: keys.toList().length,
+            itemCount: keys.length,
             itemBuilder: (ctx, index) {
               List<Widget> listItems = [];
-              for (var task in filteredTasks[keys.toList()[index]]!) {
-                listItems.add(Dismissible(
-                  key: Key(task.taskId!),
-                  confirmDismiss: (direction) async {
-                    bool response = false;
-                    // swipe right - rapid complete
-                    // rapid complete is a quick and easy way to complete standard tasks
-                    if (direction == DismissDirection.startToEnd) {
-                      await Provider.of<TaskProvider>(context, listen: false)
-                          .rapidComplete(context, task)
-                          .then((value) => response = value);
+              if (filteredTasks[keys[index]] != null) {
+                for (var task in filteredTasks[keys[index]]!) {
+                  // if task date is after today date change status icon color
+                  final dateFormat = DateFormat('dd/MM/yyyy');
+                  final taskDate =
+                      dateFormat.parse(dateFormat.format(task.date));
+                  final nowDate = DateTime(
+                    DateTime.now().year,
+                    DateTime.now().month,
+                    DateTime.now().day - 1,
+                  );
+                  final statusColor = taskDate.isAfter(nowDate)
+                      ? Theme.of(context).hintColor
+                      : Theme.of(context).errorColor;
 
-                      // undo rapid complete
-                      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor:
-                              Theme.of(context).appBarTheme.backgroundColor,
-                          content: Text('${task.title} - Rapid Complete done!'),
-                          duration: const Duration(seconds: 4),
-                          action: SnackBarAction(
-                            textColor: Colors.amber,
-                            label: 'UNDO',
-                            onPressed: () {
-                              Provider.of<TaskProvider>(context, listen: false)
-                                  .undoRapidComplete();
-                            },
-                          ),
-                        ),
-                      );
+                  listItems.add(Dismissible(
+                    key: Key(task.taskId!),
+                    confirmDismiss: (direction) async {
+                      bool response = false;
+                      // swipe right - rapid complete
+                      // rapid complete is a quick and easy way to complete standard tasks
+                      if (direction == DismissDirection.startToEnd) {
+                        await Provider.of<TaskProvider>(context, listen: false)
+                            .rapidComplete(context, task)
+                            .then((value) => response = value);
 
-                      // swipe left - delete
-                    } else if (direction == DismissDirection.endToStart) {
-                      await _showDeleteDialog(context, task).then((value) {
-                        if (value) {
-                          Provider.of<TaskProvider>(context, listen: false)
-                              .deleteTask(context, task);
-                          response = value;
-                        } else {
-                          response = false;
-                        }
-                      });
-                      String msg;
-                      if (response) {
-                        msg = 'Task deleted!';
-                      } else {
-                        msg = 'Task not deleted.';
-                      }
-                      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(msg),
-                          backgroundColor: Theme.of(context).errorColor,
-                        ),
-                      );
-                    }
-                    return response;
-                  },
-                  secondaryBackground: Container(
-                    padding: const EdgeInsets.only(right: 10),
-                    alignment: Alignment.centerRight,
-                    color: Colors.red,
-                    child: Icon(
-                      Icons.delete,
-                      color: Colors.white,
-                      size: SizeConfig.blockSizeHorizontal * 15,
-                    ),
-                  ),
-                  background: Container(
-                    padding: const EdgeInsets.only(left: 10),
-                    alignment: Alignment.centerLeft,
-                    color: Colors.green,
-                    child: Icon(
-                      Icons.done,
-                      color: Colors.white,
-                      size: SizeConfig.blockSizeHorizontal * 20,
-                    ),
-                  ),
-                  child: GestureDetector(
-                    onTap: () => Navigator.of(context)
-                        .pushNamed(TaskDetailsScreen.routeName, arguments: task)
-                        .then((value) {
-                      if (value != null) {
+                        // undo rapid complete
+                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Item deleted'),
+                          SnackBar(
+                            backgroundColor:
+                                Theme.of(context).appBarTheme.backgroundColor,
+                            content:
+                                Text('${task.title} - Rapid Complete done!'),
+                            duration: const Duration(seconds: 4),
+                            action: SnackBarAction(
+                              textColor: Colors.amber,
+                              label: 'UNDO',
+                              onPressed: () {
+                                Provider.of<TaskProvider>(context,
+                                        listen: false)
+                                    .undoRapidComplete();
+                              },
+                            ),
+                          ),
+                        );
+
+                        // swipe left - delete
+                      } else if (direction == DismissDirection.endToStart) {
+                        await _showDeleteDialog(context, task).then((value) {
+                          if (value) {
+                            Provider.of<TaskProvider>(context, listen: false)
+                                .deleteTask(context, task);
+                            response = value;
+                          } else {
+                            response = false;
+                          }
+                        });
+                        String msg;
+                        if (response) {
+                          msg = 'Task deleted!';
+                        } else {
+                          msg = 'Task not deleted.';
+                        }
+                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(msg),
+                            backgroundColor: Theme.of(context).errorColor,
                           ),
                         );
                       }
-                    }),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 3.0,
-                        horizontal: 8.0,
+                      return response;
+                    },
+                    secondaryBackground: Container(
+                      padding: const EdgeInsets.only(right: 10),
+                      alignment: Alignment.centerRight,
+                      color: Colors.red,
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                        size: SizeConfig.blockSizeHorizontal * 15,
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: Container(
-                          // height: 50,
-                          color: Theme.of(context).splashColor,
-                          child: Row(
-                            children: <Widget>[
-                              Hero(
-                                tag: task.taskId!,
-                                child: Container(
-                                  color: darkTheme[task.type.index]!,
-                                  width: SizeConfig.blockSizeHorizontal * 16,
-                                  height: SizeConfig.blockSizeHorizontal * 18,
-                                  child: Icon(
-                                    eventIcons[task.type.index],
-                                    color: Colors.white,
-                                    size: SizeConfig.blockSizeHorizontal * 12,
+                    ),
+                    background: Container(
+                      padding: const EdgeInsets.only(left: 10),
+                      alignment: Alignment.centerLeft,
+                      color: Colors.green,
+                      child: Icon(
+                        Icons.done,
+                        color: Colors.white,
+                        size: SizeConfig.blockSizeHorizontal * 20,
+                      ),
+                    ),
+                    child: GestureDetector(
+                      onTap: () => Navigator.of(context)
+                          .pushNamed(TaskDetailsScreen.routeName,
+                              arguments: task)
+                          .then((value) {
+                        if (value != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Item deleted'),
+                            ),
+                          );
+                        }
+                      }),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 3.0,
+                          horizontal: 8.0,
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(15),
+                          child: Container(
+                            // height: 50,
+                            color: Theme.of(context).splashColor,
+                            child: Row(
+                              children: <Widget>[
+                                Hero(
+                                  tag: task.taskId!,
+                                  child: Container(
+                                    color: darkTheme[task.type.index]!,
+                                    width: SizeConfig.blockSizeHorizontal * 16,
+                                    height: SizeConfig.blockSizeHorizontal * 18,
+                                    child: Icon(
+                                      eventIcons[task.type.index],
+                                      color: Colors.white,
+                                      size: SizeConfig.blockSizeHorizontal * 12,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                  width: SizeConfig.blockSizeHorizontal * 3),
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text(
-                                      task.title,
-                                      style: TextStyle(
-                                        fontSize:
-                                            SizeConfig.blockSizeHorizontal * 4,
-                                        // fontWeight: FontWeight.w400,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    if (task.description != '')
-                                      SizedBox(
-                                        height: SizeConfig.blockSizeHorizontal,
-                                      ),
-                                    if (task.description != '')
+                                SizedBox(
+                                    width: SizeConfig.blockSizeHorizontal * 3),
+                                Expanded(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
                                       Text(
-                                        task.description,
-                                        overflow: TextOverflow.ellipsis,
+                                        task.title,
                                         style: TextStyle(
-                                          color: Theme.of(context).hintColor,
+                                          fontSize:
+                                              SizeConfig.blockSizeHorizontal *
+                                                  4,
+                                          // fontWeight: FontWeight.w400,
                                         ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                  ],
+                                      if (task.location != null &&
+                                          task.location != '')
+                                        SizedBox(
+                                          height:
+                                              SizeConfig.blockSizeHorizontal,
+                                        ),
+                                      if (task.location != null &&
+                                          task.location != '')
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.location_on,
+                                              color:
+                                                  Theme.of(context).hintColor,
+                                            ),
+                                            Text(
+                                              task.location!,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color:
+                                                    Theme.of(context).hintColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Icon(
-                                statusIcons[task.status.index],
-                                color: Colors.white,
-                                size: SizeConfig.blockSizeHorizontal * 9,
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Icon(Icons.arrow_forward_ios,
-                                  color: Theme.of(context).primaryColor),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                            ],
+                                Icon(
+                                  statusIcons[task.status.index],
+                                  color: statusColor,
+                                  size: SizeConfig.blockSizeHorizontal * 9,
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ));
+                  ));
+                }
               }
+              print(keys);
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: SizeConfig.blockSizeHorizontal * 5,
-                      vertical: SizeConfig.blockSizeHorizontal,
+                  if (listItems.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: SizeConfig.blockSizeHorizontal * 5,
+                        vertical: SizeConfig.blockSizeHorizontal,
+                      ),
+                      child: Text(keys[index]),
                     ),
-                    child: Text(keys[index]),
-                  ),
                   ...listItems,
                 ],
               );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/task.dart';
@@ -93,6 +94,18 @@ class CalendarEventsList extends StatelessWidget {
                   padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal),
                   itemCount: value.length,
                   itemBuilder: (ctx, index) {
+                    // if task date is after today date change status icon color
+                    final dateFormat = DateFormat('dd/MM/yyyy');
+                    final taskDate =
+                        dateFormat.parse(dateFormat.format(value[index].date));
+                    final nowDate = DateTime(
+                      DateTime.now().year,
+                      DateTime.now().month,
+                      DateTime.now().day - 1,
+                    );
+                    final statusColor = taskDate.isAfter(nowDate)
+                        ? Theme.of(context).hintColor
+                        : Theme.of(context).errorColor;
                     return Dismissible(
                       key: Key(value[index].taskId!),
                       confirmDismiss: (direction) async {
@@ -236,26 +249,37 @@ class CalendarEventsList extends StatelessWidget {
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        if (value[index].description != '')
+                                        if (value[index].location != null &&
+                                            value[index].location != '')
                                           SizedBox(
                                             height:
                                                 SizeConfig.blockSizeHorizontal,
                                           ),
-                                        if (value[index].description != '')
-                                          Text(
-                                            value[index].description,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              color:
-                                                  Theme.of(context).hintColor,
-                                            ),
+                                        if (value[index].location != null &&
+                                            value[index].location != '')
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.location_on,
+                                                color:
+                                                    Theme.of(context).hintColor,
+                                              ),
+                                              Text(
+                                                value[index].location!,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .hintColor,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                       ],
                                     ),
                                   ),
                                   Icon(
                                     statusIcons[value[index].status.index],
-                                    color: Colors.white,
+                                    color: statusColor,
                                     size: SizeConfig.blockSizeHorizontal * 9,
                                   ),
                                   const SizedBox(

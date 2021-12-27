@@ -263,6 +263,8 @@ class UserProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+    _isLoading = false;
+    notifyListeners();
   }
 
   void signout() {

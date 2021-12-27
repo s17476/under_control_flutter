@@ -8,6 +8,7 @@ class Item {
   String producer;
   String model;
   String category;
+  String location;
   String comments;
   List<Inspection> inspections;
   DateTime lastInspection;
@@ -21,6 +22,7 @@ class Item {
     required this.producer,
     required this.model,
     required this.category,
+    required this.location,
     this.comments = '',
     required this.lastInspection,
     required this.nextInspection,

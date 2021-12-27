@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
-import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
@@ -90,6 +89,7 @@ class _MainScreenState extends State<MainScreen> {
           return [
             // app bar
             SliverAppBar(
+              iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
               title: Text(
                 BottomNaviBar.tabs[_selectedPageIndex]['title'] as String,
               ),
@@ -98,7 +98,7 @@ class _MainScreenState extends State<MainScreen> {
                 if (_selectedPageIndex == 2)
                   IconButton(onPressed: () {}, icon: const Icon(Icons.chat)),
                 // show by category icon in assets screen
-                if (_selectedPageIndex == 1)
+                if (_selectedPageIndex == 3)
                   IconButton(
                     onPressed: () {
                       final itemProvider =
@@ -108,7 +108,10 @@ class _MainScreenState extends State<MainScreen> {
                         ..toggleDescendning()
                         ..fetchAndSetItems();
                     },
-                    icon: const Icon(Icons.checklist_rtl),
+                    icon: Icon(
+                      Icons.checklist_rtl,
+                      color: Theme.of(context).appBarTheme.foregroundColor,
+                    ),
                   ),
                 SizedBox(
                   width:
@@ -125,7 +128,7 @@ class _MainScreenState extends State<MainScreen> {
                     maxRadius: SizeConfig.blockSizeHorizontal * 4,
                   ),
                 // show by status button in assets screen
-                if (_selectedPageIndex == 1)
+                if (_selectedPageIndex == 3)
                   IconButton(
                     onPressed: () {
                       final itemProvider =
@@ -137,7 +140,10 @@ class _MainScreenState extends State<MainScreen> {
                         ..fetchAndSetItems();
                       // }
                     },
-                    icon: const Icon(Icons.category),
+                    icon: Icon(
+                      Icons.category,
+                      color: Theme.of(context).appBarTheme.foregroundColor,
+                    ),
                   ),
                 SizedBox(
                   width:
@@ -146,8 +152,68 @@ class _MainScreenState extends State<MainScreen> {
                           : 1,
                 ),
 
-                // show add button in tasks and assets screen
+                // show in assets screen - sort by
+                // if (_selectedPageIndex == 1)
+                //   Row(
+                //     children: [
+                //       const Text('Sort by:'),
+                //       IconButton(
+                //           onPressed: () {}, icon: const Icon(Icons.event)),
+                //       // TODO
+                //       IconButton(
+                //         onPressed: () {},
+                //         icon: const Icon(
+                //           Icons.location_on,
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+
+                // show in calendar and tasks screen
                 if (_selectedPageIndex == 1 || _selectedPageIndex == 0)
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: SizeConfig.safeBlockHorizontal * 1.5,
+                      // right: SizeConfig.blockSizeHorizontal * 3,
+                    ),
+                    child: DropdownButton<String>(
+                      alignment: AlignmentDirectional.center,
+                      underline: Container(),
+                      icon: Icon(
+                        Icons.keyboard_arrow_down_rounded,
+                        color: Theme.of(context).primaryIconTheme.color,
+                      ),
+                      value: dropdownValue,
+                      // style: TextStyle(color: Colors.white),
+                      items: dropdownItems.map((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Center(
+                            child: Text(
+                              value,
+                              // textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          dropdownValue = newValue!;
+                        });
+                        Provider.of<TaskProvider>(context, listen: false)
+                                .executor =
+                            TaskExecutor
+                                .values[dropdownItems.indexOf(dropdownValue)];
+                      },
+                      dropdownColor: Colors.black,
+                    ),
+                  ),
+
+                // show add button in tasks and assets screen
+                if (_selectedPageIndex == 3 || _selectedPageIndex == 0)
                   IconButton(
                     onPressed:
                         // in assets screen
@@ -191,48 +257,6 @@ class _MainScreenState extends State<MainScreen> {
                 SizedBox(
                   width: SizeConfig.blockSizeHorizontal * 4,
                 ),
-                // show in calendar
-                if (_selectedPageIndex == 3 || _selectedPageIndex == 0)
-                  Padding(
-                    padding: EdgeInsets.only(
-                      top: SizeConfig.safeBlockHorizontal * 1.5,
-                      right: SizeConfig.blockSizeHorizontal * 3,
-                    ),
-                    child: DropdownButton<String>(
-                      alignment: AlignmentDirectional.center,
-                      underline: Container(),
-                      icon: Icon(
-                        Icons.keyboard_arrow_down_rounded,
-                        color: Theme.of(context).primaryIconTheme.color,
-                      ),
-                      value: dropdownValue,
-                      // style: TextStyle(color: Colors.white),
-                      items: dropdownItems.map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Center(
-                            child: Text(
-                              value,
-                              // textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: SizeConfig.blockSizeHorizontal * 4.5,
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          dropdownValue = newValue!;
-                        });
-                        Provider.of<TaskProvider>(context, listen: false)
-                                .executor =
-                            TaskExecutor
-                                .values[dropdownItems.indexOf(dropdownValue)];
-                      },
-                      dropdownColor: Colors.black,
-                    ),
-                  )
               ],
               pinned: false,
               floating: true,

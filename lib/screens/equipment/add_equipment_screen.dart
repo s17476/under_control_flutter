@@ -26,6 +26,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
   String _producer = '';
   String _model = '';
   String _category = '';
+  String _location = '';
   String _comments = '';
 
   // add new asset
@@ -75,6 +76,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
           producer: _producer,
           model: _model,
           category: _category,
+          location: _location,
           comments: _comments,
           lastInspection: _lastInspection!,
           nextInspection: _nextInspection!,
@@ -139,7 +141,14 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit equipment'),
+        title: const Text('Add asset'),
+        iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+        actions: [
+          IconButton(onPressed: _addNewEquipment, icon: const Icon(Icons.save)),
+          SizedBox(
+            width: SizeConfig.blockSizeHorizontal * 3,
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: AnimatedPadding(
@@ -284,6 +293,37 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                       },
                       onSaved: (value) {
                         _category = value!;
+                      },
+                    ),
+                    SizedBox(
+                      height: SizeConfig.blockSizeVertical * 3,
+                    ),
+                    //location
+                    TextFormField(
+                      key: const ValueKey('location'),
+                      keyboardType: TextInputType.name,
+                      textInputAction: TextInputAction.next,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(
+                          vertical: SizeConfig.blockSizeHorizontal * 1,
+                          horizontal: SizeConfig.blockSizeHorizontal * 5,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Theme.of(context).splashColor,
+                        hintText: 'Asset location',
+                      ),
+                      validator: (val) {
+                        if (val!.length < 2) {
+                          return 'location to short';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _location = value!;
                       },
                     ),
                     SizedBox(
@@ -452,24 +492,24 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                 height: SizeConfig.blockSizeVertical * 0.5,
               ),
               // save button
-              ElevatedButton(
-                onPressed: _addNewEquipment,
-                child: Text(
-                  'Add equipment',
-                  style: TextStyle(
-                    fontSize: SizeConfig.blockSizeHorizontal * 5.5,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  primary: Theme.of(context).primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30.0),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: SizeConfig.blockSizeVertical * 3,
-              ),
+              // ElevatedButton(
+              //   onPressed: _addNewEquipment,
+              //   child: Text(
+              //     'Add asset',
+              //     style: TextStyle(
+              //       fontSize: SizeConfig.blockSizeHorizontal * 5.5,
+              //     ),
+              //   ),
+              //   style: ElevatedButton.styleFrom(
+              //     primary: Theme.of(context).primaryColor,
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(30.0),
+              //     ),
+              //   ),
+              // ),
+              // SizedBox(
+              //   height: SizeConfig.blockSizeVertical * 3,
+              // ),
             ],
           ),
         ),

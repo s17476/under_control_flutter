@@ -13,9 +13,9 @@ class LoadingScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Logo(
-            greenLettersSize: SizeConfig.blockSizeVertical * 2,
-            whitheLettersSize: SizeConfig.blockSizeVertical * 1.4,
+          const Logo(
+            greenLettersSize: 15,
+            whitheLettersSize: 10,
           ),
           CircularProgressIndicator(
             color: Theme.of(context).primaryColor,
