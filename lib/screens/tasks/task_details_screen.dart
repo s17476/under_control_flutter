@@ -27,6 +27,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
   String _executorName = '';
   String _creatorName = '';
   bool _isInEditMode = false;
+  DateTime? oldNextDate;
+  String? oldInterval;
+  Task? transferObjectTask;
+
+  final ScrollController _scrollController = ScrollController();
 
   final List<Color?> darkTheme = const [
     Colors.green,
@@ -77,13 +82,15 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
   @override
   void initState() {
     super.initState();
+
     //initialize animations controllers
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
+
     _userSlideAnimation = Tween<Offset>(
-      begin: const Offset(0, -0.5),
+      begin: const Offset(0, 1.0),
       end: const Offset(0, 0),
     ).animate(
       CurvedAnimation(
@@ -91,8 +98,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
         curve: Curves.linear,
       ),
     );
+
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, -0.5),
+      begin: const Offset(0, 1.0),
       end: const Offset(0, 0),
     ).animate(
       CurvedAnimation(
@@ -100,10 +108,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
         curve: Curves.linear,
       ),
     );
+
     _opacityAnimation = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
       parent: _animationController!,
       curve: Curves.easeIn,
     ));
+
     _opacityAnimationBackward =
         Tween(begin: 1.0, end: 0.0).animate(CurvedAnimation(
       parent: _animationController!,
@@ -111,12 +121,14 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
     ));
   }
 
+  //dispose animation controller
   @override
   void dispose() {
     super.dispose();
     _animationController!.dispose();
   }
 
+  //get task executor name
   Future<void> _getExecutorName() async {
     await Provider.of<UserProvider>(context)
         .getUserById(context, task.executorId!)
@@ -127,6 +139,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
     });
   }
 
+  //get task creator name
   Future<void> _getCreatorName() async {
     await Provider.of<UserProvider>(context)
         .getUserById(context, task.userId)
@@ -137,6 +150,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
     });
   }
 
+  // show delete confirmation dialog
   Future<bool> _showDeleteDialog(
     BuildContext context,
     Task task,
@@ -183,22 +197,72 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
     );
   }
 
+  // show complete confirmation dialog
+  Future<bool> _showCompleteDialog(
+    BuildContext context,
+    Task task,
+  ) async {
+    return await showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Complete task?'),
+          content: SingleChildScrollView(
+            child: Text(
+              'Are you sure You want to complete \n${task.title}?',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text(
+                'No',
+                style: TextStyle(
+                  color: Theme.of(context).errorColor,
+                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text(
+                'Yes',
+                style: TextStyle(
+                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                ),
+              ),
+            ),
+          ],
+          actionsAlignment: MainAxisAlignment.spaceEvenly,
+        );
+      },
+    );
+  }
+
   // toggle view / edit mode
   void _toggleEditMode() => setState(() {
         _isInEditMode = !_isInEditMode;
       });
 
-//TODO
+  // save changes if completed == false
+  // complete task if completed == true
   void _completeTask(bool completed) {
     if (_formKey.currentState != null) {
       // validate user input
       final isValid = _formKey.currentState!.validate();
       if (isValid) {
         _formKey.currentState!.save();
-
-        if (task.taskInterval != 'No') {
-          // set inspections interval
-          List<String> duration = task.taskInterval!.split(' ');
+        if (transferObjectTask!.duration != null) {
+          task.duration = transferObjectTask!.duration;
+        }
+        if (transferObjectTask!.taskInterval != task.taskInterval) {
+          List<String> duration = transferObjectTask!.taskInterval!.split(' ');
+          task.taskInterval = transferObjectTask!.taskInterval;
           if (duration[1] == 'week' || duration[1] == 'weeks') {
             task.nextDate = DateTime(
               task.date.year,
@@ -213,35 +277,42 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                 task.date.month, task.date.day);
           }
         }
+
+        // executor ID
         task.executorId =
             Provider.of<UserProvider>(context, listen: false).user!.userId;
-        print(
-            'completeTask ${task.taskInterval}  date ${DateFormat('dd/MM/yyyy').format(task.date)}');
-        print('${task.comments}');
+
+        // date
+        task.date = transferObjectTask!.date;
+
+        // cost
+        task.cost = transferObjectTask!.cost;
+
+        // comments
+        task.comments = transferObjectTask!.comments;
+
+        // task finished and moved to archive
+        if (completed) {
+          task.status = TaskStatus.completed;
+          Provider.of<TaskProvider>(context, listen: false)
+              .completeTask(context, task);
+        } else {
+          // task is started, but not finished
+          task.status = TaskStatus.started;
+          Provider.of<TaskProvider>(context, listen: false).updateTask(task);
+        }
       }
     }
   }
 
   @override
   void didChangeDependencies() {
-    var tmpTask = ModalRoute.of(context)!.settings.arguments as Task;
-    task = Task(
-      title: tmpTask.title,
-      date: tmpTask.date,
-      executor: tmpTask.executor,
-      userId: tmpTask.userId,
-      description: tmpTask.description,
-      comments: tmpTask.comments,
-      status: tmpTask.status,
-      type: tmpTask.type,
-      executorId: tmpTask.executorId,
-      images: tmpTask.images,
-      itemId: tmpTask.itemId,
-      location: tmpTask.location,
-      nextDate: tmpTask.nextDate,
-      taskId: tmpTask.taskId,
-      taskInterval: tmpTask.taskInterval,
-    );
+    task = ModalRoute.of(context)!.settings.arguments as Task;
+
+    if (task.nextDate != null && oldNextDate != null) {
+      oldNextDate = task.nextDate;
+      oldInterval = task.taskInterval;
+    }
     if (task.executorId != null && _executorName == '') {
       _getExecutorName();
     }
@@ -253,6 +324,27 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
+    // used to store task state before saving
+    transferObjectTask = Task(
+      title: task.title,
+      date: task.date,
+      executor: task.executor,
+      userId: task.userId,
+      description: task.description,
+      comments: task.comments,
+      status: task.status,
+      type: task.type,
+      executorId: task.executorId,
+      images: task.images,
+      itemId: task.itemId,
+      location: task.location,
+      nextDate: task.nextDate,
+      taskId: task.taskId,
+      taskInterval: task.taskInterval,
+      cost: task.cost,
+      duration: task.duration,
+    );
+
     final items = Provider.of<ItemProvider>(context, listen: false).items;
     final textStyle = Theme.of(context).textTheme.headline6!.copyWith(
         // fontSize: SizeConfig.blockSizeHorizontal * 4.5,
@@ -267,7 +359,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
 
     Item? asset;
 
-    print(task.itemId);
+    // print(task.itemId);
     final index = items.indexWhere((element) => element.itemId == task.itemId);
     if (index >= 0) {
       asset = items[index];
@@ -284,7 +376,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                 if (value == true) {
                   Provider.of<TaskProvider>(context, listen: false)
                       .deleteTask(context, task);
-                  Navigator.of(context).pop(value);
+                  Navigator.of(context).pop('deleted');
                 }
               });
             },
@@ -296,7 +388,17 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
           // done appbar button
           if (_isInEditMode)
             IconButton(
-              onPressed: () => _completeTask(false),
+              onPressed: () {
+                FocusScope.of(context).unfocus();
+                _toggleEditMode();
+                if (_isInEditMode) {
+                  _animationController!.forward();
+                } else {
+                  _animationController!.reverse();
+                }
+
+                _completeTask(false);
+              },
               icon: Icon(
                 Icons.save,
                 color: Theme.of(context).primaryColor,
@@ -307,7 +409,15 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
           // ),
           if (_isInEditMode)
             IconButton(
-              onPressed: () => _completeTask(true),
+              onPressed: () {
+                FocusScope.of(context).unfocus();
+                _showCompleteDialog(context, task).then((value) {
+                  if (value == true) {
+                    _completeTask(true);
+                    Navigator.of(context).pop('completed');
+                  }
+                });
+              },
               icon: Icon(
                 Icons.done,
                 color: Theme.of(context).primaryColor,
@@ -320,7 +430,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
       ),
       body: Container(
         width: SizeConfig.blockSizeHorizontal * 100,
-        height: SizeConfig.blockSizeVertical * 100,
+        height: SizeConfig.blockSizeVertical * 110,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -332,6 +442,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
           ),
         ),
         child: SingleChildScrollView(
+          controller: _scrollController,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -412,7 +523,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
               ),
               Padding(
                 padding:
-                    const EdgeInsets.only(left: 16.0, top: 16.0, right: 16),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -569,7 +680,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                       ],
                     ),
                     // next date
-                    if (task.taskInterval != 'No')
+                    if (task.taskInterval != 'No' && task.nextDate != null)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -610,106 +721,186 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                         ),
                       ],
                     ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16, bottom: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // cost
+                    if (task.cost != null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // complete / cancel button
-                          TextButton.icon(
-                            onPressed: () {
-                              FocusScope.of(context).unfocus();
-                              _toggleEditMode();
-                              if (_isInEditMode) {
-                                _animationController!.forward();
-                              } else {
-                                _animationController!.reverse();
-                              }
-                            },
-                            icon: _isInEditMode
-                                ? Icon(
-                                    Icons.cancel,
-                                    size: SizeConfig.blockSizeHorizontal * 6,
-                                    color: Theme.of(context).errorColor,
-                                  )
-                                : Icon(
-                                    Icons.keyboard_arrow_down_outlined,
-                                    size: SizeConfig.blockSizeHorizontal * 8,
-                                  ),
-                            label: Text(
-                              _isInEditMode ? 'Cancel' : 'Complete the task',
-                              style: textStyle.copyWith(
-                                color: Theme.of(context)
-                                    .appBarTheme
-                                    .backgroundColor,
-                                fontSize: SizeConfig.blockSizeHorizontal * 4.5,
-                              ),
-                            ),
+                          const SizedBox(
+                            height: 8,
                           ),
-                          //save task button
-                          if (_isInEditMode)
-                            TextButton.icon(
-                              onPressed: () => _completeTask(false),
-                              icon: Icon(
-                                Icons.save,
-                                size: SizeConfig.blockSizeHorizontal * 6,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              label: Text(
-                                'Save',
-                                style: textStyle.copyWith(
-                                  color: Theme.of(context)
-                                      .appBarTheme
-                                      .backgroundColor,
-                                  fontSize:
-                                      SizeConfig.blockSizeHorizontal * 4.5,
-                                ),
-                              ),
-                            ),
-                          //complete task button
-                          if (_isInEditMode)
-                            TextButton.icon(
-                              onPressed: () => _completeTask(true),
-                              icon: Icon(
-                                Icons.done,
-                                size: SizeConfig.blockSizeHorizontal * 6,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              label: Text(
-                                'Complete',
-                                style: textStyle.copyWith(
-                                  color: Theme.of(context)
-                                      .appBarTheme
-                                      .backgroundColor,
-                                  fontSize:
-                                      SizeConfig.blockSizeHorizontal * 4.5,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-
-                    Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          //name field
-                          FadeTransition(
-                            opacity: _opacityAnimation!,
-                            child: SlideTransition(
-                              position: _userSlideAnimation!,
-                              child: task.type != TaskType.inspection
-                                  ? TaskComplete(
-                                      task: task,
-                                    )
-                                  : null,
-                            ),
+                          Text(
+                            'Cost',
+                            style: labelTextStyle,
+                          ),
+                          const SizedBox(
+                            height: 1,
+                          ),
+                          Text(
+                            '${task.cost} EUR',
+                            style: textStyle,
                           ),
                         ],
                       ),
+                    // duration
+                    if (task.duration != null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            'Duration',
+                            style: labelTextStyle,
+                          ),
+                          const SizedBox(
+                            height: 1,
+                          ),
+                          Text(
+                            '${task.duration! ~/ 60} hrs, ${task.duration! % 60} min',
+                            style: textStyle,
+                          ),
+                        ],
+                      ),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 500),
+                      height: _isInEditMode ? null : 0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 16),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              FadeTransition(
+                                opacity: _opacityAnimation!,
+                                child: SlideTransition(
+                                  position: _userSlideAnimation!,
+                                  child: task.type != TaskType.inspection
+                                      ? TaskComplete(
+                                          task: transferObjectTask!,
+                                        )
+                                      : null,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
+                  ],
+                ),
+              ),
+
+              // action buttons bar
+              AnimatedContainer(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                duration: const Duration(milliseconds: 500),
+                color: _isInEditMode
+                    ? Theme.of(context).appBarTheme.backgroundColor
+                    : null,
+                width: double.infinity,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // complete / cancel button
+                    TextButton.icon(
+                      onPressed: () {
+                        FocusScope.of(context).unfocus();
+                        _toggleEditMode();
+                        if (_isInEditMode) {
+                          _animationController!.forward();
+                          _scrollController.animateTo(
+                            400,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.easeIn,
+                          );
+                        } else {
+                          _animationController!.reverse();
+                          // _scrollController.animateTo(
+                          //   -200,
+                          //   duration: Duration(milliseconds: 500),
+                          //   curve: Curves.easeIn,
+                          // );
+                        }
+                      },
+                      icon: _isInEditMode
+                          ? Icon(
+                              Icons.cancel,
+                              size: SizeConfig.blockSizeHorizontal * 6,
+                              color: Theme.of(context).errorColor,
+                            )
+                          : Icon(
+                              Icons.keyboard_arrow_down_outlined,
+                              size: SizeConfig.blockSizeHorizontal * 8,
+                            ),
+                      label: Text(
+                        _isInEditMode ? 'Cancel' : 'Complete the task',
+                        style: textStyle.copyWith(
+                          color: _isInEditMode
+                              ? Theme.of(context).appBarTheme.foregroundColor
+                              : Theme.of(context).appBarTheme.backgroundColor,
+                          fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                        ),
+                      ),
+                    ),
+                    //save task button
+                    if (_isInEditMode)
+                      TextButton.icon(
+                        onPressed: () {
+                          FocusScope.of(context).unfocus();
+                          _toggleEditMode();
+                          if (_isInEditMode) {
+                            _animationController!.forward();
+                          } else {
+                            _animationController!.reverse();
+                          }
+
+                          _completeTask(false);
+                        },
+                        icon: Icon(
+                          Icons.save,
+                          size: SizeConfig.blockSizeHorizontal * 6,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        label: Text(
+                          'Save',
+                          style: textStyle.copyWith(
+                            color: _isInEditMode
+                                ? Theme.of(context).appBarTheme.foregroundColor
+                                : Theme.of(context).appBarTheme.backgroundColor,
+                            fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                          ),
+                        ),
+                      ),
+                    //complete task button
+                    if (_isInEditMode)
+                      TextButton.icon(
+                        onPressed: () {
+                          FocusScope.of(context).unfocus();
+                          _showCompleteDialog(context, task).then((value) {
+                            if (value == true) {
+                              _completeTask(true);
+                              Navigator.of(context).pop('completed');
+                            }
+                          });
+                        },
+                        icon: Icon(
+                          Icons.done,
+                          size: SizeConfig.blockSizeHorizontal * 6,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        label: Text(
+                          'Complete',
+                          style: textStyle.copyWith(
+                            color: _isInEditMode
+                                ? Theme.of(context).appBarTheme.foregroundColor
+                                : Theme.of(context).appBarTheme.backgroundColor,
+                            fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),

@@ -190,19 +190,16 @@ class _TasksScreenState extends State<TasksScreen> {
                             response = false;
                           }
                         });
-                        String msg;
+
                         if (response) {
-                          msg = 'Task deleted!';
-                        } else {
-                          msg = 'Task not deleted.';
+                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: const Text('Task deleted!'),
+                              backgroundColor: Theme.of(context).errorColor,
+                            ),
+                          );
                         }
-                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(msg),
-                            backgroundColor: Theme.of(context).errorColor,
-                          ),
-                        );
                       }
                       return response;
                     },
@@ -232,9 +229,19 @@ class _TasksScreenState extends State<TasksScreen> {
                               arguments: task)
                           .then((value) {
                         if (value != null) {
+                          String msg = '';
+                          Color color =
+                              Theme.of(context).appBarTheme.backgroundColor!;
+                          if (value == 'deleted') {
+                            msg = 'Task has been deleted!';
+                          } else if (value == 'completed') {
+                            msg = 'Task completed. Well done!';
+                            color = Theme.of(context).primaryColor;
+                          }
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Item deleted'),
+                            SnackBar(
+                              content: Text(msg),
+                              backgroundColor: color,
                             ),
                           );
                         }

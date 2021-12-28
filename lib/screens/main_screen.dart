@@ -169,23 +169,6 @@ class _MainScreenState extends State<MainScreen> {
                             : 1,
                   ),
 
-                  // show in assets screen - sort by
-                  // if (_selectedPageIndex == 1)
-                  //   Row(
-                  //     children: [
-                  //       const Text('Sort by:'),
-                  //       IconButton(
-                  //           onPressed: () {}, icon: const Icon(Icons.event)),
-                  //       // TODO
-                  //       IconButton(
-                  //         onPressed: () {},
-                  //         icon: const Icon(
-                  //           Icons.location_on,
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-
                   // show in calendar and tasks screen
                   if (_selectedPageIndex == 1 || _selectedPageIndex == 0)
                     Padding(
@@ -246,8 +229,11 @@ class _MainScreenState extends State<MainScreen> {
                                     if (value != null) {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                        const SnackBar(
+                                        SnackBar(
                                           content: Text('New asset added'),
+                                          backgroundColor: Theme.of(context)
+                                              .appBarTheme
+                                              .backgroundColor,
                                         ),
                                       );
                                     }
@@ -263,9 +249,12 @@ class _MainScreenState extends State<MainScreen> {
                                     if (value != null) {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                        const SnackBar(
+                                        SnackBar(
                                           content:
                                               Text('Task successcul added'),
+                                          backgroundColor: Theme.of(context)
+                                              .appBarTheme
+                                              .backgroundColor,
                                         ),
                                       );
                                     }

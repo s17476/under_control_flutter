@@ -111,6 +111,7 @@ class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
                                   Icon(
                                     eventIcons[task.type.index],
                                     color: darkTheme[task.type.index],
+                                    size: SizeConfig.blockSizeHorizontal * 7,
                                   ),
                                 ],
                               )

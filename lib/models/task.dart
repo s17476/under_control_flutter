@@ -23,7 +23,7 @@ class Task {
   TaskStatus status;
   TaskType type;
   List<File>? images;
-  Double? cost;
+  double? cost;
   int? duration;
 
   Task({

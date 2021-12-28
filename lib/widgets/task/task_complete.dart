@@ -1,3 +1,6 @@
+import 'dart:ffi';
+
+import 'package:flutter/services.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/Picker.dart';
@@ -6,7 +9,10 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/task.dart';
 
 class TaskComplete extends StatefulWidget {
-  const TaskComplete({Key? key, required this.task}) : super(key: key);
+  TaskComplete({
+    Key? key,
+    required this.task,
+  }) : super(key: key);
 
   final Task task;
 
@@ -26,6 +32,7 @@ class _TaskCompleteState extends State<TaskComplete> {
     Colors.red,
   ];
 
+  // date picker
   void _datePicker() {
     showDatePicker(
       builder: (BuildContext context, Widget? child) {
@@ -59,12 +66,13 @@ class _TaskCompleteState extends State<TaskComplete> {
   Widget build(BuildContext context) {
     if (widget.task.duration != null && widget.task.duration != 0) {
       _hour = (widget.task.duration! ~/ 60);
-      _min = widget.task.duration! - (_hour * 60);
+      _min = widget.task.duration! % 60;
     }
     _taskInterval = widget.task.taskInterval!;
     return Column(
       children: [
         TextFormField(
+          initialValue: widget.task.comments,
           key: const ValueKey('comments'),
           textInputAction: TextInputAction.newline,
           maxLines: null,
@@ -93,6 +101,8 @@ class _TaskCompleteState extends State<TaskComplete> {
         Padding(
           padding: const EdgeInsets.only(top: 16),
           child: TextFormField(
+            initialValue:
+                widget.task.cost != null ? widget.task.cost!.toString() : '',
             key: const ValueKey('cost'),
             textInputAction: TextInputAction.next,
             keyboardType: TextInputType.number,
@@ -109,18 +119,26 @@ class _TaskCompleteState extends State<TaskComplete> {
               fillColor: Theme.of(context).splashColor,
               labelText: 'Cost',
               labelStyle: TextStyle(
-                  color: Theme.of(context).appBarTheme.backgroundColor),
+                color: Theme.of(context).appBarTheme.backgroundColor,
+              ),
             ),
             onSaved: (value) {
               if (value != null && value != '') {
-                widget.task.comments = value;
+                try {
+                  widget.task.cost = double.parse(value);
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Wrong number format')));
+                }
               }
             },
           ),
         ),
         Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: SizeConfig.blockSizeHorizontal * 8,
+          padding: EdgeInsets.only(
+            left: SizeConfig.blockSizeHorizontal * 8,
+            right: SizeConfig.blockSizeHorizontal * 8,
+            top: SizeConfig.blockSizeHorizontal * 4,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -176,6 +194,7 @@ class _TaskCompleteState extends State<TaskComplete> {
                 style: TextStyle(
                   color: Theme.of(context).appBarTheme.backgroundColor,
                   fontSize: SizeConfig.blockSizeHorizontal * 4,
+                  fontWeight: FontWeight.w600,
                 ),
                 underline: Container(height: 0),
                 onChanged: (String? newValue) {
@@ -205,8 +224,10 @@ class _TaskCompleteState extends State<TaskComplete> {
         ),
 
         Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: SizeConfig.blockSizeHorizontal * 8,
+          padding: EdgeInsets.only(
+            left: SizeConfig.blockSizeHorizontal * 8,
+            right: SizeConfig.blockSizeHorizontal * 8,
+            bottom: SizeConfig.blockSizeHorizontal * 8,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -242,17 +263,10 @@ class _TaskCompleteState extends State<TaskComplete> {
                         child: Container(
                           width: 30.0,
                           alignment: Alignment.center,
-                          child: Icon(Icons.more_vert),
+                          child: const Icon(Icons.more_vert),
                         ),
                       )
                     ],
-                    // backgroundColor: Colors.white,
-                    // cancel: Text(
-                    //   'Cancel',
-                    //   style: TextStyle(
-                    //       color: Colors.red,
-                    //       fontSize: SizeConfig.blockSizeHorizontal * 6),
-                    // ),
                     cancelText: 'Cancel',
                     cancelTextStyle: TextStyle(
                       color: Colors.red,
@@ -278,10 +292,9 @@ class _TaskCompleteState extends State<TaskComplete> {
                       duration = (picker.getSelectedValues()[0] * 60) +
                           picker.getSelectedValues()[1];
                       setState(() {
+                        print('set state $duration');
                         widget.task.duration = duration;
                       });
-
-                      print('duration $duration');
                     },
                   ).showDialog(context);
                 },

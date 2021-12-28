@@ -92,8 +92,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     TaskProvider taskProvider = Provider.of<TaskProvider>(context);
     _eventList = taskProvider.getAllTasks;
-    print(
-        "build ..................................... ${_eventList.keys}, $_selectedDay");
     executor = Provider.of<TaskProvider>(context).executor;
     _selectedEvents.value = _getEventsForDay(_selectedDay!);
     return Column(

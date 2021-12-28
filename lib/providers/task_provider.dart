@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:under_control_flutter/models/app_user.dart';
-import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 
 class TaskProvider with ChangeNotifier {
@@ -91,7 +90,10 @@ class TaskProvider with ChangeNotifier {
           status: TaskStatus.values[doc['status']],
           type: TaskType.values[doc['type']],
           images: doc['images'],
+          cost: doc['cost'],
+          duration: doc['duration'],
         );
+        print('f\ne\nt\nc\nh\n ${tmpTask.cost}  ${tmpTask.duration}');
         if (tmpTasks.containsKey(stringDate)) {
           tmpTasks[stringDate]!.add(tmpTask);
         } else {
@@ -127,6 +129,8 @@ class TaskProvider with ChangeNotifier {
       'status': task.status.index,
       'type': task.type.index,
       'images': task.images,
+      'cost': task.cost,
+      'duration': task.duration,
     }).then((autoreneratedId) {
       tmpTask = Task(
         taskId: autoreneratedId.id,
@@ -144,6 +148,8 @@ class TaskProvider with ChangeNotifier {
         status: task.status,
         type: task.type,
         images: task.images,
+        cost: task.cost,
+        duration: task.duration,
       );
       final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
       if (_tasks.containsKey(date)) {
@@ -154,6 +160,46 @@ class TaskProvider with ChangeNotifier {
       print('added task');
       notifyListeners();
     });
+  }
+
+  // update task
+  Future<void> updateTask(Task task) async {
+    print('task dur update ${task.duration}');
+    final tasksRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(_user!.companyId)
+        .collection('tasks')
+        .doc(task.taskId);
+
+    await tasksRef.set({
+      'title': task.title,
+      'date': task.date.toIso8601String(),
+      'nextDate': task.nextDate?.toIso8601String(),
+      'taskInterval': task.taskInterval,
+      'executor': task.executor.index,
+      'executorId': task.executorId,
+      'userId': task.userId,
+      'itemId': task.itemId,
+      'location': task.location,
+      'description': task.description,
+      'comments': task.comments,
+      'status': task.status.index,
+      'type': task.type.index,
+      'images': task.images,
+      'cost': task.cost,
+      'duration': task.duration,
+    });
+    _tasks.forEach((key, val) {
+      var index = val.indexWhere((element) => element.taskId == task.taskId);
+      if (index > -1) {
+        _tasks[key]![index] = task;
+      }
+    });
+    notifyListeners();
+  }
+
+  Future<void> completeTask(BuildContext context, Task task) async {
+    await addToArchive(task).then((_) => deleteTask(context, task));
   }
 
   Future<void> addToArchive(Task task) async {
@@ -175,10 +221,12 @@ class TaskProvider with ChangeNotifier {
       'itemId': task.itemId,
       'location': task.location,
       'description': task.description,
-      'comments': 'Rapid Complete',
-      'status': TaskStatus.completed.index,
+      'comments': task.comments,
+      'status': task.status.index,
       'type': task.type.index,
       'images': task.images,
+      'cost': task.cost,
+      'duration': task.duration,
     }).then((autoreneratedId) {
       _undoTask = Task(
         taskId: autoreneratedId.id,
@@ -196,6 +244,8 @@ class TaskProvider with ChangeNotifier {
         status: task.status,
         type: task.type,
         images: task.images,
+        cost: task.cost,
+        duration: task.duration,
       );
       tmpTask = Task(
         taskId: autoreneratedId.id,
@@ -209,10 +259,12 @@ class TaskProvider with ChangeNotifier {
         itemId: task.itemId,
         location: task.location,
         description: task.description,
-        comments: 'Rapid Complete',
-        status: TaskStatus.completed,
+        comments: task.comments,
+        status: task.status,
         type: task.type,
         images: task.images,
+        cost: task.cost,
+        duration: task.duration,
       );
 
       final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
@@ -278,16 +330,20 @@ class TaskProvider with ChangeNotifier {
 
   Future<bool> rapidComplete(BuildContext context, Task task) async {
     _undoContext = context;
+    task.status = TaskStatus.completed;
+    task.comments = 'Rapid Complete';
 
     var response = false;
     await addToArchive(task).then(
         (_) => deleteTask(context, task).then((value) => response = value));
-    print('rapid      $_undoTask');
+    // print('rapid      $_undoTask');
     return response;
   }
 
   Future<bool> undoRapidComplete() async {
-    print('undo      $_undoTask');
+    _undoTask!.status = TaskStatus.started;
+    _undoTask!.comments = '';
+    // print('undo      $_undoTask');
     var response = false;
     await addTask(_undoTask!).then((value) =>
         deleteFromTaskArchive(_undoContext!, _undoTask!)
