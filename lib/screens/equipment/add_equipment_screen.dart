@@ -144,7 +144,12 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
         title: const Text('Add asset'),
         iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
         actions: [
-          IconButton(onPressed: _addNewEquipment, icon: const Icon(Icons.save)),
+          IconButton(
+              onPressed: _addNewEquipment,
+              icon: Icon(
+                Icons.save,
+                size: SizeConfig.blockSizeHorizontal * 9,
+              )),
           SizedBox(
             width: SizeConfig.blockSizeHorizontal * 3,
           ),

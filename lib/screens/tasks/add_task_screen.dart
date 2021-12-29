@@ -223,7 +223,13 @@ class _AddTaskScreenState extends State<AddTaskScreen>
         title: const Text('Create new task'),
         iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
         actions: [
-          IconButton(onPressed: _addNewTask, icon: const Icon(Icons.save)),
+          IconButton(
+            onPressed: _addNewTask,
+            icon: Icon(
+              Icons.save,
+              size: SizeConfig.blockSizeHorizontal * 9,
+            ),
+          ),
           SizedBox(
             width: SizeConfig.blockSizeHorizontal * 3,
           ),

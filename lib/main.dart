@@ -11,6 +11,7 @@ import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
+import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
 import 'package:under_control_flutter/screens/start/add_company_screen.dart';
 import 'package:under_control_flutter/screens/equipment/add_equipment_screen.dart';
 import 'package:under_control_flutter/screens/start/auth_screen.dart';
@@ -183,6 +184,7 @@ class _AppState extends State<App> {
               const EquipmentDetailsScreen(),
           AddTaskScreen.routeName: (ctx) => const AddTaskScreen(),
           TaskDetailsScreen.routeName: (ctx) => const TaskDetailsScreen(),
+          AddInspectionScreen.routeName: (ctx) => const AddInspectionScreen(),
         },
       ),
     );

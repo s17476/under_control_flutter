@@ -1,10 +1,9 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-
 import 'package:under_control_flutter/helpers/size_config.dart';
 
+//helper to pick images from camera and device storage
 class UserImagePicker extends StatefulWidget {
   const UserImagePicker(
       {Key? key, required this.imagePickFn, required this.image})
@@ -33,7 +32,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
     final picker = ImagePicker();
 
     try {
-      //get low quality avatar image to improve loading speed
+      //gets low quality avatar image to improve loading speed
       final pickedFile = await picker.pickImage(
         source: souruce,
         imageQuality: 80,

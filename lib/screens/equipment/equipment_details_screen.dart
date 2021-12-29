@@ -5,6 +5,7 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/screens/equipment/edit_equipment_screen.dart';
+import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
 import 'package:under_control_flutter/widgets/inspections_list.dart';
 import 'package:under_control_flutter/widgets/status_icon.dart';
 
@@ -338,7 +339,8 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                       TextStyle(fontSize: SizeConfig.blockSizeHorizontal * 4.5),
                 ),
                 onPressed: () {
-                  print("add new inspection");
+                  Navigator.of(context).pushNamed(AddInspectionScreen.routeName,
+                      arguments: item);
                 },
                 icon: Container(
                   // width: SizeConfig.blockSizeHorizontal * 14.5,
