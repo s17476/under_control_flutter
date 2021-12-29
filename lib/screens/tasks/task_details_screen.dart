@@ -295,15 +295,22 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
         // comments
         task.comments = transferObjectTask!.comments;
 
-// task is started, but not finished
+        // task is started, but not finished
         task.status = TaskStatus.started;
         Provider.of<TaskProvider>(context, listen: false).updateTask(task);
         // task finished and moved to archive
         if (completed) {
           task.status = TaskStatus.completed;
           Provider.of<TaskProvider>(context, listen: false)
-            ..completeTask(task, oldTask!)
-            ..addNextTask(task);
+              .completeTask(task, oldTask!);
+          var tmp = task.copyWith(
+            comments: '',
+            cost: 0,
+            duration: 0,
+            status: TaskStatus.planned,
+          );
+          print(tmp.duration);
+          Provider.of<TaskProvider>(context, listen: false).addNextTask(tmp);
         }
       }
     }
@@ -313,6 +320,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
   void didChangeDependencies() {
     task = ModalRoute.of(context)!.settings.arguments as Task;
     oldTask = task.copyWith();
+    print('didDependency ${task.duration}');
 
     // if (task.nextDate != null && oldNextDate != null) {
     //   oldNextDate = task.nextDate;
@@ -330,7 +338,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
   @override
   Widget build(BuildContext context) {
     // used to store task state before saving
-    transferObjectTask = task.copyWith(date: DateTime.now());
+
+    transferObjectTask ??= task.copyWith(date: DateTime.now());
+    print('build task dur ${task.duration}');
+
+    print('build duration ${transferObjectTask?.duration}');
 
     final items = Provider.of<ItemProvider>(context, listen: false).items;
     final textStyle = Theme.of(context).textTheme.headline6!.copyWith(

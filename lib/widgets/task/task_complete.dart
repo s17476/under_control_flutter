@@ -56,6 +56,7 @@ class _TaskCompleteState extends State<TaskComplete> {
       if (value == null) {
         return;
       }
+
       setState(() {
         widget.task.date = value;
       });
@@ -64,6 +65,7 @@ class _TaskCompleteState extends State<TaskComplete> {
 
   @override
   Widget build(BuildContext context) {
+    print('duration ${widget.task.duration}');
     if (widget.task.duration != null && widget.task.duration != 0) {
       _hour = (widget.task.duration! ~/ 60);
       _min = widget.task.duration! % 60;

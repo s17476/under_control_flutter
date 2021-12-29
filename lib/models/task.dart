@@ -86,7 +86,7 @@ class Task {
       type: type ?? this.type,
       images: images ?? this.images,
       cost: cost ?? this.cost,
-      duration: duration ?? duration,
+      duration: duration ?? this.duration,
     );
   }
 }

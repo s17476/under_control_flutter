@@ -215,9 +215,7 @@ class TaskProvider with ChangeNotifier {
       nextTask = task.copyWith(
         date: task.nextDate,
         nextDate: nextDate,
-        cost: null,
         comments: '',
-        duration: null,
         status: TaskStatus.planned,
       );
     }
