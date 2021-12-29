@@ -113,16 +113,40 @@ class CalendarEventsList extends StatelessWidget {
                         // swipe right - rapid complete
                         // rapid complete is a quick and easy way to complete standard tasks
                         if (direction == DismissDirection.startToEnd) {
-                          Task task = value[index];
+                          List<String> duration =
+                              value[index].taskInterval!.split(' ');
+                          final today = DateTime.now();
+                          if (duration[1] == 'week' || duration[1] == 'weeks') {
+                            value[index].nextDate = DateTime(
+                              today.year,
+                              today.month,
+                              today.day + (int.parse(duration[0]) * 7),
+                            );
+                          } else if (duration[1] == 'month' ||
+                              duration[1] == 'months') {
+                            value[index].nextDate = DateTime(
+                              today.year,
+                              today.month + int.parse(duration[0]),
+                              today.day,
+                            );
+                          } else if (duration[1] == 'year' ||
+                              duration[1] == 'years') {
+                            value[index].nextDate = DateTime(
+                              today.year + int.parse(duration[0]),
+                              today.month,
+                              today.day,
+                            );
+                          }
+                          Task tmpTask = value[index];
                           await Provider.of<TaskProvider>(context,
                                   listen: false)
-                              .rapidComplete(context, task)
-                              .then((value) => response = value);
+                              .rapidComplete(context, value[index])
+                              .then((val) => response = val);
 
                           var nextTask = await Provider.of<TaskProvider>(
                                   context,
                                   listen: false)
-                              .addNextTask(task);
+                              .addNextTask(tmpTask);
 
                           // undo rapid complete
 
@@ -134,7 +158,8 @@ class CalendarEventsList extends StatelessWidget {
                                     .appBarTheme
                                     .backgroundColor,
                                 content: Text(
-                                    '${task.title} - Rapid Complete done!'),
+                                  '${tmpTask.title} - Rapid Complete done!',
+                                ),
                                 duration: const Duration(seconds: 4),
                                 action: SnackBarAction(
                                   textColor: Colors.amber,
@@ -146,7 +171,7 @@ class CalendarEventsList extends StatelessWidget {
                                     if (nextTask != null) {
                                       await Provider.of<TaskProvider>(context,
                                               listen: false)
-                                          .deleteTask(context, nextTask);
+                                          .deleteTask(nextTask);
                                     }
                                   },
                                 ),
@@ -159,7 +184,7 @@ class CalendarEventsList extends StatelessWidget {
                               .then((val) {
                             if (val) {
                               Provider.of<TaskProvider>(context, listen: false)
-                                  .deleteTask(context, value[index]);
+                                  .deleteTask(value[index]);
                               response = val;
                             } else {
                               response = false;
