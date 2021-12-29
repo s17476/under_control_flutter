@@ -119,11 +119,15 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                                       arguments: item)
                                   .then((value) {
                                 if (value != null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Item deleted'),
-                                    ),
-                                  );
+                                  ScaffoldMessenger.of(context)
+                                    ..removeCurrentSnackBar()
+                                    ..showSnackBar(
+                                      SnackBar(
+                                        content: Text('Item deleted'),
+                                        backgroundColor:
+                                            Theme.of(context).errorColor,
+                                      ),
+                                    );
                                 }
                               }),
                               child: ListTile(

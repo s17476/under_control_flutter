@@ -295,7 +295,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
         if (completed) {
           task.status = TaskStatus.completed;
           Provider.of<TaskProvider>(context, listen: false)
-              .completeTask(context, task);
+            ..completeTask(context, task)
+            ..addNextTask(task);
         } else {
           // task is started, but not finished
           task.status = TaskStatus.started;
@@ -325,25 +326,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
   @override
   Widget build(BuildContext context) {
     // used to store task state before saving
-    transferObjectTask = Task(
-      title: task.title,
-      date: task.date,
-      executor: task.executor,
-      userId: task.userId,
-      description: task.description,
-      comments: task.comments,
-      status: task.status,
-      type: task.type,
-      executorId: task.executorId,
-      images: task.images,
-      itemId: task.itemId,
-      location: task.location,
-      nextDate: task.nextDate,
-      taskId: task.taskId,
-      taskInterval: task.taskInterval,
-      cost: task.cost,
-      duration: task.duration,
-    );
+    transferObjectTask = task.copyWith(date: DateTime.now());
 
     final items = Provider.of<ItemProvider>(context, listen: false).items;
     final textStyle = Theme.of(context).textTheme.headline6!.copyWith(
@@ -398,6 +381,15 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                 }
 
                 _completeTask(false);
+                ScaffoldMessenger.of(context)
+                  ..removeCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: const Text('Data saved'),
+                      backgroundColor:
+                          Theme.of(context).appBarTheme.backgroundColor,
+                    ),
+                  );
               },
               icon: Icon(
                 Icons.save,
@@ -417,6 +409,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                     Navigator.of(context).pop('completed');
                   }
                 });
+                Provider.of<TaskProvider>(context, listen: false)
+                    .fetchAndSetTasks();
               },
               icon: Icon(
                 Icons.done,
@@ -776,11 +770,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                                 opacity: _opacityAnimation!,
                                 child: SlideTransition(
                                   position: _userSlideAnimation!,
-                                  child: task.type != TaskType.inspection
-                                      ? TaskComplete(
-                                          task: transferObjectTask!,
-                                        )
-                                      : null,
+                                  child: TaskComplete(
+                                    task: transferObjectTask!,
+                                  ),
                                 ),
                               ),
                             ],
@@ -858,6 +850,17 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                           }
 
                           _completeTask(false);
+
+                          ScaffoldMessenger.of(context)
+                            ..removeCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                content: const Text('Data saved'),
+                                backgroundColor: Theme.of(context)
+                                    .appBarTheme
+                                    .backgroundColor,
+                              ),
+                            );
                         },
                         icon: Icon(
                           Icons.save,
@@ -885,6 +888,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                               Navigator.of(context).pop('completed');
                             }
                           });
+                          Provider.of<TaskProvider>(context, listen: false)
+                              .fetchAndSetTasks();
                         },
                         icon: Icon(
                           Icons.done,

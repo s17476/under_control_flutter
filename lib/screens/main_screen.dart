@@ -90,10 +90,13 @@ class _MainScreenState extends State<MainScreen> {
         final cantExit = timegap >= const Duration(seconds: 2);
         pre_backpress = DateTime.now();
         if (cantExit) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Press Back button again to Exit'),
-            duration: Duration(seconds: 2),
-          ));
+          ScaffoldMessenger.of(context)
+            ..removeCurrentSnackBar()
+            ..showSnackBar(SnackBar(
+              content: const Text('Press Back button again to Exit'),
+              duration: const Duration(seconds: 2),
+              backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+            ));
           return false;
         } else {
           return true;
@@ -228,14 +231,15 @@ class _MainScreenState extends State<MainScreen> {
                                       .then((value) {
                                     if (value != null) {
                                       ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text('New asset added'),
-                                          backgroundColor: Theme.of(context)
-                                              .appBarTheme
-                                              .backgroundColor,
-                                        ),
-                                      );
+                                        ..removeCurrentSnackBar()
+                                        ..showSnackBar(
+                                          SnackBar(
+                                            content: Text('New asset added'),
+                                            backgroundColor: Theme.of(context)
+                                                .appBarTheme
+                                                .backgroundColor,
+                                          ),
+                                        );
                                     }
                                   });
                                 }
@@ -248,15 +252,16 @@ class _MainScreenState extends State<MainScreen> {
                                       .then((value) {
                                     if (value != null) {
                                       ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content:
-                                              Text('Task successcul added'),
-                                          backgroundColor: Theme.of(context)
-                                              .appBarTheme
-                                              .backgroundColor,
-                                        ),
-                                      );
+                                        ..removeCurrentSnackBar()
+                                        ..showSnackBar(
+                                          SnackBar(
+                                            content:
+                                                const Text('New task added'),
+                                            backgroundColor: Theme.of(context)
+                                                .appBarTheme
+                                                .backgroundColor,
+                                          ),
+                                        );
                                     }
                                   });
                                 },

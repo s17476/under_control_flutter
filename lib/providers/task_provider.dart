@@ -105,16 +105,17 @@ class TaskProvider with ChangeNotifier {
     });
   }
 
-  Future<void> addTask(Task task) async {
+  Future<Task?> addTask(Task task) async {
     print('add task executor id  ${task.executorId}');
     Task tmpTask;
+    Task result;
     // get taskss referance
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
         .doc(_user!.companyId)
         .collection('tasks');
 
-    await tasksRef.add({
+    result = await tasksRef.add({
       'title': task.title,
       'date': task.date.toIso8601String(),
       'nextDate': task.nextDate?.toIso8601String(),
@@ -132,39 +133,21 @@ class TaskProvider with ChangeNotifier {
       'cost': task.cost,
       'duration': task.duration,
     }).then((autoreneratedId) {
-      tmpTask = Task(
-        taskId: autoreneratedId.id,
-        title: task.title,
-        date: task.date,
-        nextDate: task.nextDate,
-        taskInterval: task.taskInterval,
-        executor: task.executor,
-        executorId: task.executorId,
-        userId: task.userId,
-        itemId: task.itemId,
-        location: task.location,
-        description: task.description,
-        comments: task.comments,
-        status: task.status,
-        type: task.type,
-        images: task.images,
-        cost: task.cost,
-        duration: task.duration,
-      );
+      tmpTask = task.copyWith(taskId: autoreneratedId.id);
       final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
       if (_tasks.containsKey(date)) {
         _tasks[date]!.add(tmpTask);
       } else {
         _tasks[date] = [tmpTask];
       }
-      print('added task');
       notifyListeners();
+      return tmpTask;
     });
+    return result;
   }
 
   // update task
   Future<void> updateTask(Task task) async {
-    print('task dur update ${task.duration}');
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
         .doc(_user!.companyId)
@@ -193,13 +176,93 @@ class TaskProvider with ChangeNotifier {
       var index = val.indexWhere((element) => element.taskId == task.taskId);
       if (index > -1) {
         _tasks[key]![index] = task;
+        notifyListeners();
       }
     });
-    notifyListeners();
   }
 
   Future<void> completeTask(BuildContext context, Task task) async {
     await addToArchive(task).then((_) => deleteTask(context, task));
+  }
+
+  // add next task to the list
+  Future<Task?> addNextTask(Task task) async {
+    Task? nextTask;
+
+    // // if execution date is in the future
+    // if (task.date.isAfter(DateTime.now())) {
+    //   task.date = DateTime.now();
+    // }
+
+    // // update current date
+    // if (task.taskInterval != 'No') {
+    //   List<String> duration = task.taskInterval!.split(' ');
+    //   DateTime nextDate = DateTime.now();
+    //   if (duration[1] == 'week' || duration[1] == 'weeks') {
+    //     nextDate = DateTime(
+    //       task.nextDate!.year,
+    //       task.nextDate!.month,
+    //       task.nextDate!.day + (int.parse(duration[0]) * 7),
+    //     );
+    //   } else if (duration[1] == 'month' || duration[1] == 'months') {
+    //     nextDate = DateTime(
+    //       task.nextDate!.year,
+    //       task.nextDate!.month + int.parse(duration[0]),
+    //       task.nextDate!.day,
+    //     );
+    //   } else if (duration[1] == 'year' || duration[1] == 'years') {
+    //     nextDate = DateTime(
+    //       task.nextDate!.year + int.parse(duration[0]),
+    //       task.nextDate!.month,
+    //       task.nextDate!.day,
+    //     );
+    //   }
+    //   nextTask = task.copyWith(
+    //     date: task.nextDate,
+    //     nextDate: nextDate,
+    //     cost: null,
+    //     comments: '',
+    //     duration: null,
+    //     status: TaskStatus.planned,
+    //   );
+    // }
+
+    // update next task date
+    if (task.taskInterval != 'No') {
+      List<String> duration = task.taskInterval!.split(' ');
+      DateTime nextDate = DateTime.now();
+      if (duration[1] == 'week' || duration[1] == 'weeks') {
+        nextDate = DateTime(
+          task.nextDate!.year,
+          task.nextDate!.month,
+          task.nextDate!.day + (int.parse(duration[0]) * 7),
+        );
+      } else if (duration[1] == 'month' || duration[1] == 'months') {
+        nextDate = DateTime(
+          task.nextDate!.year,
+          task.nextDate!.month + int.parse(duration[0]),
+          task.nextDate!.day,
+        );
+      } else if (duration[1] == 'year' || duration[1] == 'years') {
+        nextDate = DateTime(
+          task.nextDate!.year + int.parse(duration[0]),
+          task.nextDate!.month,
+          task.nextDate!.day,
+        );
+      }
+      nextTask = task.copyWith(
+        date: task.nextDate,
+        nextDate: nextDate,
+        cost: null,
+        comments: '',
+        duration: null,
+        status: TaskStatus.planned,
+      );
+    }
+    if (nextTask == null) {
+      return null;
+    }
+    return await addTask(nextTask);
   }
 
   Future<void> addToArchive(Task task) async {
@@ -228,44 +291,10 @@ class TaskProvider with ChangeNotifier {
       'cost': task.cost,
       'duration': task.duration,
     }).then((autoreneratedId) {
-      _undoTask = Task(
+      _undoTask = _undoTask!.copyWith(
         taskId: autoreneratedId.id,
-        title: task.title,
-        date: task.date,
-        nextDate: task.nextDate,
-        taskInterval: task.taskInterval,
-        executor: task.executor,
-        executorId: task.userId,
-        userId: task.userId,
-        itemId: task.itemId,
-        location: task.location,
-        description: task.description,
-        comments: task.comments,
-        status: task.status,
-        type: task.type,
-        images: task.images,
-        cost: task.cost,
-        duration: task.duration,
       );
-      tmpTask = Task(
-        taskId: autoreneratedId.id,
-        title: task.title,
-        date: task.date,
-        nextDate: task.nextDate,
-        taskInterval: task.taskInterval,
-        executor: task.executor,
-        executorId: _user!.userId,
-        userId: task.userId,
-        itemId: task.itemId,
-        location: task.location,
-        description: task.description,
-        comments: task.comments,
-        status: task.status,
-        type: task.type,
-        images: task.images,
-        cost: task.cost,
-        duration: task.duration,
-      );
+      tmpTask = task.copyWith();
 
       final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
       if (_tasksArchive.containsKey(date)) {
@@ -330,6 +359,7 @@ class TaskProvider with ChangeNotifier {
 
   Future<bool> rapidComplete(BuildContext context, Task task) async {
     _undoContext = context;
+    _undoTask = task;
     task.status = TaskStatus.completed;
     task.comments = 'Rapid Complete';
 

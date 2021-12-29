@@ -113,31 +113,45 @@ class CalendarEventsList extends StatelessWidget {
                         // swipe right - rapid complete
                         // rapid complete is a quick and easy way to complete standard tasks
                         if (direction == DismissDirection.startToEnd) {
-                          var title = value[index].title;
+                          Task task = value[index];
                           await Provider.of<TaskProvider>(context,
                                   listen: false)
-                              .rapidComplete(context, value[index])
+                              .rapidComplete(context, task)
                               .then((value) => response = value);
 
+                          var nextTask = await Provider.of<TaskProvider>(
+                                  context,
+                                  listen: false)
+                              .addNextTask(task);
+
                           // undo rapid complete
-                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              backgroundColor:
-                                  Theme.of(context).appBarTheme.backgroundColor,
-                              content: Text('$title - Rapid Complete done!'),
-                              duration: const Duration(seconds: 4),
-                              action: SnackBarAction(
-                                textColor: Colors.amber,
-                                label: 'UNDO',
-                                onPressed: () {
-                                  Provider.of<TaskProvider>(context,
-                                          listen: false)
-                                      .undoRapidComplete();
-                                },
+
+                          ScaffoldMessenger.of(context)
+                            ..removeCurrentSnackBar()
+                            ..showSnackBar(
+                              SnackBar(
+                                backgroundColor: Theme.of(context)
+                                    .appBarTheme
+                                    .backgroundColor,
+                                content: Text(
+                                    '${task.title} - Rapid Complete done!'),
+                                duration: const Duration(seconds: 4),
+                                action: SnackBarAction(
+                                  textColor: Colors.amber,
+                                  label: 'UNDO',
+                                  onPressed: () async {
+                                    await Provider.of<TaskProvider>(context,
+                                            listen: false)
+                                        .undoRapidComplete();
+                                    if (nextTask != null) {
+                                      await Provider.of<TaskProvider>(context,
+                                              listen: false)
+                                          .deleteTask(context, nextTask);
+                                    }
+                                  },
+                                ),
                               ),
-                            ),
-                          );
+                            );
 
                           // swipe left - delete
                         } else if (direction == DismissDirection.endToStart) {
@@ -151,19 +165,17 @@ class CalendarEventsList extends StatelessWidget {
                               response = false;
                             }
                           });
-                          String msg;
+
                           if (response) {
-                            msg = 'Task deleted!';
-                          } else {
-                            msg = 'Task not deleted.';
+                            ScaffoldMessenger.of(context)
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: const Text('Task deleted!'),
+                                  backgroundColor: Theme.of(context).errorColor,
+                                ),
+                              );
                           }
-                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(msg),
-                              backgroundColor: Theme.of(context).errorColor,
-                            ),
-                          );
                         }
                         return response;
                       },
