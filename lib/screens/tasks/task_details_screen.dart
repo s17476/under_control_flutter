@@ -27,8 +27,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
   String _executorName = '';
   String _creatorName = '';
   bool _isInEditMode = false;
-  DateTime? oldNextDate;
-  String? oldInterval;
+  Task? oldTask;
   Task? transferObjectTask;
 
   final ScrollController _scrollController = ScrollController();
@@ -260,22 +259,27 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
         if (transferObjectTask!.duration != null) {
           task.duration = transferObjectTask!.duration;
         }
-        if (transferObjectTask!.taskInterval != task.taskInterval) {
-          List<String> duration = transferObjectTask!.taskInterval!.split(' ');
-          task.taskInterval = transferObjectTask!.taskInterval;
-          if (duration[1] == 'week' || duration[1] == 'weeks') {
-            task.nextDate = DateTime(
-              task.date.year,
-              task.date.month,
-              task.date.day + (int.parse(duration[0]) * 7),
-            );
-          } else if (duration[1] == 'month' || duration[1] == 'months') {
-            task.nextDate = DateTime(task.date.year,
-                task.date.month + int.parse(duration[0]), task.date.day);
-          } else if (duration[1] == 'year' || duration[1] == 'years') {
-            task.nextDate = DateTime(task.date.year + int.parse(duration[0]),
-                task.date.month, task.date.day);
-          }
+
+        List<String> duration = transferObjectTask!.taskInterval!.split(' ');
+        task.taskInterval = transferObjectTask!.taskInterval;
+        if (duration[1] == 'week' || duration[1] == 'weeks') {
+          task.nextDate = DateTime(
+            transferObjectTask!.date.year,
+            transferObjectTask!.date.month,
+            transferObjectTask!.date.day + (int.parse(duration[0]) * 7),
+          );
+        } else if (duration[1] == 'month' || duration[1] == 'months') {
+          task.nextDate = DateTime(
+            transferObjectTask!.date.year,
+            transferObjectTask!.date.month + int.parse(duration[0]),
+            transferObjectTask!.date.day,
+          );
+        } else if (duration[1] == 'year' || duration[1] == 'years') {
+          task.nextDate = DateTime(
+            transferObjectTask!.date.year + int.parse(duration[0]),
+            transferObjectTask!.date.month,
+            transferObjectTask!.date.day,
+          );
         }
 
         // executor ID
@@ -291,16 +295,15 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
         // comments
         task.comments = transferObjectTask!.comments;
 
+// task is started, but not finished
+        task.status = TaskStatus.started;
+        Provider.of<TaskProvider>(context, listen: false).updateTask(task);
         // task finished and moved to archive
         if (completed) {
           task.status = TaskStatus.completed;
           Provider.of<TaskProvider>(context, listen: false)
-            ..completeTask(context, task)
+            ..completeTask(task, oldTask!)
             ..addNextTask(task);
-        } else {
-          // task is started, but not finished
-          task.status = TaskStatus.started;
-          Provider.of<TaskProvider>(context, listen: false).updateTask(task);
         }
       }
     }
@@ -309,11 +312,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
   @override
   void didChangeDependencies() {
     task = ModalRoute.of(context)!.settings.arguments as Task;
+    oldTask = task.copyWith();
 
-    if (task.nextDate != null && oldNextDate != null) {
-      oldNextDate = task.nextDate;
-      oldInterval = task.taskInterval;
-    }
+    // if (task.nextDate != null && oldNextDate != null) {
+    //   oldNextDate = task.nextDate;
+    //   oldInterval = task.taskInterval;
+    // }
     if (task.executorId != null && _executorName == '') {
       _getExecutorName();
     }
@@ -358,7 +362,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
               _showDeleteDialog(context, task).then((value) {
                 if (value == true) {
                   Provider.of<TaskProvider>(context, listen: false)
-                      .deleteTask(context, task);
+                      .deleteTask(task);
                   Navigator.of(context).pop('deleted');
                 }
               });
@@ -888,8 +892,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                               Navigator.of(context).pop('completed');
                             }
                           });
-                          Provider.of<TaskProvider>(context, listen: false)
-                              .fetchAndSetTasks();
+                          // Provider.of<TaskProvider>(context, listen: false)
+                          //     .fetchAndSetTasks();
                         },
                         icon: Icon(
                           Icons.done,

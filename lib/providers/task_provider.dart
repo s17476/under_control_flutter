@@ -176,56 +176,18 @@ class TaskProvider with ChangeNotifier {
       var index = val.indexWhere((element) => element.taskId == task.taskId);
       if (index > -1) {
         _tasks[key]![index] = task;
-        notifyListeners();
       }
     });
+    notifyListeners();
   }
 
-  Future<void> completeTask(BuildContext context, Task task) async {
-    await addToArchive(task).then((_) => deleteTask(context, task));
+  Future<void> completeTask(Task task, Task oldTask) async {
+    await addToArchive(task).then((_) => deleteTask(oldTask));
   }
 
   // add next task to the list
   Future<Task?> addNextTask(Task task) async {
     Task? nextTask;
-
-    // // if execution date is in the future
-    // if (task.date.isAfter(DateTime.now())) {
-    //   task.date = DateTime.now();
-    // }
-
-    // // update current date
-    // if (task.taskInterval != 'No') {
-    //   List<String> duration = task.taskInterval!.split(' ');
-    //   DateTime nextDate = DateTime.now();
-    //   if (duration[1] == 'week' || duration[1] == 'weeks') {
-    //     nextDate = DateTime(
-    //       task.nextDate!.year,
-    //       task.nextDate!.month,
-    //       task.nextDate!.day + (int.parse(duration[0]) * 7),
-    //     );
-    //   } else if (duration[1] == 'month' || duration[1] == 'months') {
-    //     nextDate = DateTime(
-    //       task.nextDate!.year,
-    //       task.nextDate!.month + int.parse(duration[0]),
-    //       task.nextDate!.day,
-    //     );
-    //   } else if (duration[1] == 'year' || duration[1] == 'years') {
-    //     nextDate = DateTime(
-    //       task.nextDate!.year + int.parse(duration[0]),
-    //       task.nextDate!.month,
-    //       task.nextDate!.day,
-    //     );
-    //   }
-    //   nextTask = task.copyWith(
-    //     date: task.nextDate,
-    //     nextDate: nextDate,
-    //     cost: null,
-    //     comments: '',
-    //     duration: null,
-    //     status: TaskStatus.planned,
-    //   );
-    // }
 
     // update next task date
     if (task.taskInterval != 'No') {
@@ -291,7 +253,7 @@ class TaskProvider with ChangeNotifier {
       'cost': task.cost,
       'duration': task.duration,
     }).then((autoreneratedId) {
-      _undoTask = _undoTask!.copyWith(
+      _undoTask = _undoTask?.copyWith(
         taskId: autoreneratedId.id,
       );
       tmpTask = task.copyWith();
@@ -306,7 +268,7 @@ class TaskProvider with ChangeNotifier {
     });
   }
 
-  Future<bool> deleteTask(BuildContext context, Task task) async {
+  Future<bool> deleteTask(Task task) async {
     var response = true;
     await FirebaseFirestore.instance
         .collection('companies')
@@ -317,16 +279,17 @@ class TaskProvider with ChangeNotifier {
         .then((_) {
       final key = DateFormat('dd/MM/yyyy').format(task.date);
       _tasks[key]!.removeWhere((element) => element.taskId == task.taskId);
-      if (_tasks[key]!.isEmpty) {
+      if (_tasks[key] != null && _tasks[key]!.isEmpty) {
         _tasks.remove(key);
       }
       notifyListeners();
     }).catchError((error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Failed to delete item"),
-        ),
-      );
+      print(error);
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   const SnackBar(
+      //     content: Text("Failed to delete item"),
+      //   ),
+      // );
     });
     return response;
   }
@@ -364,8 +327,8 @@ class TaskProvider with ChangeNotifier {
     task.comments = 'Rapid Complete';
 
     var response = false;
-    await addToArchive(task).then(
-        (_) => deleteTask(context, task).then((value) => response = value));
+    await addToArchive(task)
+        .then((_) => deleteTask(task).then((value) => response = value));
     // print('rapid      $_undoTask');
     return response;
   }
