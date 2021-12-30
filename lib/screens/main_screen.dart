@@ -3,6 +3,7 @@ import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/task.dart';
+import 'package:under_control_flutter/providers/checklist_provider.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
@@ -46,6 +47,8 @@ class _MainScreenState extends State<MainScreen> {
     Provider.of<ItemProvider>(context, listen: false)
       ..fetchAndSetItems()
       ..fetchInspectionsStatus();
+    Provider.of<ChecklistProvider>(context, listen: false)
+        .fetchAndSetChecklists();
 
     //hide and show bottom navigation bar while scrolling
     _isBottomNavBarVisible = true;

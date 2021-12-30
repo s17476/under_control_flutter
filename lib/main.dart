@@ -6,6 +6,7 @@ import 'package:under_control_flutter/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/providers/checklist_provider.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
@@ -107,6 +108,10 @@ class _AppState extends State<App> {
           create: (ctx) => TaskProvider(),
           update: (ctx, user, task) => task!..updateUser(user.user),
         ),
+        ChangeNotifierProxyProvider<UserProvider, ChecklistProvider>(
+          create: (ctx) => ChecklistProvider(),
+          update: (ctx, user, checklist) => checklist!..updateUser(user.user),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -149,15 +154,9 @@ class _AppState extends State<App> {
                             .initializeUser(context, userSnapshot.data!.uid)
                             .then((user) {
                           if (user != null && user.companyId != null) {
-                            // print(user.companyId);
                             // initialize company provider
                             Provider.of<CompanyProvider>(context, listen: false)
                                 .initializeCompany(context, user.companyId!);
-                            // .then((company) {
-                            // if (company != null) {
-                            // print(company.name);
-                            // }
-                            // });
                           }
                         });
                       }

@@ -496,25 +496,6 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
               SizedBox(
                 height: SizeConfig.blockSizeVertical * 0.5,
               ),
-              // save button
-              // ElevatedButton(
-              //   onPressed: _addNewEquipment,
-              //   child: Text(
-              //     'Add asset',
-              //     style: TextStyle(
-              //       fontSize: SizeConfig.blockSizeHorizontal * 5.5,
-              //     ),
-              //   ),
-              //   style: ElevatedButton.styleFrom(
-              //     primary: Theme.of(context).primaryColor,
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(30.0),
-              //     ),
-              //   ),
-              // ),
-              // SizedBox(
-              //   height: SizeConfig.blockSizeVertical * 3,
-              // ),
             ],
           ),
         ),

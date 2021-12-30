@@ -283,11 +283,6 @@ class TaskProvider with ChangeNotifier {
       notifyListeners();
     }).catchError((error) {
       print(error);
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(
-      //     content: Text("Failed to delete item"),
-      //   ),
-      // );
     });
     return response;
   }
