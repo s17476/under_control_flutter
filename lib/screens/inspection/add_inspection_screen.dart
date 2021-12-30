@@ -3,9 +3,11 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/checklist.dart';
+import 'package:under_control_flutter/models/inspection.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/checklist_provider.dart';
 import 'package:under_control_flutter/providers/inspection_provider.dart';
+import 'package:under_control_flutter/providers/item_provider.dart';
 
 class AddInspectionScreen extends StatefulWidget {
   const AddInspectionScreen({Key? key}) : super(key: key);
@@ -28,9 +30,11 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
   String _statusString = 'OK';
   DateTime? _inspectionDate;
   String _checklistName = 'New checklist';
+  String _inspectionInterval = 'No';
 
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _nameTextController = TextEditingController();
+  final TextEditingController _commentsTextController = TextEditingController();
 
   late Checklist _selectedChecklist;
 
@@ -39,6 +43,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
   @override
   void initState() {
     super.initState();
+    _inspectionDate = DateTime.now();
     checklists =
         Provider.of<ChecklistProvider>(context, listen: false).checklists;
     _selectedChecklist = checklists[0];
@@ -50,6 +55,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
     checklists = Provider.of<ChecklistProvider>(context).checklists;
     _animationControllers.clear();
     _animations.clear();
+    _inspectionInterval = item.interval;
     // print('keys lenght ${_selectedChecklist.fields.keys.length}');
     _updateAnimationControllers();
     super.didChangeDependencies();
@@ -111,6 +117,75 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
     });
   }
 
+  void saveInspection() {
+    int statusValue;
+    if (_selectedChecklist.name == 'New checklist') {
+      _selectedChecklist.name = '';
+    }
+    if (_statusString == 'OK') {
+      statusValue = InspectionStatus.ok.index;
+    } else if (_statusString == 'Needs attention') {
+      statusValue = InspectionStatus.needsAttention.index;
+    } else {
+      statusValue = InspectionStatus.failed.index;
+    }
+
+    Inspection inspection = Inspection(
+      date: _inspectionDate!,
+      comments: _commentsTextController.text,
+      checklist: _selectedChecklist,
+      status: statusValue,
+    );
+    Provider.of<InspectionProvider>(context, listen: false)
+        .addInspection(
+      item,
+      inspection,
+    )
+        .then((value) {
+      if (!value) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Error occured while adding to Data Base. Please try again later.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+      } else {
+        item.inspectionStatus = inspection.status;
+        item.lastInspection = inspection.date;
+        item.interval = _inspectionInterval;
+
+// TODO make one function
+        List<String> duration = item.interval.split(' ');
+
+        if (duration[1] == 'week' || duration[1] == 'weeks') {
+          item.nextInspection = DateTime(
+            item.lastInspection.year,
+            item.lastInspection.month,
+            item.lastInspection.day + (int.parse(duration[0]) * 7),
+          );
+        } else if (duration[1] == 'month' || duration[1] == 'months') {
+          item.nextInspection = DateTime(
+            item.lastInspection.year,
+            item.lastInspection.month + int.parse(duration[0]),
+            item.lastInspection.day,
+          );
+        } else if (duration[1] == 'year' || duration[1] == 'years') {
+          item.nextInspection = DateTime(
+            item.lastInspection.year + int.parse(duration[0]),
+            item.lastInspection.month,
+            item.lastInspection.day,
+          );
+        }
+        Provider.of<ItemProvider>(context, listen: false)
+            .updateItem(item)
+            .then((_) => Navigator.of(context).pop(value));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // set shown date
@@ -124,7 +199,9 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
         title: const Text('Add inspection'),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              saveInspection();
+            },
             icon: Icon(
               Icons.save,
               color: Colors.green,
@@ -515,7 +592,89 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                         ],
                       ),
                     ),
-
+                    const Divider(),
+                    // comments
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              textCapitalization: TextCapitalization.sentences,
+                              controller: _commentsTextController,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(
+                                  vertical: SizeConfig.blockSizeHorizontal * 1,
+                                  horizontal:
+                                      SizeConfig.blockSizeHorizontal * 5,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: BorderSide.none,
+                                ),
+                                filled: true,
+                                fillColor: Theme.of(context).splashColor,
+                                labelText: 'Comments',
+                                labelStyle: TextStyle(
+                                  color: Theme.of(context)
+                                      .appBarTheme
+                                      .foregroundColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // inspection interval
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Cyclic task:',
+                          style: TextStyle(
+                            fontSize: SizeConfig.blockSizeHorizontal * 4,
+                            color: Theme.of(context).textTheme.headline6!.color,
+                          ),
+                        ),
+                        DropdownButton<String>(
+                          borderRadius: BorderRadius.circular(10),
+                          value: _inspectionInterval,
+                          icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                          iconSize: SizeConfig.blockSizeHorizontal * 6,
+                          iconEnabledColor: Theme.of(context).primaryColor,
+                          alignment: Alignment.center,
+                          elevation: 16,
+                          style: TextStyle(
+                            color: Colors.green,
+                            fontSize: SizeConfig.blockSizeHorizontal * 4,
+                          ),
+                          underline: Container(height: 0),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _inspectionInterval = newValue!;
+                            });
+                          },
+                          dropdownColor:
+                              Theme.of(context).appBarTheme.backgroundColor,
+                          items: <String>[
+                            'No',
+                            '2 years',
+                            '1 year',
+                            '6 months',
+                            '3 months',
+                            '1 month',
+                            '2 weeks',
+                            '1 week',
+                          ].map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
                     // inspection status
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -528,6 +687,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                           ),
                         ),
                         DropdownButton<String>(
+                          borderRadius: BorderRadius.circular(10),
                           value: _statusString,
                           icon: const Icon(Icons.keyboard_arrow_down_rounded),
                           iconSize: SizeConfig.blockSizeHorizontal * 6,

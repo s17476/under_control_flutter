@@ -108,8 +108,10 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                 );
               }
             }),
-            icon: Icon(Icons.edit,
-                color: Theme.of(context).appBarTheme.foregroundColor),
+            icon: Icon(
+              Icons.edit,
+              color: Theme.of(context).appBarTheme.foregroundColor,
+            ),
           ),
           SizedBox(
             width: SizeConfig.blockSizeHorizontal * 2,
@@ -135,267 +137,270 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
           ),
         ],
       ),
-      body: Container(
-        padding: const EdgeInsets.only(
-          left: 16,
-          right: 16,
-          top: 8,
-        ),
-        width: SizeConfig.blockSizeHorizontal * 100,
-        height: SizeConfig.blockSizeVertical * 100,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.black,
-              Colors.grey,
-            ],
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 8,
           ),
-        ),
-        child: Column(
-          // mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: SizeConfig.blockSizeHorizontal * 50,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+          width: SizeConfig.blockSizeHorizontal * 100,
+          height: SizeConfig.blockSizeVertical * 100,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black,
+                Colors.grey,
+              ],
+            ),
+          ),
+          child: Column(
+            // mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: SizeConfig.blockSizeHorizontal * 50,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: Text(
+                                'Internal ID',
+                                style: labelTextStyle,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: Text(
+                                item.internalId,
+                                style: textStyle,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: Text(
+                                'Producer',
+                                style: labelTextStyle,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: Text(
+                                item.producer,
+                                style: textStyle,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: Text(
+                                'Model',
+                                style: labelTextStyle,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: Text(
+                                item.model,
+                                style: textStyle,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: Text(
+                                'Category',
+                                style: labelTextStyle,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: Text(
+                                item.category,
+                                style: textStyle,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: Text(
+                                'Location',
+                                style: labelTextStyle,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: Text(
+                                item.location,
+                                style: textStyle,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(1.0),
+                              child: Text(
+                                'Comments',
+                                style: labelTextStyle,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(1.0),
                             child: Text(
-                              'Internal ID',
+                              'Inspection every',
                               style: labelTextStyle,
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(1.0),
                             child: Text(
-                              item.internalId,
+                              item.interval,
                               style: textStyle,
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(1.0),
                             child: Text(
-                              'Producer',
+                              'Last inspection',
                               style: labelTextStyle,
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(1.0),
                             child: Text(
-                              item.producer,
+                              DateFormat('dd/MMM/yyyy')
+                                  .format(item.lastInspection),
                               style: textStyle,
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(1.0),
                             child: Text(
-                              'Model',
+                              'Next inspection',
                               style: labelTextStyle,
                             ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(1.0),
                             child: Text(
-                              item.model,
-                              style: textStyle,
+                              DateFormat('dd/MMM/yyyy')
+                                  .format(item.nextInspection),
+                              style: item.inspectionStatus ==
+                                      InspectionStatus.expired.index
+                                  ? expiredTextStyle
+                                  : textStyle,
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Text(
-                              'Category',
-                              style: labelTextStyle,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Text(
-                              item.category,
-                              style: textStyle,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Text(
-                              'Location',
-                              style: labelTextStyle,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Text(
-                              item.location,
-                              style: textStyle,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Text(
-                              'Comments',
-                              style: labelTextStyle,
+                            padding: const EdgeInsets.only(top: 8),
+                            child: StatusIcon(
+                              heroTag: item.itemId!,
+                              inspectionStatus: item.inspectionStatus,
+                              size: 20,
+                              textSize: 7,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(1.0),
-                          child: Text(
-                            'Inspection every',
-                            style: labelTextStyle,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(1.0),
-                          child: Text(
-                            item.interval,
-                            style: textStyle,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(1.0),
-                          child: Text(
-                            'Last inspection',
-                            style: labelTextStyle,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(1.0),
-                          child: Text(
-                            DateFormat('dd/MMM/yyyy')
-                                .format(item.lastInspection),
-                            style: textStyle,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(1.0),
-                          child: Text(
-                            'Next inspection',
-                            style: labelTextStyle,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(1.0),
-                          child: Text(
-                            DateFormat('dd/MMM/yyyy')
-                                .format(item.nextInspection),
-                            style: item.inspectionStatus ==
-                                    InspectionStatus.expired.index
-                                ? expiredTextStyle
-                                : textStyle,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: StatusIcon(
-                            heroTag: item.itemId!,
-                            inspectionStatus: item.inspectionStatus,
-                            size: 20,
-                            textSize: 7,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(3.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: Text(
-                      item.comments.isEmpty ? '------' : item.comments,
-                      // overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: Theme.of(context).textTheme.headline6!.color,
-                        fontSize: SizeConfig.blockSizeHorizontal * 4.5,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            // add new inspection button
-            Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.only(
-                top: SizeConfig.blockSizeHorizontal * 5,
-                left: SizeConfig.blockSizeHorizontal * 4,
-              ),
-              child: TextButton.icon(
-                label: Text(
-                  "Add new inspection",
-                  style:
-                      TextStyle(fontSize: SizeConfig.blockSizeHorizontal * 4.5),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(AddInspectionScreen.routeName,
-                      arguments: item);
-                },
-                icon: Container(
-                  // width: SizeConfig.blockSizeHorizontal * 14.5,
-                  alignment: Alignment.topRight,
-                  child: Stack(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                            left: SizeConfig.blockSizeHorizontal * 4),
-                        child: Icon(
-                          Icons.add,
-                          size: SizeConfig.blockSizeHorizontal * 4.5,
-                        ),
-                      ),
-                      Icon(
-                        Icons.search,
-                        size: SizeConfig.blockSizeHorizontal * 7,
-                      )
                     ],
                   ),
-                ),
-              ),
-            ),
-            // add new task
-            Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.only(
-                top: SizeConfig.blockSizeHorizontal,
-                left: SizeConfig.blockSizeHorizontal * 4,
-              ),
-              child: TextButton.icon(
-                label: Text(
-                  "Add new task",
-                  style:
-                      TextStyle(fontSize: SizeConfig.blockSizeHorizontal * 4.5),
-                ),
-                onPressed: () {
-                  print("add new task");
-                },
-                icon: Container(
-                  padding: EdgeInsets.only(
-                    left: SizeConfig.blockSizeHorizontal * 1,
-                    right: SizeConfig.blockSizeHorizontal * 1.5,
+                  Padding(
+                    padding: const EdgeInsets.all(3.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Text(
+                        item.comments.isEmpty ? '------' : item.comments,
+                        // overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Theme.of(context).textTheme.headline6!.color,
+                          fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                        ),
+                      ),
+                    ),
                   ),
-                  // width: SizeConfig.blockSizeHorizontal * 14.5,
-                  alignment: Alignment.topRight,
-                  child: Icon(
-                    Icons.add_task,
-                    size: SizeConfig.blockSizeHorizontal * 6,
+                ],
+              ),
+              // add new inspection button
+              Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.only(
+                  top: SizeConfig.blockSizeHorizontal * 5,
+                  left: SizeConfig.blockSizeHorizontal * 4,
+                ),
+                child: TextButton.icon(
+                  label: Text(
+                    "Add new inspection",
+                    style: TextStyle(
+                        fontSize: SizeConfig.blockSizeHorizontal * 4.5),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                        AddInspectionScreen.routeName,
+                        arguments: item);
+                  },
+                  icon: Container(
+                    // width: SizeConfig.blockSizeHorizontal * 14.5,
+                    alignment: Alignment.topRight,
+                    child: Stack(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(
+                              left: SizeConfig.blockSizeHorizontal * 4),
+                          child: Icon(
+                            Icons.add,
+                            size: SizeConfig.blockSizeHorizontal * 4.5,
+                          ),
+                        ),
+                        Icon(
+                          Icons.search,
+                          size: SizeConfig.blockSizeHorizontal * 7,
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            InspectionsList(context: context, item: item),
-          ],
+              // add new task
+              Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.only(
+                  top: SizeConfig.blockSizeHorizontal,
+                  left: SizeConfig.blockSizeHorizontal * 4,
+                ),
+                child: TextButton.icon(
+                  label: Text(
+                    "Add new task",
+                    style: TextStyle(
+                        fontSize: SizeConfig.blockSizeHorizontal * 4.5),
+                  ),
+                  onPressed: () {
+                    print("add new task");
+                  },
+                  icon: Container(
+                    padding: EdgeInsets.only(
+                      left: SizeConfig.blockSizeHorizontal * 1,
+                      right: SizeConfig.blockSizeHorizontal * 1.5,
+                    ),
+                    // width: SizeConfig.blockSizeHorizontal * 14.5,
+                    alignment: Alignment.topRight,
+                    child: Icon(
+                      Icons.add_task,
+                      size: SizeConfig.blockSizeHorizontal * 6,
+                    ),
+                  ),
+                ),
+              ),
+              InspectionsList(context: context, item: item),
+            ],
+          ),
         ),
       ),
     );

@@ -132,6 +132,10 @@ class ItemProvider with ChangeNotifier {
       'category': item.category.toUpperCase(),
       'location': item.location,
       'comments': item.comments,
+      'inspectionStatus': item.inspectionStatus,
+      'nextInspection': item.nextInspection.toIso8601String(),
+      'lastInspection': item.lastInspection.toIso8601String(),
+      'interval': item.interval,
     }).then((_) {
       var editedItem =
           _items.indexWhere((element) => element.itemId == item.itemId);

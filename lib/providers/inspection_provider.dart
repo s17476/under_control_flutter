@@ -48,4 +48,39 @@ class InspectionProvider with ChangeNotifier {
       notifyListeners();
     });
   }
+
+  // add new inspection
+  Future<bool> addInspection(Item item, Inspection inspection) async {
+    bool response;
+    final inspectionRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(_user!.companyId)
+        .collection('items')
+        .doc(item.itemId)
+        .collection('inspections');
+
+    Map<String, dynamic> values = {
+      'date': inspection.date.toIso8601String(),
+      'comments': inspection.comments,
+      'status': inspection.status,
+      'checklistName': inspection.checklist!.name,
+    };
+
+    values.addAll(inspection.checklist!.fields);
+
+    // add to DB
+    response = await inspectionRef.add(values).then(
+      (value) {
+        inspection = inspection.copyWith(inspectionId: value.id);
+        // add to local list
+        _inspections.add(inspection);
+        notifyListeners();
+
+        return true;
+      },
+    ).catchError((_) {
+      return false;
+    });
+    return response;
+  }
 }
