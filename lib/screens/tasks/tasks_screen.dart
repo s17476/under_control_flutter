@@ -3,7 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/task.dart';
+import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
+import 'package:under_control_flutter/providers/user_provider.dart';
+import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
 
 import 'task_details_screen.dart';
 
@@ -176,10 +179,41 @@ class _TasksScreenState extends State<TasksScreen> {
                         listItems.add(Dismissible(
                           key: Key(task.taskId!),
                           confirmDismiss: (direction) async {
+                            bool exit = false;
                             bool response = false;
                             // swipe right - rapid complete
                             // rapid complete is a quick and easy way to complete standard tasks
                             if (direction == DismissDirection.startToEnd) {
+                              // if task is inspection
+                              if (task.type == TaskType.inspection) {
+                                await Navigator.of(context)
+                                    .pushNamed(AddInspectionScreen.routeName,
+                                        arguments: Provider.of<ItemProvider>(
+                                                context,
+                                                listen: false)
+                                            .items
+                                            .firstWhere((element) =>
+                                                element.itemId == task.itemId))
+                                    .then((value) {
+                                  if (value != null) {
+                                    exit = value as bool;
+                                  }
+                                });
+                                if (exit == false) {
+                                  ScaffoldMessenger.of(context)
+                                    ..removeCurrentSnackBar()
+                                    ..showSnackBar(
+                                      SnackBar(
+                                        content: const Text(
+                                            'Rapid Complete canceled!'),
+                                        backgroundColor:
+                                            Theme.of(context).errorColor,
+                                      ),
+                                    );
+                                  return false;
+                                }
+                              }
+// TODO
                               List<String> duration =
                                   task.taskInterval!.split(' ');
                               final today = DateTime.now();

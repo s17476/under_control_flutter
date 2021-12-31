@@ -6,6 +6,7 @@ import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/screens/equipment/edit_equipment_screen.dart';
 import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
+import 'package:under_control_flutter/screens/tasks/add_task_screen.dart';
 import 'package:under_control_flutter/widgets/inspections_list.dart';
 import 'package:under_control_flutter/widgets/status_icon.dart';
 
@@ -332,14 +333,15 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
               Container(
                 alignment: Alignment.centerLeft,
                 padding: EdgeInsets.only(
-                  top: SizeConfig.blockSizeHorizontal * 5,
-                  left: SizeConfig.blockSizeHorizontal * 4,
+                  top: SizeConfig.blockSizeHorizontal * 3,
+                  // left: SizeConfig.blockSizeHorizontal * 4,
                 ),
                 child: TextButton.icon(
                   label: Text(
                     "Add new inspection",
                     style: TextStyle(
-                        fontSize: SizeConfig.blockSizeHorizontal * 4.5),
+                      fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                    ),
                   ),
                   onPressed: () {
                     Navigator.of(context).pushNamed(
@@ -353,7 +355,8 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                       children: [
                         Padding(
                           padding: EdgeInsets.only(
-                              left: SizeConfig.blockSizeHorizontal * 4),
+                            left: SizeConfig.blockSizeHorizontal * 4,
+                          ),
                           child: Icon(
                             Icons.add,
                             size: SizeConfig.blockSizeHorizontal * 4.5,
@@ -371,19 +374,20 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
               // add new task
               Container(
                 alignment: Alignment.centerLeft,
-                padding: EdgeInsets.only(
-                  top: SizeConfig.blockSizeHorizontal,
-                  left: SizeConfig.blockSizeHorizontal * 4,
-                ),
+                // padding: EdgeInsets.only(
+                //   top: SizeConfig.blockSizeHorizontal,
+                // left: SizeConfig.blockSizeHorizontal * 4,
+                // ),
                 child: TextButton.icon(
                   label: Text(
                     "Add new task",
                     style: TextStyle(
-                        fontSize: SizeConfig.blockSizeHorizontal * 4.5),
+                      fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                    ),
                   ),
-                  onPressed: () {
-                    print("add new task");
-                  },
+                  onPressed: () => Navigator.of(context).pushNamed(
+                      AddTaskScreen.routeName,
+                      arguments: ['asset', item]),
                   icon: Container(
                     padding: EdgeInsets.only(
                       left: SizeConfig.blockSizeHorizontal * 1,

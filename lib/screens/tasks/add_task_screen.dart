@@ -22,6 +22,9 @@ class _AddTaskScreenState extends State<AddTaskScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
 
+  String? parameter;
+  Item? item;
+
   final List<Color?> darkTheme = const [
     Colors.green,
     Colors.blue,
@@ -70,6 +73,20 @@ class _AddTaskScreenState extends State<AddTaskScreen>
   void initState() {
     super.initState();
     Provider.of<UserProvider>(context, listen: false).initializeCompanyUsers();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (ModalRoute.of(context)!.settings.arguments != null) {
+      parameter =
+          (ModalRoute.of(context)!.settings.arguments as List)[0] as String;
+      if (parameter == 'asset') {
+        item =
+            ((ModalRoute.of(context)!.settings.arguments as List)[1] as Item);
+        selectedAsset = item;
+      }
+    }
   }
 
 // add new task
@@ -324,7 +341,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                     ),
 
                     // Asset dropdown
-                    // TODO
                     DropdownButtonFormField(
                       isExpanded: true,
                       icon: Icon(
@@ -353,20 +369,22 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         fillColor: Theme.of(context).splashColor,
                       ),
                       dropdownColor: Colors.grey.shade800,
-                      value: '',
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedAsset = allAssets.firstWhere(
-                              (element) => element.itemId == newValue!);
-                          if (selectedAsset?.producer != null &&
-                              selectedAsset?.producer != '') {
-                            titleController!.text =
-                                '$dropdownValue - ${selectedAsset?.producer} ${selectedAsset?.model} ${selectedAsset?.internalId}';
-                          } else {
-                            titleController!.text = dropdownValue;
-                          }
-                        });
-                      },
+                      value: parameter == 'asset' ? item!.itemId : '',
+                      onChanged: parameter == 'asset'
+                          ? null
+                          : (String? newValue) {
+                              setState(() {
+                                selectedAsset = allAssets.firstWhere(
+                                    (element) => element.itemId == newValue!);
+                                if (selectedAsset?.producer != null &&
+                                    selectedAsset?.producer != '') {
+                                  titleController!.text =
+                                      '$dropdownValue - ${selectedAsset?.producer} ${selectedAsset?.model} ${selectedAsset?.internalId}';
+                                } else {
+                                  titleController!.text = dropdownValue;
+                                }
+                              });
+                            },
                       items: allAssets.map((Item item) {
                         return DropdownMenuItem<String>(
                           value: '${item.itemId}',
