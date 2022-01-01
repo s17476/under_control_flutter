@@ -52,12 +52,15 @@ class InspectionProvider with ChangeNotifier {
         // fetch checklist
         Map checkpointsMap = doc.data() as Map;
         for (var checkpoint in checkpointsMap.keys) {
-          if (checkpoint != 'user' ||
-              checkpoint != 'date' ||
-              checkpoint != 'comments' ||
-              checkpoint != 'status' ||
+          if (checkpoint == 'checklistName') {
+            tmpChecklist.name = checkpoint;
+          } else if (checkpoint != 'user' &&
+              checkpoint != 'date' &&
+              checkpoint != 'comments' &&
+              checkpoint != 'status' &&
               checkpoint != 'taskId') {
-            tmpChecklist.fields[checkpoint] = false;
+            tmpChecklist.fields[checkpoint] = doc[checkpoint];
+            print('checkpoint    ${doc[checkpoint]}');
           }
         }
       }

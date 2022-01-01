@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/inspection_provider.dart';
+import 'package:under_control_flutter/widgets/status_icon.dart';
 
 class InspectionsList extends StatefulWidget {
   const InspectionsList({Key? key, required this.context, required this.item})
@@ -20,10 +21,10 @@ class _InspectionsListState extends State<InspectionsList> {
   var showInspections = false;
 
   @override
-  void didChangeDependencies() {
+  void initState() {
     Provider.of<InspectionProvider>(context, listen: false)
         .fetchByItem(widget.item);
-    super.didChangeDependencies();
+    super.initState();
   }
 
   @override
@@ -83,26 +84,97 @@ class _InspectionsListState extends State<InspectionsList> {
             height: showInspections ? null : 0,
 
             // color: Colors.white12,
-            child: ListView(shrinkWrap: true, children: [
+            child: Column(children: [
               const Divider(),
               ...Provider.of<InspectionProvider>(context)
                   .inspections
                   .map((insp) {
-                return Row(
+                return Column(
                   children: [
-                    Text(
-                      DateFormat('dd/MMM/yyyy').format(insp.date),
-                    ),
-                    Column(
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        if (insp.comments != '') Text(insp.comments),
-                        const Text('Checklist:'),
-                        if (insp.checklist != null &&
-                            insp.checklist!.fields.isNotEmpty)
-                          for (var item in insp.checklist!.fields.keys)
-                            Text('$item - ${insp.checklist!.fields[item]}'),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                DateFormat('dd').format(insp.date),
+                              ),
+                              Text(
+                                DateFormat('MMM').format(insp.date),
+                              ),
+                              Text(
+                                DateFormat('yyyy').format(insp.date),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                const Text('Checklist:'),
+                                if (insp.checklist != null &&
+                                    insp.checklist!.fields.isNotEmpty)
+                                  for (var item in insp.checklist!.fields.keys)
+                                    Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(item),
+                                        insp.checklist!.fields[item] == true
+                                            ? const Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 2),
+                                                child: CircleAvatar(
+                                                  radius: 15,
+                                                  backgroundColor: Colors.green,
+                                                  child: Icon(
+                                                    Icons.done,
+                                                    size: 25,
+                                                  ),
+                                                ),
+                                              )
+                                            : const Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 2),
+                                                child: CircleAvatar(
+                                                  radius: 15,
+                                                  backgroundColor: Colors.red,
+                                                  child: Icon(
+                                                    Icons.clear,
+                                                    size: 25,
+                                                  ),
+                                                ),
+                                              ),
+                                      ],
+                                    ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              const Text('Inspection'),
+                              const Text('status'),
+                              StatusIcon(
+                                textSize: 0,
+                                heroTag: insp.date.toIso8601String(),
+                                size: 10,
+                                inspectionStatus: insp.status,
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
-                    )
+                    ),
+                    const Divider(),
                   ],
                 );
 
