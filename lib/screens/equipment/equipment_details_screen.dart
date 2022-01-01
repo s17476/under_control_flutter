@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
+import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/screens/equipment/edit_equipment_screen.dart';
 import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
 import 'package:under_control_flutter/screens/tasks/add_task_screen.dart';
@@ -71,9 +72,11 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
   @override
   void didChangeDependencies() {
     var id = ModalRoute.of(context)!.settings.arguments as Item;
-    item = Provider.of<ItemProvider>(context)
-        .items
-        .firstWhere((element) => element.itemId == id.itemId);
+    try {
+      item = Provider.of<ItemProvider>(context)
+          .items
+          .firstWhere((element) => element.itemId == id.itemId);
+    } catch (e) {}
     super.didChangeDependencies();
   }
 
@@ -123,8 +126,20 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
             onPressed: () {
               _showDeleteDialog(context, item).then((value) {
                 if (value != null) {
+                  // delete item
                   Provider.of<ItemProvider>(context, listen: false)
                       .deleteItem(context, item.itemId);
+                  // delete all
+                  var tasks = Provider.of<TaskProvider>(context, listen: false)
+                      .getAllTasks;
+                  for (var key in tasks.keys) {
+                    for (var task in tasks[key]!) {
+                      if (task.itemId == item.itemId) {
+                        Provider.of<TaskProvider>(context, listen: false)
+                            .deleteTask(task);
+                      }
+                    }
+                  }
                 }
               });
             },
@@ -138,203 +153,202 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.only(
-            left: 16,
-            right: 16,
-            top: 8,
+      body: Container(
+        width: SizeConfig.blockSizeHorizontal * 100,
+        height: SizeConfig.blockSizeVertical * 110,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black,
+              Colors.grey,
+            ],
           ),
-          width: SizeConfig.blockSizeHorizontal * 100,
-          height: SizeConfig.blockSizeVertical * 100,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black,
-                Colors.grey,
-              ],
-            ),
-          ),
+        ),
+        child: SingleChildScrollView(
           child: Column(
             // mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: SizeConfig.blockSizeHorizontal * 50,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: SizeConfig.blockSizeHorizontal * 50,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(1.0),
+                                child: Text(
+                                  'Internal ID',
+                                  style: labelTextStyle,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(1.0),
+                                child: Text(
+                                  item.internalId,
+                                  style: textStyle,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(1.0),
+                                child: Text(
+                                  'Producer',
+                                  style: labelTextStyle,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(1.0),
+                                child: Text(
+                                  item.producer,
+                                  style: textStyle,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(1.0),
+                                child: Text(
+                                  'Model',
+                                  style: labelTextStyle,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(1.0),
+                                child: Text(
+                                  item.model,
+                                  style: textStyle,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(1.0),
+                                child: Text(
+                                  'Category',
+                                  style: labelTextStyle,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(1.0),
+                                child: Text(
+                                  item.category,
+                                  style: textStyle,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(1.0),
+                                child: Text(
+                                  'Location',
+                                  style: labelTextStyle,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(1.0),
+                                child: Text(
+                                  item.location,
+                                  style: textStyle,
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(1.0),
+                                child: Text(
+                                  'Comments',
+                                  style: labelTextStyle,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Column(
                           children: [
                             Padding(
                               padding: const EdgeInsets.all(1.0),
                               child: Text(
-                                'Internal ID',
+                                'Inspection every',
                                 style: labelTextStyle,
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(1.0),
                               child: Text(
-                                item.internalId,
+                                item.interval,
                                 style: textStyle,
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(1.0),
                               child: Text(
-                                'Producer',
+                                'Last inspection',
                                 style: labelTextStyle,
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(1.0),
                               child: Text(
-                                item.producer,
+                                DateFormat('dd/MMM/yyyy')
+                                    .format(item.lastInspection),
                                 style: textStyle,
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(1.0),
                               child: Text(
-                                'Model',
+                                'Next inspection',
                                 style: labelTextStyle,
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.all(1.0),
                               child: Text(
-                                item.model,
-                                style: textStyle,
+                                DateFormat('dd/MMM/yyyy')
+                                    .format(item.nextInspection),
+                                style: item.inspectionStatus ==
+                                        InspectionStatus.expired.index
+                                    ? expiredTextStyle
+                                    : textStyle,
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.all(1.0),
-                              child: Text(
-                                'Category',
-                                style: labelTextStyle,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(1.0),
-                              child: Text(
-                                item.category,
-                                style: textStyle,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(1.0),
-                              child: Text(
-                                'Location',
-                                style: labelTextStyle,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(1.0),
-                              child: Text(
-                                item.location,
-                                style: textStyle,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(1.0),
-                              child: Text(
-                                'Comments',
-                                style: labelTextStyle,
+                              padding: const EdgeInsets.only(top: 8),
+                              child: StatusIcon(
+                                heroTag: item.itemId!,
+                                inspectionStatus: item.inspectionStatus,
+                                size: 20,
+                                textSize: 7,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Text(
-                              'Inspection every',
-                              style: labelTextStyle,
-                            ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(3.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Text(
+                          item.comments.isEmpty ? '------' : item.comments,
+                          // overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: Theme.of(context).textTheme.headline6!.color,
+                            fontSize: SizeConfig.blockSizeHorizontal * 4.5,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Text(
-                              item.interval,
-                              style: textStyle,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Text(
-                              'Last inspection',
-                              style: labelTextStyle,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Text(
-                              DateFormat('dd/MMM/yyyy')
-                                  .format(item.lastInspection),
-                              style: textStyle,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Text(
-                              'Next inspection',
-                              style: labelTextStyle,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Text(
-                              DateFormat('dd/MMM/yyyy')
-                                  .format(item.nextInspection),
-                              style: item.inspectionStatus ==
-                                      InspectionStatus.expired.index
-                                  ? expiredTextStyle
-                                  : textStyle,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: StatusIcon(
-                              heroTag: item.itemId!,
-                              inspectionStatus: item.inspectionStatus,
-                              size: 20,
-                              textSize: 7,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Text(
-                        item.comments.isEmpty ? '------' : item.comments,
-                        // overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: Theme.of(context).textTheme.headline6!.color,
-                          fontSize: SizeConfig.blockSizeHorizontal * 4.5,
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               // add new inspection button
               Container(
                 alignment: Alignment.centerLeft,
-                padding: EdgeInsets.only(
-                  top: SizeConfig.blockSizeHorizontal * 3,
-                  // left: SizeConfig.blockSizeHorizontal * 4,
+                padding: const EdgeInsets.only(
+                  top: 8,
+                  left: 8,
                 ),
                 child: TextButton.icon(
                   label: Text(
@@ -346,7 +360,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                   onPressed: () {
                     Navigator.of(context).pushNamed(
                         AddInspectionScreen.routeName,
-                        arguments: item);
+                        arguments: [item, null]);
                   },
                   icon: Container(
                     // width: SizeConfig.blockSizeHorizontal * 14.5,
@@ -374,10 +388,9 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
               // add new task
               Container(
                 alignment: Alignment.centerLeft,
-                // padding: EdgeInsets.only(
-                //   top: SizeConfig.blockSizeHorizontal,
-                // left: SizeConfig.blockSizeHorizontal * 4,
-                // ),
+                padding: const EdgeInsets.only(
+                  left: 8,
+                ),
                 child: TextButton.icon(
                   label: Text(
                     "Add new task",

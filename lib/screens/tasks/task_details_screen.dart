@@ -260,28 +260,32 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
           task.duration = transferObjectTask!.duration;
         }
 
-        List<String> duration = transferObjectTask!.taskInterval!.split(' ');
-        task.taskInterval = transferObjectTask!.taskInterval;
-        if (duration[1] == 'week' || duration[1] == 'weeks') {
-          task.nextDate = DateTime(
-            transferObjectTask!.date.year,
-            transferObjectTask!.date.month,
-            transferObjectTask!.date.day + (int.parse(duration[0]) * 7),
-          );
-        } else if (duration[1] == 'month' || duration[1] == 'months') {
-          task.nextDate = DateTime(
-            transferObjectTask!.date.year,
-            transferObjectTask!.date.month + int.parse(duration[0]),
-            transferObjectTask!.date.day,
-          );
-        } else if (duration[1] == 'year' || duration[1] == 'years') {
-          task.nextDate = DateTime(
-            transferObjectTask!.date.year + int.parse(duration[0]),
-            transferObjectTask!.date.month,
-            transferObjectTask!.date.day,
-          );
+        if (transferObjectTask!.taskInterval != 'No') {
+          List<String> duration = transferObjectTask!.taskInterval!.split(' ');
+          task.taskInterval = transferObjectTask!.taskInterval;
+          if (duration[1] == 'week' || duration[1] == 'weeks') {
+            task.nextDate = DateTime(
+              transferObjectTask!.date.year,
+              transferObjectTask!.date.month,
+              transferObjectTask!.date.day + (int.parse(duration[0]) * 7),
+            );
+          } else if (duration[1] == 'month' || duration[1] == 'months') {
+            task.nextDate = DateTime(
+              transferObjectTask!.date.year,
+              transferObjectTask!.date.month + int.parse(duration[0]),
+              transferObjectTask!.date.day,
+            );
+          } else if (duration[1] == 'year' || duration[1] == 'years') {
+            task.nextDate = DateTime(
+              transferObjectTask!.date.year + int.parse(duration[0]),
+              transferObjectTask!.date.month,
+              transferObjectTask!.date.day,
+            );
+          }
+        } else {
+          task.nextDate = null;
+          task.taskInterval = 'No';
         }
-
         // executor ID
         task.executorId =
             Provider.of<UserProvider>(context, listen: false).user!.userId;
@@ -309,7 +313,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
             duration: 0,
             status: TaskStatus.planned,
           );
-          print(tmp.duration);
+
           Provider.of<TaskProvider>(context, listen: false).addNextTask(tmp);
         }
       }
@@ -320,12 +324,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
   void didChangeDependencies() {
     task = ModalRoute.of(context)!.settings.arguments as Task;
     oldTask = task.copyWith();
-    print('didDependency ${task.duration}');
 
-    // if (task.nextDate != null && oldNextDate != null) {
-    //   oldNextDate = task.nextDate;
-    //   oldInterval = task.taskInterval;
-    // }
     if (task.executorId != null && _executorName == '') {
       _getExecutorName();
     }
@@ -338,11 +337,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
   @override
   Widget build(BuildContext context) {
     // used to store task state before saving
-
     transferObjectTask ??= task.copyWith(date: DateTime.now());
-    print('build task dur ${task.duration}');
-
-    print('build duration ${transferObjectTask?.duration}');
 
     final items = Provider.of<ItemProvider>(context, listen: false).items;
     final textStyle = Theme.of(context).textTheme.headline6!.copyWith(
@@ -513,7 +508,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                       ),
                     ],
                   ),
-                  //  status icon
+                  //  status
                   Padding(
                     padding: EdgeInsets.only(
                       right: SizeConfig.blockSizeHorizontal * 8,
@@ -525,7 +520,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                           color: Colors.white,
                           size: SizeConfig.blockSizeHorizontal * 10,
                         ),
-                        Text(_statusText[task.status.index]),
+                        Text(
+                          _statusText[task.status.index],
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ],
                     ),
                   ),
@@ -820,7 +818,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                         if (_isInEditMode) {
                           _animationController!.forward();
                           _scrollController.animateTo(
-                            400,
+                            500,
                             duration: const Duration(milliseconds: 500),
                             curve: Curves.easeIn,
                           );

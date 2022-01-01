@@ -88,7 +88,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
         //or show snackbar with error message
         await Provider.of<ItemProvider>(context, listen: false)
             .addNewItem(item)
-            .then((_) => Navigator.of(context).pop(true))
+            .then((resultItem) => Navigator.of(context).pop(resultItem))
             .catchError((_) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

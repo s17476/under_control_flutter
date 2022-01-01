@@ -186,15 +186,16 @@ class _TasksScreenState extends State<TasksScreen> {
                             if (direction == DismissDirection.startToEnd) {
                               // if task is inspection
                               if (task.type == TaskType.inspection) {
-                                await Navigator.of(context)
-                                    .pushNamed(AddInspectionScreen.routeName,
-                                        arguments: Provider.of<ItemProvider>(
-                                                context,
-                                                listen: false)
-                                            .items
-                                            .firstWhere((element) =>
-                                                element.itemId == task.itemId))
-                                    .then((value) {
+                                await Navigator.of(context).pushNamed(
+                                    AddInspectionScreen.routeName,
+                                    arguments: [
+                                      Provider.of<ItemProvider>(context,
+                                              listen: false)
+                                          .items
+                                          .firstWhere((element) =>
+                                              element.itemId == task.itemId),
+                                      task
+                                    ]).then((value) {
                                   if (value != null) {
                                     exit = value as bool;
                                   }
@@ -214,30 +215,34 @@ class _TasksScreenState extends State<TasksScreen> {
                                 }
                               }
 // TODO
-                              List<String> duration =
-                                  task.taskInterval!.split(' ');
-                              final today = DateTime.now();
-                              if (duration[1] == 'week' ||
-                                  duration[1] == 'weeks') {
-                                task.nextDate = DateTime(
-                                  today.year,
-                                  today.month,
-                                  today.day + (int.parse(duration[0]) * 7),
-                                );
-                              } else if (duration[1] == 'month' ||
-                                  duration[1] == 'months') {
-                                task.nextDate = DateTime(
-                                  today.year,
-                                  today.month + int.parse(duration[0]),
-                                  today.day,
-                                );
-                              } else if (duration[1] == 'year' ||
-                                  duration[1] == 'years') {
-                                task.nextDate = DateTime(
-                                  today.year + int.parse(duration[0]),
-                                  today.month,
-                                  today.day,
-                                );
+                              // print('task interval  ${task.taskInterval}');
+                              if (task.taskInterval != null &&
+                                  task.taskInterval != 'No') {
+                                List<String> duration =
+                                    task.taskInterval!.split(' ');
+                                final today = DateTime.now();
+                                if (duration[1] == 'week' ||
+                                    duration[1] == 'weeks') {
+                                  task.nextDate = DateTime(
+                                    today.year,
+                                    today.month,
+                                    today.day + (int.parse(duration[0]) * 7),
+                                  );
+                                } else if (duration[1] == 'month' ||
+                                    duration[1] == 'months') {
+                                  task.nextDate = DateTime(
+                                    today.year,
+                                    today.month + int.parse(duration[0]),
+                                    today.day,
+                                  );
+                                } else if (duration[1] == 'year' ||
+                                    duration[1] == 'years') {
+                                  task.nextDate = DateTime(
+                                    today.year + int.parse(duration[0]),
+                                    today.month,
+                                    today.day,
+                                  );
+                                }
                               }
 
                               await Provider.of<TaskProvider>(context,

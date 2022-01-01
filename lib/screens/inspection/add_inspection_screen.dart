@@ -5,9 +5,11 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/checklist.dart';
 import 'package:under_control_flutter/models/inspection.dart';
 import 'package:under_control_flutter/models/item.dart';
+import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/checklist_provider.dart';
 import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
+import 'package:under_control_flutter/providers/user_provider.dart';
 
 class AddInspectionScreen extends StatefulWidget {
   const AddInspectionScreen({Key? key}) : super(key: key);
@@ -23,6 +25,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
   final _formKey = GlobalKey<FormState>();
 
   late Item item;
+  late Task? task;
 
   final List<AnimationController> _animationControllers = [];
   final List<Animation<double>> _animations = [];
@@ -51,7 +54,10 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
 
   @override
   void didChangeDependencies() {
-    item = ModalRoute.of(context)!.settings.arguments as Item;
+    item = (ModalRoute.of(context)!.settings.arguments as List<dynamic>)[0]
+        as Item;
+    task = (ModalRoute.of(context)!.settings.arguments as List<dynamic>)[1]
+        as Task?;
     checklists = Provider.of<ChecklistProvider>(context).checklists;
     _animationControllers.clear();
     _animations.clear();
@@ -83,9 +89,6 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
           CurvedAnimation(
               parent: _animationControllers[i], curve: Curves.easeOut));
     }
-
-    print(
-        'after make controllers  ${_selectedChecklist.fields.keys.toList().length}');
   }
 
   void _presentDayPicker() {
@@ -131,10 +134,12 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
     }
 
     Inspection inspection = Inspection(
+      user: Provider.of<UserProvider>(context, listen: false).user!.userId,
       date: _inspectionDate!,
       comments: _commentsTextController.text,
       checklist: _selectedChecklist,
       status: statusValue,
+      taskId: task?.taskId,
     );
     Provider.of<InspectionProvider>(context, listen: false)
         .addInspection(
@@ -247,10 +252,6 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                         ),
                       ],
                     ),
-                    // SizedBox(
-                    //   height: SizeConfig.blockSizeVertical * 1,
-                    // ),
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -305,7 +306,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                       ],
                     ),
                     // if (_checklistName == 'New checklist')
-                    Container(
+                    SizedBox(
                       child: Column(
                         children: [
                           const Divider(),

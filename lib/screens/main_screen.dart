@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
+import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/checklist_provider.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
@@ -231,18 +232,45 @@ class _MainScreenState extends State<MainScreen> {
                                   Navigator.of(context)
                                       .push(_createRute(
                                           () => const AddEquipmentScreen()))
-                                      .then((value) {
-                                    if (value != null) {
+                                      .then((resultItem) {
+                                    print('new item:   $resultItem');
+                                    if (resultItem != null) {
                                       ScaffoldMessenger.of(context)
                                         ..removeCurrentSnackBar()
                                         ..showSnackBar(
                                           SnackBar(
-                                            content: Text('New asset added'),
+                                            content:
+                                                const Text('New asset added!'),
                                             backgroundColor: Theme.of(context)
                                                 .appBarTheme
                                                 .backgroundColor,
                                           ),
                                         );
+                                      var tmpItem = resultItem as Item;
+                                      Provider.of<TaskProvider>(context,
+                                              listen: false)
+                                          .addTask(
+                                        Task(
+                                          title:
+                                              'Inspection - ${tmpItem.producer} ${tmpItem.model}',
+                                          date: tmpItem.lastInspection,
+                                          executor: TaskExecutor.company,
+                                          userId: Provider.of<UserProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .user!
+                                              .userId,
+                                          description:
+                                              'Periodic inspection. Auto-added.',
+                                          comments: '',
+                                          status: TaskStatus.planned,
+                                          type: TaskType.inspection,
+                                          itemId: tmpItem.itemId,
+                                          location: tmpItem.location,
+                                          taskInterval: tmpItem.interval,
+                                          nextDate: tmpItem.nextInspection,
+                                        ),
+                                      );
                                     }
                                   });
                                 }

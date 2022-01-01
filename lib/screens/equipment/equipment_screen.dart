@@ -7,12 +7,11 @@ import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/screens/equipment/equipment_details_screen.dart';
 import 'package:under_control_flutter/widgets/status_icon.dart';
 
+// this screen shows a list of all registred in DB assets
 class EquipmentScreen extends StatefulWidget {
   const EquipmentScreen({
     Key? key,
   }) : super(key: key);
-
-  // final AppUser appUser;
 
   @override
   State<EquipmentScreen> createState() => _EquipmentScreenState();
@@ -21,6 +20,7 @@ class EquipmentScreen extends StatefulWidget {
 class _EquipmentScreenState extends State<EquipmentScreen> {
   var _isLoading = false;
   var _currentCategory = '';
+  // colors used to mark categories in lise view
   final colors = [
     Colors.blue,
     Colors.indigo,
@@ -32,6 +32,7 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
   ];
   var colorPointer = -1;
 
+  // fetch data from DB and refresh list
   Future<void> _refreshItems() async {
     setState(() {
       _isLoading = true;
@@ -55,22 +56,24 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
   Widget build(BuildContext context) {
     ItemProvider itemProvider = Provider.of<ItemProvider>(context);
     final items = itemProvider.items;
-    // bool isExpired = false;
     _currentCategory = '';
+
     return RefreshIndicator(
       onRefresh: _refreshItems,
       backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
       color: Theme.of(context).primaryColor,
       child: _isLoading
+          // data is loading
           ? Center(
               child: CircularProgressIndicator(
                 color: Theme.of(context).primaryColor,
               ),
             )
+          // no data found
           : items.isEmpty
               ? Center(
                   child: Text(
-                    'No equipment registered. \n\n Add some!',
+                    'No assets registered. \n\n Add some!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: SizeConfig.blockSizeHorizontal * 6,
@@ -78,12 +81,11 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                     ),
                   ),
                 )
+              // show list of items when loaded and has data
               : ListView(
                   padding: EdgeInsets.symmetric(
-                    // vertical: SizeConfig.blockSizeVertical * 1,
                     horizontal: SizeConfig.blockSizeHorizontal * 2,
                   ),
-                  // itemCount: items.length,
                   children: [
                     ...items.map(
                       (item) {
@@ -96,14 +98,14 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                           } else {
                             colorPointer = 0;
                           }
-                          // print(' $currentCategory   ${item.category}');
                         }
                         return Column(
                           key: ValueKey<String>(item.itemId!),
                           children: [
+                            // if order by category (default mode) is selected
+                            // if category changes print category name as items divider
                             if (categoryChanges && itemProvider.showCategories)
                               ListTile(
-                                // key: ValueKey('${items[i].itemId}separator'),
                                 title: Text(
                                   item.category,
                                   style: TextStyle(
@@ -113,7 +115,9 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                                   ),
                                 ),
                               ),
+                            // assets list item
                             GestureDetector(
+                              // go to details screen on tap
                               onTap: () => Navigator.of(context)
                                   .pushNamed(EquipmentDetailsScreen.routeName,
                                       arguments: item)
@@ -123,7 +127,7 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                                     ..removeCurrentSnackBar()
                                     ..showSnackBar(
                                       SnackBar(
-                                        content: Text('Item deleted'),
+                                        content: const Text('Item deleted'),
                                         backgroundColor:
                                             Theme.of(context).errorColor,
                                       ),
@@ -131,6 +135,7 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                                 }
                               }),
                               child: ListTile(
+                                // category avatar
                                 leading: CircleAvatar(
                                   child: FittedBox(
                                     child: Padding(
@@ -144,12 +149,13 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                                     ),
                                   ),
                                   backgroundColor: colors[colorPointer],
-                                  // radius: SizeConfig.blockSizeHorizontal * 3,
                                 ),
+                                // list item title
                                 title: Text(
                                   '${item.producer}  ${item.model}',
                                   style: Theme.of(context).textTheme.headline6,
                                 ),
+                                // list item subtitle
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -170,6 +176,7 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                                     ),
                                   ],
                                 ),
+                                // last inspection status icon
                                 trailing: StatusIcon(
                                   heroTag: item.itemId!,
                                   inspectionStatus: item.inspectionStatus,
@@ -185,6 +192,5 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                   ],
                 ),
     );
-    // Text('data');
   }
 }
