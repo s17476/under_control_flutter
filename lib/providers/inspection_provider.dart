@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/checklist.dart';
@@ -61,7 +60,7 @@ class InspectionProvider with ChangeNotifier {
               checkpoint != 'status' &&
               checkpoint != 'taskId') {
             tmpChecklist.fields[checkpoint] = doc[checkpoint];
-            print('checkpoint    ${doc[checkpoint]}');
+            // print('checkpoint    ${doc[checkpoint]}');
           }
         }
       }

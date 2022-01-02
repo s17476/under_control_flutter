@@ -218,10 +218,20 @@ class CalendarEventsList extends StatelessWidget {
                         padding: const EdgeInsets.only(left: 10),
                         alignment: Alignment.centerLeft,
                         color: Colors.green,
-                        child: Icon(
-                          Icons.done,
-                          color: Colors.white,
-                          size: SizeConfig.blockSizeHorizontal * 15,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.done,
+                              color: Colors.white,
+                              size: SizeConfig.blockSizeHorizontal * 15,
+                            ),
+                            Text(
+                              'Rapid Complete',
+                              style: TextStyle(
+                                fontSize: SizeConfig.blockSizeHorizontal * 5,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       child: GestureDetector(

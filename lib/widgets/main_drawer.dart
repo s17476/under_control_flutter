@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
+import 'package:under_control_flutter/providers/chart_data_provider.dart';
+import 'package:under_control_flutter/providers/checklist_provider.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
@@ -19,7 +21,9 @@ class MainDrawer extends StatelessWidget {
     Provider.of<CompanyProvider>(context, listen: false).clear();
     Provider.of<InspectionProvider>(context, listen: false).clear();
     Provider.of<ItemProvider>(context, listen: false).clear();
-    Provider.of<TaskProvider>(context, listen: false).clear;
+    Provider.of<TaskProvider>(context, listen: false).clear();
+    Provider.of<ChecklistProvider>(context, listen: false).clear();
+    Provider.of<ChartDataProvider>(context, listen: false).clear();
     userProvider.signout();
   }
 

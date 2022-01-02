@@ -16,6 +16,10 @@ class ChecklistProvider with ChangeNotifier {
     _user = user;
   }
 
+  void clear() {
+    _user = null;
+  }
+
   List<Checklist> get checklists =>
       [Checklist(name: 'New checklist', fields: {}), ..._checklists];
 

@@ -79,13 +79,13 @@ class ItemProvider with ChangeNotifier {
         .doc();
 
     // get inspections referance
-    final inspectionRef = FirebaseFirestore.instance
-        .collection('companies')
-        .doc(_user!.companyId)
-        .collection('items')
-        .doc(itemRef.id)
-        .collection('inspections')
-        .doc();
+    // final inspectionRef = FirebaseFirestore.instance
+    //     .collection('companies')
+    //     .doc(_user!.companyId)
+    //     .collection('items')
+    //     .doc(itemRef.id)
+    //     .collection('inspections')
+    //     .doc();
 
     // add asset to DB
     batch.set(itemRef, {

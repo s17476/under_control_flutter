@@ -4,6 +4,7 @@ import 'package:under_control_flutter/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/providers/chart_data_provider.dart';
 import 'package:under_control_flutter/providers/checklist_provider.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/inspection_provider.dart';
@@ -66,6 +67,7 @@ class _AppState extends State<App> {
         ),
       ),
       scaffoldBackgroundColor: Colors.white12,
+      // scaffoldBackgroundColor: const Color(0xff232d37),
       primaryColor: Colors.green,
       backgroundColor: Colors.grey,
       cardColor: Colors.black26,
@@ -109,6 +111,10 @@ class _AppState extends State<App> {
         ChangeNotifierProxyProvider<UserProvider, ChecklistProvider>(
           create: (ctx) => ChecklistProvider(),
           update: (ctx, user, checklist) => checklist!..updateUser(user.user),
+        ),
+        ChangeNotifierProxyProvider<UserProvider, ChartDataProvider>(
+          create: (ctx) => ChartDataProvider(),
+          update: (ctx, user, chartData) => chartData!..updateUser(user.user),
         ),
       ],
       child: MaterialApp(

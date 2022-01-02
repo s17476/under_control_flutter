@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 
 import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/company.dart';
-import 'package:under_control_flutter/screens/start/choose_company_screen.dart';
 
 class UserProvider with ChangeNotifier {
   AppUser? _user;
@@ -23,7 +22,6 @@ class UserProvider with ChangeNotifier {
         userId: _user!.userId,
         email: _user!.email,
         userName: _user!.userName,
-        // password: _user.password,
         userImage: _user!.userImage,
         company: _user!.company,
         companyId: _user!.companyId,
@@ -103,7 +101,6 @@ class UserProvider with ChangeNotifier {
       }
       _isLoading = false;
       _hasData = true;
-
       return tmpUser;
     });
     notifyListeners();
@@ -115,7 +112,6 @@ class UserProvider with ChangeNotifier {
     BuildContext context,
     String userId,
   ) async {
-    print('user id $userId');
     _user = await FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
@@ -192,12 +188,6 @@ class UserProvider with ChangeNotifier {
           email: email,
           password: password,
         );
-
-        //get user data from DB
-        // CollectionReference usersRef =
-        //     FirebaseFirestore.instance.collection('users');
-        // final snapshot = await usersRef.doc(userCredential.user!.uid).get();
-
         await initializeUser(context, userCredential.user!.uid);
 
         _isLoading = false;

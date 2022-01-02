@@ -93,7 +93,7 @@ class TaskProvider with ChangeNotifier {
           cost: doc['cost'],
           duration: doc['duration'],
         );
-        print('f\ne\nt\nc\nh\n ${tmpTask.cost}  ${tmpTask.duration}');
+        // print('f\ne\nt\nc\nh\n ${tmpTask.cost}  ${tmpTask.duration}');
         if (tmpTasks.containsKey(stringDate)) {
           tmpTasks[stringDate]!.add(tmpTask);
         } else {
@@ -106,7 +106,7 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<Task?> addTask(Task task) async {
-    print('add task executor id  ${task.executorId}');
+    // print('add task executor id  ${task.executorId}');
     Task tmpTask;
     Task result;
     // get taskss referance
@@ -282,7 +282,7 @@ class TaskProvider with ChangeNotifier {
       }
       notifyListeners();
     }).catchError((error) {
-      print(error);
+      // print(error);
     });
     return response;
   }

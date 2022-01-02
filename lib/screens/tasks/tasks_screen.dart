@@ -328,10 +328,21 @@ class _TasksScreenState extends State<TasksScreen> {
                             padding: const EdgeInsets.only(left: 10),
                             alignment: Alignment.centerLeft,
                             color: Colors.green,
-                            child: Icon(
-                              Icons.done,
-                              color: Colors.white,
-                              size: SizeConfig.blockSizeHorizontal * 20,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.done,
+                                  color: Colors.white,
+                                  size: SizeConfig.blockSizeHorizontal * 20,
+                                ),
+                                Text(
+                                  'Rapid Complete',
+                                  style: TextStyle(
+                                    fontSize:
+                                        SizeConfig.blockSizeHorizontal * 5,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           child: GestureDetector(

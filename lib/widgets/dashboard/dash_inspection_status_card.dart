@@ -38,7 +38,7 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
     Map<InspectionStatus, int> inspectionsStatus =
         itemProvider.inspectionsStatus;
 
-    print('inspection status $inspectionsStatus');
+    // print('inspection status $inspectionsStatus');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
