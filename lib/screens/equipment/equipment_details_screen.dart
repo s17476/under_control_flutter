@@ -140,6 +140,9 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                       }
                     }
                   }
+                  // update status
+                  Provider.of<ItemProvider>(context, listen: false)
+                      .fetchInspectionsStatus();
                 }
               });
             },
@@ -162,7 +165,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
             end: Alignment.bottomCenter,
             colors: [
               Colors.black,
-              Colors.grey,
+              Colors.white10,
             ],
           ),
         ),

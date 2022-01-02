@@ -442,7 +442,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
             end: Alignment.bottomCenter,
             colors: [
               Colors.black,
-              Colors.grey,
+              Colors.white10,
             ],
           ),
         ),
@@ -818,7 +818,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                         if (_isInEditMode) {
                           _animationController!.forward();
                           _scrollController.animateTo(
-                            500,
+                            600,
                             duration: const Duration(milliseconds: 500),
                             curve: Curves.easeIn,
                           );

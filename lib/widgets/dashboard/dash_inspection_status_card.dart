@@ -38,6 +38,8 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
     Map<InspectionStatus, int> inspectionsStatus =
         itemProvider.inspectionsStatus;
 
+    print('inspection status $inspectionsStatus');
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -150,16 +152,20 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
   Text makeComment(Map<InspectionStatus, int> inspectionsStatus) {
     String comment;
     Color commentColor;
-    if (inspectionsStatus[InspectionStatus.expired] != null) {
+    if (inspectionsStatus[InspectionStatus.expired] != null &&
+        inspectionsStatus[InspectionStatus.expired] != 0) {
       comment = "Some inspections are out of date.";
       commentColor = Colors.red;
-    } else if (inspectionsStatus[InspectionStatus.failed] != null) {
+    } else if (inspectionsStatus[InspectionStatus.failed] != null &&
+        inspectionsStatus[InspectionStatus.failed] != 0) {
       comment = "Some inspections failed.";
       commentColor = Colors.red;
-    } else if (inspectionsStatus[InspectionStatus.needsAttention] != null) {
-      comment = "Some inspections are out of date.";
+    } else if (inspectionsStatus[InspectionStatus.needsAttention] != null &&
+        inspectionsStatus[InspectionStatus.needsAttention] != 0) {
+      comment = "Some assets needs attention.";
       commentColor = Colors.amber;
-    } else if (inspectionsStatus[InspectionStatus.ok] != null) {
+    } else if (inspectionsStatus[InspectionStatus.ok] != null &&
+        inspectionsStatus[InspectionStatus.ok] != 0) {
       comment = "All inspections are OK. Well done.";
       commentColor = Colors.green;
     } else {

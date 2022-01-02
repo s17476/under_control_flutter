@@ -34,6 +34,7 @@ class InspectionProvider with ChangeNotifier {
         .collection('items')
         .doc(item.itemId)
         .collection('inspections')
+        .orderBy('date', descending: true)
         .get()
         .then((QuerySnapshot querySnapshot) {
       // fetch inspections

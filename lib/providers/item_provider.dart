@@ -102,14 +102,14 @@ class ItemProvider with ChangeNotifier {
     });
 
     // add initial inspection
-    batch.set(inspectionRef, {
-      'user': _user!.userId,
-      'date': item.lastInspection.toIso8601String(),
-      'status': item.inspectionStatus,
-      'comments': 'Initial inspection',
-      'checklistName': '',
-      'taskId': '',
-    });
+    // batch.set(inspectionRef, {
+    //   'user': _user!.userId,
+    //   'date': item.lastInspection.toIso8601String(),
+    //   'status': item.inspectionStatus,
+    //   'comments': 'Initial inspection',
+    //   'checklistName': '',
+    //   'taskId': '',
+    // });
 
     // commit batch if no error occured
     await batch.commit().then((_) {

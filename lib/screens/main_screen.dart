@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
@@ -252,8 +253,11 @@ class _MainScreenState extends State<MainScreen> {
                                           .addTask(
                                         Task(
                                           title:
-                                              'Inspection - ${tmpItem.producer} ${tmpItem.model}',
-                                          date: tmpItem.lastInspection,
+                                              '${tmpItem.producer} ${tmpItem.model}',
+                                          date: DateCalc.getNextDate(
+                                            tmpItem.lastInspection,
+                                            tmpItem.interval,
+                                          )!,
                                           executor: TaskExecutor.company,
                                           userId: Provider.of<UserProvider>(
                                                   context,
@@ -268,9 +272,15 @@ class _MainScreenState extends State<MainScreen> {
                                           itemId: tmpItem.itemId,
                                           location: tmpItem.location,
                                           taskInterval: tmpItem.interval,
-                                          nextDate: tmpItem.nextInspection,
+                                          nextDate: DateCalc.getNextDate(
+                                            tmpItem.nextInspection,
+                                            tmpItem.interval,
+                                          )!,
                                         ),
                                       );
+                                      Provider.of<ItemProvider>(context,
+                                              listen: false)
+                                          .fetchInspectionsStatus();
                                     }
                                   });
                                 }
