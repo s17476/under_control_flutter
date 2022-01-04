@@ -7,6 +7,7 @@ import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
+import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
 import 'package:under_control_flutter/widgets/task/task_complete.dart';
 
 class TaskDetailsScreen extends StatefulWidget {
@@ -894,12 +895,45 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                     //complete task button
                     if (_isInEditMode)
                       TextButton.icon(
-                        onPressed: () {
+                        onPressed: () async {
                           FocusScope.of(context).unfocus();
-                          _showCompleteDialog(context, task).then((value) {
+                          bool exit = false;
+                          _showCompleteDialog(context, task)
+                              .then((value) async {
                             if (value == true) {
-                              _completeTask(true);
-                              Navigator.of(context).pop('completed');
+                              // if task is inspection
+                              if (task.type == TaskType.inspection) {
+                                await Navigator.of(context).pushNamed(
+                                    AddInspectionScreen.routeName,
+                                    arguments: [
+                                      Provider.of<ItemProvider>(context,
+                                              listen: false)
+                                          .items
+                                          .firstWhere((element) =>
+                                              element.itemId == task.itemId),
+                                      task
+                                    ]).then((value) {
+                                  if (value != null) {
+                                    exit = value as bool;
+                                  }
+                                });
+                                if (exit == false) {
+                                  ScaffoldMessenger.of(context)
+                                    ..removeCurrentSnackBar()
+                                    ..showSnackBar(
+                                      SnackBar(
+                                        content:
+                                            const Text('Complete canceled!'),
+                                        backgroundColor:
+                                            Theme.of(context).errorColor,
+                                      ),
+                                    );
+                                  return false;
+                                } else {
+                                  _completeTask(true);
+                                  Navigator.of(context).pop('completed');
+                                }
+                              }
                             }
                           });
                           // Provider.of<TaskProvider>(context, listen: false)

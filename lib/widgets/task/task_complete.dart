@@ -6,7 +6,7 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/task.dart';
 
 class TaskComplete extends StatefulWidget {
-  TaskComplete({
+  const TaskComplete({
     Key? key,
     required this.task,
   }) : super(key: key);
@@ -31,6 +31,7 @@ class _TaskCompleteState extends State<TaskComplete> {
 
   // date picker
   void _datePicker() {
+    FocusScope.of(context).requestFocus(FocusNode());
     showDatePicker(
       builder: (BuildContext context, Widget? child) {
         return Theme(
@@ -197,6 +198,7 @@ class _TaskCompleteState extends State<TaskComplete> {
                 ),
                 underline: Container(height: 0),
                 onChanged: (String? newValue) {
+                  FocusScope.of(context).requestFocus(FocusNode());
                   setState(() {
                     widget.task.taskInterval = newValue!;
                   });
@@ -240,6 +242,7 @@ class _TaskCompleteState extends State<TaskComplete> {
               ),
               TextButton(
                 onPressed: () {
+                  FocusScope.of(context).requestFocus(FocusNode());
                   int duration = 0;
                   Picker(
                     adapter: NumberPickerAdapter(data: <NumberPickerColumn>[

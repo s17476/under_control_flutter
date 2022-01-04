@@ -92,6 +92,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
   }
 
   void _presentDayPicker() {
+    FocusScope.of(context).requestFocus(FocusNode());
     showDatePicker(
       builder: (BuildContext context, Widget? child) {
         return Theme(
@@ -274,6 +275,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                             ),
                             underline: Container(height: 0),
                             onChanged: (String? newValue) {
+                              FocusScope.of(context).requestFocus(FocusNode());
                               setState(() {
                                 _checklistName = newValue!;
                                 _selectedChecklist = checklists.firstWhere(
@@ -434,6 +436,8 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                                   ),
                                   TextButton.icon(
                                     onPressed: () {
+                                      FocusScope.of(context)
+                                          .requestFocus(FocusNode());
                                       String msg = '';
                                       if (_selectedChecklist.fields.keys
                                           .contains(
@@ -526,6 +530,8 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                                       padding: const EdgeInsets.only(left: 10),
                                       child: IconButton(
                                         onPressed: () {
+                                          FocusScope.of(context)
+                                              .requestFocus(FocusNode());
                                           String msg = '';
                                           if (_nameTextController.text
                                               .trim()
@@ -578,6 +584,8 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                                     ),
                                     IconButton(
                                       onPressed: () {
+                                        FocusScope.of(context)
+                                            .requestFocus(FocusNode());
                                         _checklistName = 'New checklist';
                                         Provider.of<ChecklistProvider>(context,
                                                 listen: false)
@@ -687,6 +695,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                             ),
                             underline: Container(height: 0),
                             onChanged: (String? newValue) {
+                              FocusScope.of(context).requestFocus(FocusNode());
                               setState(() {
                                 _inspectionInterval = newValue!;
                               });
@@ -741,6 +750,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                             ),
                             underline: Container(height: 0),
                             onChanged: (String? newValue) {
+                              FocusScope.of(context).requestFocus(FocusNode());
                               setState(() {
                                 _statusString = newValue!;
                               });

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:intl/intl.dart';
 import 'package:under_control_flutter/models/app_user.dart';
@@ -92,7 +93,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
   Future<Item?> _addNewTask() async {
     if (_formKey.currentState != null) {
       // validate user input
-      final isValid = _formKey.currentState!.validate();
+      bool isValid = _formKey.currentState!.validate();
       FocusScope.of(context).unfocus();
       String? executorId;
       DateTime? nextDate;
@@ -100,6 +101,18 @@ class _AddTaskScreenState extends State<AddTaskScreen>
       String? userId;
       String? selectedItemId;
       String? selectedLocation;
+
+      if (dropdownValue == 'Inspection' &&
+          (selectedAsset == null || selectedAsset!.model.isEmpty)) {
+        isValid = false;
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text('Choose asset to inspect'),
+            ),
+          );
+      }
 
       if (isValid) {
         if (executorDropdown == 'Specific user') {
@@ -109,20 +122,21 @@ class _AddTaskScreenState extends State<AddTaskScreen>
 
         if (_taskInterval != 'No') {
           // set inspections interval
-          List<String> duration = _taskInterval.split(' ');
-          if (duration[1] == 'week' || duration[1] == 'weeks') {
-            nextDate = DateTime(
-              _taskDate!.year,
-              _taskDate!.month,
-              _taskDate!.day + (int.parse(duration[0]) * 7),
-            );
-          } else if (duration[1] == 'month' || duration[1] == 'months') {
-            nextDate = DateTime(_taskDate!.year,
-                _taskDate!.month + int.parse(duration[0]), _taskDate!.day);
-          } else if (duration[1] == 'year' || duration[1] == 'years') {
-            nextDate = DateTime(_taskDate!.year + int.parse(duration[0]),
-                _taskDate!.month, _taskDate!.day);
-          }
+          nextDate = DateCalc.getNextDate(_taskDate!, _taskInterval);
+          // List<String> duration = _taskInterval.split(' ');
+          // if (duration[1] == 'week' || duration[1] == 'weeks') {
+          //   nextDate = DateTime(
+          //     _taskDate!.year,
+          //     _taskDate!.month,
+          //     _taskDate!.day + (int.parse(duration[0]) * 7),
+          //   );
+          // } else if (duration[1] == 'month' || duration[1] == 'months') {
+          //   nextDate = DateTime(_taskDate!.year,
+          //       _taskDate!.month + int.parse(duration[0]), _taskDate!.day);
+          // } else if (duration[1] == 'year' || duration[1] == 'years') {
+          //   nextDate = DateTime(_taskDate!.year + int.parse(duration[0]),
+          //       _taskDate!.month, _taskDate!.day);
+          // }
         }
 
         if (executorDropdown == 'Company') {
@@ -159,7 +173,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
         );
 
         // try to add data to DB and close current screen
-        //or show snackbar with error message
+        // or show snackbar with error message
         await Provider.of<TaskProvider>(context, listen: false)
             .addTask(task)
             .then((_) => Navigator.of(context).pop(true))
@@ -312,7 +326,9 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           ),
                           border: OutlineInputBorder(
                             borderSide: BorderSide(
-                                color: Theme.of(context).splashColor, width: 0),
+                              color: Theme.of(context).splashColor,
+                              width: 0,
+                            ),
                             borderRadius: BorderRadius.circular(30),
                           ),
                           filled: true,
@@ -321,6 +337,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         dropdownColor: Colors.grey.shade800,
                         value: dropdownValue,
                         onChanged: (String? newValue) {
+                          FocusScope.of(context).requestFocus(FocusNode());
                           setState(() {
                             dropdownValue = newValue!;
                             // if (selectedAsset?.producer != null &&
@@ -387,6 +404,8 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         onChanged: parameter == 'asset'
                             ? null
                             : (String? newValue) {
+                                FocusScope.of(context)
+                                    .requestFocus(FocusNode());
                                 setState(() {
                                   selectedAsset = allAssets.firstWhere(
                                       (element) => element.itemId == newValue!);
@@ -394,6 +413,8 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                                       selectedAsset?.producer != '') {
                                     titleController!.text =
                                         '${selectedAsset?.producer} ${selectedAsset?.model} ${selectedAsset?.internalId}';
+                                  } else {
+                                    titleController!.text = '';
                                   }
                                   // else {
                                   //   titleController!.text = dropdownValue;
@@ -426,11 +447,13 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                       // title
                       TextFormField(
                         controller: titleController,
+
                         // initialValue: dropdownValue,
                         key: const ValueKey('title'),
                         keyboardType: TextInputType.name,
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
+                          errorStyle: TextStyle(color: Colors.black),
                           labelText: 'Task title',
                           labelStyle: TextStyle(
                             color:
@@ -473,6 +496,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         textInputAction: TextInputAction.newline,
 
                         decoration: InputDecoration(
+                          errorStyle: const TextStyle(color: Colors.black),
                           labelText: 'Task description',
                           labelStyle: TextStyle(
                             color:
@@ -533,6 +557,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         dropdownColor: Colors.grey.shade800,
                         value: executorDropdown,
                         onChanged: (String? newValue) {
+                          FocusScope.of(context).requestFocus(FocusNode());
                           setState(() {
                             executorDropdown = newValue!;
                           });
@@ -597,6 +622,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                                   .user!
                                   .userId,
                           onChanged: (String? newValue) {
+                            FocusScope.of(context).requestFocus(FocusNode());
                             setState(() {
                               selectedUser = allUsers.firstWhere(
                                   (element) => element!.userId == newValue);
@@ -641,6 +667,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           SizedBox(width: SizeConfig.blockSizeHorizontal * 3),
                           TextButton(
                             onPressed: () {
+                              FocusScope.of(context).requestFocus(FocusNode());
                               _presentDayPicker(
                                 darkTheme[
                                     dropdownItems.indexOf(dropdownValue)]!,
@@ -650,8 +677,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                               'Pick',
                               style: TextStyle(
                                 fontSize: SizeConfig.blockSizeHorizontal * 4,
-                                color: darkTheme[
-                                    dropdownItems.indexOf(dropdownValue)],
+                                color: Colors.black,
                               ),
                             ),
                           ),
@@ -678,18 +704,17 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                             alignment: Alignment.center,
                             elevation: 16,
                             style: TextStyle(
-                              color: darkTheme[
-                                  dropdownItems.indexOf(dropdownValue)],
+                              color: Colors.black,
                               fontSize: SizeConfig.blockSizeHorizontal * 4,
                             ),
                             underline: Container(height: 0),
                             onChanged: (String? newValue) {
+                              FocusScope.of(context).requestFocus(FocusNode());
                               setState(() {
                                 _taskInterval = newValue!;
                               });
                             },
-                            dropdownColor:
-                                Theme.of(context).appBarTheme.backgroundColor,
+                            dropdownColor: Colors.grey,
                             items: <String>[
                               'No',
                               '2 years',
