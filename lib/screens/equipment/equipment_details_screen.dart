@@ -10,6 +10,7 @@ import 'package:under_control_flutter/screens/inspection/add_inspection_screen.d
 import 'package:under_control_flutter/screens/tasks/add_task_screen.dart';
 import 'package:under_control_flutter/widgets/inspections_list.dart';
 import 'package:under_control_flutter/widgets/status_icon.dart';
+import 'package:under_control_flutter/widgets/task/connected_tasks.dart';
 
 class EquipmentDetailsScreen extends StatefulWidget {
   const EquipmentDetailsScreen({Key? key}) : super(key: key);
@@ -347,47 +348,47 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                 ),
               ),
               // add new inspection button
-              Container(
-                alignment: Alignment.centerLeft,
-                padding: const EdgeInsets.only(
-                  top: 8,
-                  left: 8,
-                ),
-                child: TextButton.icon(
-                  label: Text(
-                    "Add new inspection",
-                    style: TextStyle(
-                      fontSize: SizeConfig.blockSizeHorizontal * 4.5,
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(
-                        AddInspectionScreen.routeName,
-                        arguments: [item, null]);
-                  },
-                  icon: Container(
-                    // width: SizeConfig.blockSizeHorizontal * 14.5,
-                    alignment: Alignment.topRight,
-                    child: Stack(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(
-                            left: SizeConfig.blockSizeHorizontal * 4,
-                          ),
-                          child: Icon(
-                            Icons.add,
-                            size: SizeConfig.blockSizeHorizontal * 4.5,
-                          ),
-                        ),
-                        Icon(
-                          Icons.search,
-                          size: SizeConfig.blockSizeHorizontal * 7,
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+              // Container(
+              //   alignment: Alignment.centerLeft,
+              //   padding: const EdgeInsets.only(
+              //     top: 8,
+              //     left: 8,
+              //   ),
+              //   child: TextButton.icon(
+              //     label: Text(
+              //       "Add new inspection",
+              //       style: TextStyle(
+              //         fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+              //       ),
+              //     ),
+              //     onPressed: () {
+              //       Navigator.of(context).pushNamed(
+              //           AddInspectionScreen.routeName,
+              //           arguments: [item, null]);
+              //     },
+              //     icon: Container(
+              //       // width: SizeConfig.blockSizeHorizontal * 14.5,
+              //       alignment: Alignment.topRight,
+              //       child: Stack(
+              //         children: [
+              //           Padding(
+              //             padding: EdgeInsets.only(
+              //               left: SizeConfig.blockSizeHorizontal * 4,
+              //             ),
+              //             child: Icon(
+              //               Icons.add,
+              //               size: SizeConfig.blockSizeHorizontal * 4.5,
+              //             ),
+              //           ),
+              //           Icon(
+              //             Icons.search,
+              //             size: SizeConfig.blockSizeHorizontal * 7,
+              //           )
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              // ),
               // add new task
               Container(
                 alignment: Alignment.centerLeft,
@@ -399,6 +400,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                     "Add new task",
                     style: TextStyle(
                       fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                      color: Colors.black,
                     ),
                   ),
                   onPressed: () => Navigator.of(context).pushNamed(
@@ -419,6 +421,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                 ),
               ),
               InspectionsList(context: context, item: item),
+              ConnectedTasks(context: context, item: item),
             ],
           ),
         ),
