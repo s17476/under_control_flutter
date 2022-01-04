@@ -45,7 +45,7 @@ class _InspectionsListState extends State<InspectionsList> {
                 ? TextButton.icon(
                     icon: const Icon(
                       Icons.keyboard_arrow_up_rounded,
-                      color: Colors.grey,
+                      color: Colors.green,
                     ),
                     onPressed: () {
                       setState(() {
@@ -55,14 +55,14 @@ class _InspectionsListState extends State<InspectionsList> {
                     label: Text(
                       'Hide inspections history',
                       style: buttonStyle.copyWith(
-                        color: Colors.grey,
+                        color: Colors.black,
                       ),
                     ),
                   )
                 : TextButton.icon(
                     icon: const Icon(
                       Icons.keyboard_arrow_down_rounded,
-                      color: Colors.grey,
+                      color: Colors.green,
                     ),
                     onPressed: () {
                       setState(() {
@@ -72,7 +72,7 @@ class _InspectionsListState extends State<InspectionsList> {
                     label: Text(
                       'Show inspections history',
                       style: buttonStyle.copyWith(
-                        color: Colors.grey,
+                        color: Colors.black,
                       ),
                     ),
                   ),

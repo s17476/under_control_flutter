@@ -109,220 +109,227 @@ class _MainScreenState extends State<MainScreen> {
       },
       child: Scaffold(
         drawer: const MainDrawer(),
-        body: NestedScrollView(
-          controller: _scrollController,
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return [
-              // app bar
-              SliverAppBar(
-                iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
-                title: Text(
-                  BottomNaviBar.tabs[_selectedPageIndex]['title'] as String,
-                ),
-                actions: [
-                  // chat icon in dashboard screen
-                  if (_selectedPageIndex == 2)
-                    IconButton(onPressed: () {}, icon: const Icon(Icons.chat)),
-                  // show by category icon in assets screen
-                  if (_selectedPageIndex == 3)
-                    IconButton(
-                      onPressed: () {
-                        final itemProvider =
-                            Provider.of<ItemProvider>(context, listen: false);
-                        itemProvider
-                          ..setShowCategories = false
-                          ..toggleDescendning()
-                          ..fetchAndSetItems();
-                      },
-                      icon: Icon(
-                        Icons.checklist_rtl,
-                        color: Theme.of(context).appBarTheme.foregroundColor,
-                      ),
-                    ),
-                  SizedBox(
-                    width:
-                        SizeConfig.blockSizeHorizontal * _selectedPageIndex != 1
-                            ? 4
-                            : 1,
+        body: SafeArea(
+          child: NestedScrollView(
+            controller: _scrollController,
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return [
+                // app bar
+                SliverAppBar(
+                  iconTheme:
+                      IconThemeData(color: Theme.of(context).primaryColor),
+                  title: Text(
+                    BottomNaviBar.tabs[_selectedPageIndex]['title'] as String,
                   ),
-                  // avatar in dashboard screen
-                  if (_selectedPageIndex == 2)
-                    CircleAvatar(
-                      backgroundColor:
-                          Theme.of(context).appBarTheme.backgroundColor,
-                      backgroundImage:
-                          NetworkImage(userProvider.user!.userImage),
-                      maxRadius: SizeConfig.blockSizeHorizontal * 4,
-                    ),
-                  // show by status button in assets screen
-                  if (_selectedPageIndex == 3)
-                    IconButton(
-                      onPressed: () {
-                        final itemProvider =
-                            Provider.of<ItemProvider>(context, listen: false);
-                        itemProvider
-                          ..setShowCategories = true
-                          ..toggleDescendning()
-                          ..fetchAndSetItems();
-                      },
-                      icon: Icon(
-                        Icons.category,
-                        color: Theme.of(context).appBarTheme.foregroundColor,
-                      ),
-                    ),
-                  SizedBox(
-                    width:
-                        SizeConfig.blockSizeHorizontal * _selectedPageIndex != 1
-                            ? 4
-                            : 1,
-                  ),
-
-                  // show in calendar and tasks screen
-                  if (_selectedPageIndex == 1 || _selectedPageIndex == 0)
-                    Padding(
-                      padding: EdgeInsets.only(
-                        top: SizeConfig.safeBlockHorizontal * 1.5,
-                        // right: SizeConfig.blockSizeHorizontal * 3,
-                      ),
-                      child: DropdownButton<String>(
-                        alignment: AlignmentDirectional.center,
-                        underline: Container(),
+                  actions: [
+                    // chat icon in dashboard screen
+                    if (_selectedPageIndex == 2)
+                      IconButton(
+                          onPressed: () {}, icon: const Icon(Icons.chat)),
+                    // show by category icon in assets screen
+                    if (_selectedPageIndex == 3)
+                      IconButton(
+                        onPressed: () {
+                          final itemProvider =
+                              Provider.of<ItemProvider>(context, listen: false);
+                          itemProvider
+                            ..setShowCategories = false
+                            ..toggleDescendning()
+                            ..fetchAndSetItems();
+                        },
                         icon: Icon(
-                          Icons.keyboard_arrow_down_rounded,
-                          color: Theme.of(context).primaryIconTheme.color,
+                          Icons.checklist_rtl,
+                          color: Theme.of(context).appBarTheme.foregroundColor,
                         ),
-                        value: dropdownValue,
-                        // style: TextStyle(color: Colors.white),
-                        items: dropdownItems.map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Center(
-                              child: Text(
-                                value,
-                                // textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize:
-                                      SizeConfig.blockSizeHorizontal * 4.5,
+                      ),
+                    SizedBox(
+                      width:
+                          SizeConfig.blockSizeHorizontal * _selectedPageIndex !=
+                                  1
+                              ? 4
+                              : 1,
+                    ),
+                    // avatar in dashboard screen
+                    if (_selectedPageIndex == 2)
+                      CircleAvatar(
+                        backgroundColor:
+                            Theme.of(context).appBarTheme.backgroundColor,
+                        backgroundImage:
+                            NetworkImage(userProvider.user!.userImage),
+                        maxRadius: SizeConfig.blockSizeHorizontal * 4,
+                      ),
+                    // show by status button in assets screen
+                    if (_selectedPageIndex == 3)
+                      IconButton(
+                        onPressed: () {
+                          final itemProvider =
+                              Provider.of<ItemProvider>(context, listen: false);
+                          itemProvider
+                            ..setShowCategories = true
+                            ..toggleDescendning()
+                            ..fetchAndSetItems();
+                        },
+                        icon: Icon(
+                          Icons.category,
+                          color: Theme.of(context).appBarTheme.foregroundColor,
+                        ),
+                      ),
+                    SizedBox(
+                      width:
+                          SizeConfig.blockSizeHorizontal * _selectedPageIndex !=
+                                  1
+                              ? 4
+                              : 1,
+                    ),
+
+                    // show in calendar and tasks screen
+                    if (_selectedPageIndex == 1 || _selectedPageIndex == 0)
+                      Padding(
+                        padding: EdgeInsets.only(
+                          top: SizeConfig.safeBlockHorizontal * 1.5,
+                          // right: SizeConfig.blockSizeHorizontal * 3,
+                        ),
+                        child: DropdownButton<String>(
+                          alignment: AlignmentDirectional.center,
+                          underline: Container(),
+                          icon: Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: Theme.of(context).primaryIconTheme.color,
+                          ),
+                          value: dropdownValue,
+                          // style: TextStyle(color: Colors.white),
+                          items: dropdownItems.map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Center(
+                                child: Text(
+                                  value,
+                                  // textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize:
+                                        SizeConfig.blockSizeHorizontal * 4.5,
+                                  ),
                                 ),
                               ),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            dropdownValue = newValue!;
-                          });
-                          Provider.of<TaskProvider>(context, listen: false)
-                                  .executor =
-                              TaskExecutor
-                                  .values[dropdownItems.indexOf(dropdownValue)];
-                        },
-                        dropdownColor: Colors.black,
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownValue = newValue!;
+                            });
+                            Provider.of<TaskProvider>(context, listen: false)
+                                    .executor =
+                                TaskExecutor.values[
+                                    dropdownItems.indexOf(dropdownValue)];
+                          },
+                          dropdownColor: Colors.black,
+                        ),
                       ),
-                    ),
 
-                  // show add button in tasks and assets screen
-                  if (_selectedPageIndex == 0 ||
-                      _selectedPageIndex == 1 ||
-                      _selectedPageIndex == 3)
-                    IconButton(
-                      onPressed:
-                          // in assets screen
-                          _selectedPageIndex == 3
-                              ? () {
-                                  Navigator.of(context)
-                                      .push(_createRute(
-                                          () => const AddEquipmentScreen()))
-                                      .then((resultItem) {
-                                    print('new item:   $resultItem');
-                                    if (resultItem != null) {
-                                      ScaffoldMessenger.of(context)
-                                        ..removeCurrentSnackBar()
-                                        ..showSnackBar(
-                                          SnackBar(
-                                            content:
-                                                const Text('New asset added!'),
-                                            backgroundColor: Theme.of(context)
-                                                .appBarTheme
-                                                .backgroundColor,
+                    // show add button in tasks and assets screen
+                    if (_selectedPageIndex == 0 ||
+                        _selectedPageIndex == 1 ||
+                        _selectedPageIndex == 3)
+                      IconButton(
+                        onPressed:
+                            // in assets screen
+                            _selectedPageIndex == 3
+                                ? () {
+                                    Navigator.of(context)
+                                        .push(_createRute(
+                                            () => const AddEquipmentScreen()))
+                                        .then((resultItem) {
+                                      print('new item:   $resultItem');
+                                      if (resultItem != null) {
+                                        ScaffoldMessenger.of(context)
+                                          ..removeCurrentSnackBar()
+                                          ..showSnackBar(
+                                            SnackBar(
+                                              content: const Text(
+                                                  'New asset added!'),
+                                              backgroundColor: Theme.of(context)
+                                                  .appBarTheme
+                                                  .backgroundColor,
+                                            ),
+                                          );
+                                        var tmpItem = resultItem as Item;
+                                        Provider.of<TaskProvider>(context,
+                                                listen: false)
+                                            .addTask(
+                                          Task(
+                                            title:
+                                                '${tmpItem.producer} ${tmpItem.model}',
+                                            date: DateCalc.getNextDate(
+                                              tmpItem.lastInspection,
+                                              tmpItem.interval,
+                                            )!,
+                                            executor: TaskExecutor.company,
+                                            userId: Provider.of<UserProvider>(
+                                                    context,
+                                                    listen: false)
+                                                .user!
+                                                .userId,
+                                            description:
+                                                'Periodic inspection. Auto-added.',
+                                            comments: '',
+                                            status: TaskStatus.planned,
+                                            type: TaskType.inspection,
+                                            itemId: tmpItem.itemId,
+                                            location: tmpItem.location,
+                                            taskInterval: tmpItem.interval,
+                                            nextDate: DateCalc.getNextDate(
+                                              tmpItem.nextInspection,
+                                              tmpItem.interval,
+                                            )!,
                                           ),
                                         );
-                                      var tmpItem = resultItem as Item;
-                                      Provider.of<TaskProvider>(context,
-                                              listen: false)
-                                          .addTask(
-                                        Task(
-                                          title:
-                                              '${tmpItem.producer} ${tmpItem.model}',
-                                          date: DateCalc.getNextDate(
-                                            tmpItem.lastInspection,
-                                            tmpItem.interval,
-                                          )!,
-                                          executor: TaskExecutor.company,
-                                          userId: Provider.of<UserProvider>(
-                                                  context,
-                                                  listen: false)
-                                              .user!
-                                              .userId,
-                                          description:
-                                              'Periodic inspection. Auto-added.',
-                                          comments: '',
-                                          status: TaskStatus.planned,
-                                          type: TaskType.inspection,
-                                          itemId: tmpItem.itemId,
-                                          location: tmpItem.location,
-                                          taskInterval: tmpItem.interval,
-                                          nextDate: DateCalc.getNextDate(
-                                            tmpItem.nextInspection,
-                                            tmpItem.interval,
-                                          )!,
-                                        ),
-                                      );
-                                      Provider.of<ItemProvider>(context,
-                                              listen: false)
-                                          .fetchInspectionsStatus();
-                                    }
-                                  });
-                                }
-                              // in tasks screen
-                              //TODO uuuuuuuuuuuuuuuuussssssssssseeeeeeeeeeeerrrrrrrrrrr
-                              : () {
-                                  Navigator.of(context)
-                                      .push(_createRute(
-                                          () => const AddTaskScreen()))
-                                      .then((value) {
-                                    if (value != null) {
-                                      ScaffoldMessenger.of(context)
-                                        ..removeCurrentSnackBar()
-                                        ..showSnackBar(
-                                          SnackBar(
-                                            content:
-                                                const Text('New task added'),
-                                            backgroundColor: Theme.of(context)
-                                                .appBarTheme
-                                                .backgroundColor,
-                                          ),
-                                        );
-                                    }
-                                  });
-                                },
-                      icon: Icon(
-                        Icons.add,
-                        size: SizeConfig.blockSizeVertical * 5,
-                        color: Theme.of(context).primaryColor,
+                                        Provider.of<ItemProvider>(context,
+                                                listen: false)
+                                            .fetchInspectionsStatus();
+                                      }
+                                    });
+                                  }
+                                // in tasks screen
+                                //TODO uuuuuuuuuuuuuuuuussssssssssseeeeeeeeeeeerrrrrrrrrrr
+                                : () {
+                                    Navigator.of(context)
+                                        .push(_createRute(
+                                            () => const AddTaskScreen()))
+                                        .then((value) {
+                                      if (value != null) {
+                                        ScaffoldMessenger.of(context)
+                                          ..removeCurrentSnackBar()
+                                          ..showSnackBar(
+                                            SnackBar(
+                                              content:
+                                                  const Text('New task added'),
+                                              backgroundColor: Theme.of(context)
+                                                  .appBarTheme
+                                                  .backgroundColor,
+                                            ),
+                                          );
+                                      }
+                                    });
+                                  },
+                        icon: Icon(
+                          Icons.add,
+                          size: SizeConfig.blockSizeVertical * 5,
+                          color: Theme.of(context).primaryColor,
+                        ),
                       ),
+                    SizedBox(
+                      width: SizeConfig.blockSizeHorizontal * 4,
                     ),
-                  SizedBox(
-                    width: SizeConfig.blockSizeHorizontal * 4,
-                  ),
-                ],
-                pinned: false,
-                floating: true,
-                snap: true,
-              ),
-            ];
-          },
-          body: BottomNaviBar.tabs[_selectedPageIndex]['page'] as Widget,
+                  ],
+                  pinned: false,
+                  floating: true,
+                  snap: true,
+                ),
+              ];
+            },
+            body: BottomNaviBar.tabs[_selectedPageIndex]['page'] as Widget,
+          ),
         ),
         bottomNavigationBar: BottomNaviBar(
           selectPage: _selectPage,

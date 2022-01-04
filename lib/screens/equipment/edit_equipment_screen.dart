@@ -82,269 +82,283 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: AnimatedPadding(
-          padding: EdgeInsets.only(
-            left: SizeConfig.blockSizeHorizontal * 10,
-            right: SizeConfig.blockSizeHorizontal * 10,
-            top: SizeConfig.blockSizeHorizontal * 5,
-          ),
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.easeInOut,
-          child: Column(
-            children: [
-              Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.handyman,
-                      size: SizeConfig.blockSizeHorizontal * 20,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    SizedBox(
-                      height: SizeConfig.blockSizeVertical * 3,
-                    ),
-                    // internal id
-                    TextFormField(
-                      initialValue: _item.internalId,
-                      key: const ValueKey('internalId'),
-                      keyboardType: TextInputType.name,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: SizeConfig.blockSizeHorizontal * 1,
-                          horizontal: SizeConfig.blockSizeHorizontal * 5,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context).splashColor,
-                        labelText: 'Internal id',
-                        labelStyle: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        // focusColor: Colors.green,
-                        // hoverColor: Colors.green,
-                      ),
-                      // cursorColor: Theme.of(context).primaryColor,
-                      validator: (val) {
-                        if (val!.length < 4) {
-                          return 'Min. 4 characters';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _internalId = value!;
-                      },
-                    ),
-                    SizedBox(
-                      height: SizeConfig.blockSizeVertical * 3,
-                    ),
-                    // producer
-                    TextFormField(
-                      initialValue: _item.producer,
-                      key: const ValueKey('producer'),
-                      keyboardType: TextInputType.name,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        labelStyle: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: SizeConfig.blockSizeHorizontal * 1,
-                          horizontal: SizeConfig.blockSizeHorizontal * 5,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context).splashColor,
-                        labelText: 'Producer',
-                      ),
-                      validator: (val) {
-                        if (val!.length < 3) {
-                          return 'Producer to short';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _producer = value!;
-                      },
-                    ),
-                    SizedBox(
-                      height: SizeConfig.blockSizeVertical * 3,
-                    ),
-                    // model
-                    TextFormField(
-                      initialValue: _item.model,
-                      key: const ValueKey('model'),
-                      keyboardType: TextInputType.name,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        labelStyle: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: SizeConfig.blockSizeHorizontal * 1,
-                          horizontal: SizeConfig.blockSizeHorizontal * 5,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context).splashColor,
-                        labelText: 'Model',
-                      ),
-                      validator: (val) {
-                        if (val!.length < 3) {
-                          return 'Model to short';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _model = value!;
-                      },
-                    ),
-                    SizedBox(
-                      height: SizeConfig.blockSizeVertical * 3,
-                    ),
-                    //catergory
-                    TextFormField(
-                      initialValue: _item.category,
-                      key: const ValueKey('category'),
-                      keyboardType: TextInputType.name,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        labelStyle: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: SizeConfig.blockSizeHorizontal * 1,
-                          horizontal: SizeConfig.blockSizeHorizontal * 5,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context).splashColor,
-                        labelText: 'Category - ex. power tools, machine',
-                      ),
-                      validator: (val) {
-                        if (val!.length < 2) {
-                          return 'Categoty to short';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _category = value!;
-                      },
-                    ),
-                    SizedBox(
-                      height: SizeConfig.blockSizeVertical * 3,
-                    ),
-                    //location
-                    TextFormField(
-                      initialValue: _item.location,
-                      key: const ValueKey('location'),
-                      keyboardType: TextInputType.name,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        labelStyle: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: SizeConfig.blockSizeHorizontal * 1,
-                          horizontal: SizeConfig.blockSizeHorizontal * 5,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context).splashColor,
-                        labelText: 'Asset location',
-                      ),
-                      validator: (val) {
-                        if (val!.length < 2) {
-                          return 'Asset to short';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _location = value!;
-                      },
-                    ),
-                    SizedBox(
-                      height: SizeConfig.blockSizeVertical * 3,
-                    ),
-                    // comments
-                    TextFormField(
-                      maxLines: null,
-                      // expands: true,
-                      initialValue: _item.comments,
-                      key: const ValueKey('comments'),
-                      keyboardType: TextInputType.multiline,
-                      // textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        labelStyle: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: SizeConfig.blockSizeHorizontal * 1,
-                          horizontal: SizeConfig.blockSizeHorizontal * 5,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context).splashColor,
-                        labelText: 'Comments',
-                      ),
-                      validator: (val) {
-                        return null;
-                      },
-                      onSaved: (value) {
-                        _comments = value!;
-                      },
-                    ),
-                    SizedBox(
-                      height: SizeConfig.blockSizeVertical * 1,
-                    ),
-                  ],
-                ),
-              ),
-
-              SizedBox(
-                height: SizeConfig.blockSizeVertical * 2,
-              ),
-              // save button
-              // ElevatedButton(
-              //   onPressed: _editEquipment,
-              //   child: Text(
-              //     'Save changes',
-              //     style: TextStyle(
-              //       fontSize: SizeConfig.blockSizeHorizontal * 5.5,
-              //     ),
-              //   ),
-              //   style: ElevatedButton.styleFrom(
-              //     primary: Theme.of(context).primaryColor,
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(30.0),
-              //     ),
-              //   ),
-              // ),
-              // SizedBox(
-              //   height: SizeConfig.blockSizeVertical * 3,
-              // ),
+      body: Container(
+        width: SizeConfig.blockSizeHorizontal * 100,
+        height: SizeConfig.blockSizeVertical * 110,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black,
+              Colors.white10,
             ],
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: AnimatedPadding(
+            padding: EdgeInsets.only(
+              left: SizeConfig.blockSizeHorizontal * 10,
+              right: SizeConfig.blockSizeHorizontal * 10,
+              top: SizeConfig.blockSizeHorizontal * 5,
+            ),
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOut,
+            child: Column(
+              children: [
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.handyman,
+                        size: SizeConfig.blockSizeHorizontal * 20,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      SizedBox(
+                        height: SizeConfig.blockSizeVertical * 3,
+                      ),
+                      // internal id
+                      TextFormField(
+                        initialValue: _item.internalId,
+                        key: const ValueKey('internalId'),
+                        keyboardType: TextInputType.name,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: SizeConfig.blockSizeHorizontal * 1,
+                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Theme.of(context).splashColor,
+                          labelText: 'Internal id',
+                          labelStyle: const TextStyle(
+                            color: Colors.white,
+                          ),
+                          // focusColor: Colors.green,
+                          // hoverColor: Colors.green,
+                        ),
+                        // cursorColor: Theme.of(context).primaryColor,
+                        validator: (val) {
+                          if (val!.length < 4) {
+                            return 'Min. 4 characters';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _internalId = value!;
+                        },
+                      ),
+                      SizedBox(
+                        height: SizeConfig.blockSizeVertical * 3,
+                      ),
+                      // producer
+                      TextFormField(
+                        initialValue: _item.producer,
+                        key: const ValueKey('producer'),
+                        keyboardType: TextInputType.name,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          labelStyle: const TextStyle(
+                            color: Colors.white,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: SizeConfig.blockSizeHorizontal * 1,
+                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Theme.of(context).splashColor,
+                          labelText: 'Producer',
+                        ),
+                        validator: (val) {
+                          if (val!.length < 3) {
+                            return 'Producer to short';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _producer = value!;
+                        },
+                      ),
+                      SizedBox(
+                        height: SizeConfig.blockSizeVertical * 3,
+                      ),
+                      // model
+                      TextFormField(
+                        initialValue: _item.model,
+                        key: const ValueKey('model'),
+                        keyboardType: TextInputType.name,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          labelStyle: const TextStyle(
+                            color: Colors.white,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: SizeConfig.blockSizeHorizontal * 1,
+                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Theme.of(context).splashColor,
+                          labelText: 'Model',
+                        ),
+                        validator: (val) {
+                          if (val!.length < 3) {
+                            return 'Model to short';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _model = value!;
+                        },
+                      ),
+                      SizedBox(
+                        height: SizeConfig.blockSizeVertical * 3,
+                      ),
+                      //catergory
+                      TextFormField(
+                        initialValue: _item.category,
+                        key: const ValueKey('category'),
+                        keyboardType: TextInputType.name,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          labelStyle: const TextStyle(
+                            color: Colors.white,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: SizeConfig.blockSizeHorizontal * 1,
+                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Theme.of(context).splashColor,
+                          labelText: 'Category - ex. power tools, machine',
+                        ),
+                        validator: (val) {
+                          if (val!.length < 2) {
+                            return 'Categoty to short';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _category = value!;
+                        },
+                      ),
+                      SizedBox(
+                        height: SizeConfig.blockSizeVertical * 3,
+                      ),
+                      //location
+                      TextFormField(
+                        initialValue: _item.location,
+                        key: const ValueKey('location'),
+                        keyboardType: TextInputType.name,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          labelStyle: const TextStyle(
+                            color: Colors.white,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: SizeConfig.blockSizeHorizontal * 1,
+                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Theme.of(context).splashColor,
+                          labelText: 'Asset location',
+                        ),
+                        validator: (val) {
+                          if (val!.length < 2) {
+                            return 'Asset to short';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _location = value!;
+                        },
+                      ),
+                      SizedBox(
+                        height: SizeConfig.blockSizeVertical * 3,
+                      ),
+                      // comments
+                      TextFormField(
+                        maxLines: null,
+                        // expands: true,
+                        initialValue: _item.comments,
+                        key: const ValueKey('comments'),
+                        keyboardType: TextInputType.multiline,
+                        // textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          labelStyle: const TextStyle(
+                            color: Colors.white,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                            vertical: SizeConfig.blockSizeHorizontal * 1,
+                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Theme.of(context).splashColor,
+                          labelText: 'Comments',
+                        ),
+                        validator: (val) {
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _comments = value!;
+                        },
+                      ),
+                      SizedBox(
+                        height: SizeConfig.blockSizeVertical * 1,
+                      ),
+                    ],
+                  ),
+                ),
+
+                SizedBox(
+                  height: SizeConfig.blockSizeVertical * 2,
+                ),
+                // save button
+                // ElevatedButton(
+                //   onPressed: _editEquipment,
+                //   child: Text(
+                //     'Save changes',
+                //     style: TextStyle(
+                //       fontSize: SizeConfig.blockSizeHorizontal * 5.5,
+                //     ),
+                //   ),
+                //   style: ElevatedButton.styleFrom(
+                //     primary: Theme.of(context).primaryColor,
+                //     shape: RoundedRectangleBorder(
+                //       borderRadius: BorderRadius.circular(30.0),
+                //     ),
+                //   ),
+                // ),
+                // SizedBox(
+                //   height: SizeConfig.blockSizeVertical * 3,
+                // ),
+              ],
+            ),
           ),
         ),
       ),

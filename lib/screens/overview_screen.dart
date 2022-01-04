@@ -273,72 +273,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
                             }),
                 ),
               ),
-              // Asset dropdown
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 16.0,
-                  right: 16.0,
-                  top: 24,
-                  bottom: 8.0,
-                ),
-                child: DropdownButtonFormField(
-                  isExpanded: true,
-                  icon: Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: Theme.of(context).primaryIconTheme.color,
-                    size: SizeConfig.blockSizeHorizontal * 8,
-                  ),
-                  alignment: AlignmentDirectional.centerStart,
-                  decoration: InputDecoration(
-                    labelText: 'Asset',
-                    labelStyle: TextStyle(
-                      color: Theme.of(context).appBarTheme.foregroundColor,
-                      fontSize: 20,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Theme.of(context).splashColor, width: 0),
-                    ),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Theme.of(context).splashColor, width: 0),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    filled: true,
-                    fillColor: Theme.of(context).splashColor,
-                  ),
-                  dropdownColor: Colors.grey.shade800,
-                  value: 'All assets',
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedAsset =
-                          newValue == 'All assets' ? null : newValue;
-                    });
-                  },
-                  items: allAssets.map((Item item) {
-                    return DropdownMenuItem<String>(
-                      value: '${item.itemId}',
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          left: SizeConfig.blockSizeHorizontal * 2,
-                        ),
-                        child: Text(
-                          '${item.producer} ${item.model} ${item.internalId}',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: SizeConfig.blockSizeHorizontal * 4,
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-
               if (labels.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.only(
-                    top: 8,
+                    top: 16,
                     left: 28,
                   ),
                   width: double.infinity,
@@ -370,28 +308,115 @@ class _OverviewScreenState extends State<OverviewScreen> {
                             .parse(labels[_currentRangeValues.end.round()]);
                       });
                     },
+                    // onChangeEnd: (_) {
+                    //   chartDataProvider.getAssetExpenses(
+                    //     itemId: selectedAsset,
+                    //     fromDate: sliderFromDate,
+                    //     toDate: sliderToDate,
+                    //   );
+                    //   if (sliderFromDate != null) {
+                    //     _fromDate = sliderFromDate;
+                    //   }
+                    // },
                     activeColor: Colors.green,
                     inactiveColor: Colors.green.shade900,
                   ),
                 ),
-
-              // chart refresh button
-              IconButton(
-                iconSize: SizeConfig.blockSizeHorizontal * 12,
-                onPressed: () {
-                  chartDataProvider.getAssetExpenses(
-                    itemId: selectedAsset,
-                    fromDate: sliderFromDate,
-                    toDate: sliderToDate,
-                  );
-                  if (sliderFromDate != null) {
-                    _fromDate = sliderFromDate;
-                  }
-                },
-                icon: Icon(
-                  Icons.refresh,
-                  color: Theme.of(context).primaryColor,
-                ),
+              // Asset dropdown
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 16.0,
+                          // right: 16.0,
+                          top: 16,
+                          bottom: 8.0,
+                        ),
+                        child: DropdownButtonFormField(
+                          isExpanded: true,
+                          icon: Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: Theme.of(context).primaryIconTheme.color,
+                            size: SizeConfig.blockSizeHorizontal * 8,
+                          ),
+                          alignment: AlignmentDirectional.centerStart,
+                          decoration: InputDecoration(
+                            labelText: 'Asset',
+                            labelStyle: TextStyle(
+                              color:
+                                  Theme.of(context).appBarTheme.foregroundColor,
+                              fontSize: 20,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Theme.of(context).splashColor,
+                                width: 0,
+                              ),
+                            ),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Theme.of(context).splashColor,
+                                width: 0,
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            filled: true,
+                            fillColor: Theme.of(context).splashColor,
+                          ),
+                          dropdownColor: Colors.grey.shade800,
+                          value: 'All assets',
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedAsset =
+                                  newValue == 'All assets' ? null : newValue;
+                            });
+                          },
+                          items: allAssets.map((Item item) {
+                            return DropdownMenuItem<String>(
+                              value: '${item.itemId}',
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: SizeConfig.blockSizeHorizontal * 2,
+                                ),
+                                child: Text(
+                                  '${item.producer} ${item.model} ${item.internalId}',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize:
+                                        SizeConfig.blockSizeHorizontal * 4,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // chart refresh button
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0, left: 4, right: 8),
+                    child: IconButton(
+                      iconSize: SizeConfig.blockSizeHorizontal * 14,
+                      onPressed: () {
+                        chartDataProvider.getAssetExpenses(
+                          itemId: selectedAsset,
+                          fromDate: sliderFromDate,
+                          toDate: sliderToDate,
+                        );
+                        if (sliderFromDate != null) {
+                          _fromDate = sliderFromDate;
+                        }
+                      },
+                      icon: Icon(
+                        Icons.refresh,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           );
