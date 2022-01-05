@@ -234,7 +234,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           ? LineChart(
                               mainData(),
                             )
-                          // show info if no loded but no data to show
+                          // show info if  loded but no data to show
                           : Builder(builder: (context) {
                               for (var key in chartData.keys) {
                                 chartData[key] = -2;

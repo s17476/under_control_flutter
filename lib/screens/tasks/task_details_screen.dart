@@ -933,6 +933,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                                   _completeTask(true);
                                   Navigator.of(context).pop('completed');
                                 }
+                              } else {
+                                _completeTask(true);
+                                Navigator.of(context).pop('completed');
                               }
                             }
                           });

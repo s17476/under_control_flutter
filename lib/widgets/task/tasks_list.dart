@@ -150,6 +150,7 @@ class _TasksListState extends State<TasksList> {
 
     return filteredTasks.isNotEmpty
         ? ListView.builder(
+            // turn scroll off if showing in task details screen
             physics: widget.item != null
                 ? const NeverScrollableScrollPhysics()
                 : null,
@@ -159,6 +160,9 @@ class _TasksListState extends State<TasksList> {
             itemBuilder: (ctx, index) {
               List<Widget> listItems = [];
               if (filteredTasks[keys[index]] != null) {
+                final dateFormat = DateFormat('dd/MM/yyyy');
+                keys.sort((a, b) =>
+                    dateFormat.parse(a).compareTo(dateFormat.parse(b)));
                 for (var task in filteredTasks[keys[index]]!) {
                   // if task date is after today date change status icon color
                   final dateFormat = DateFormat('dd/MM/yyyy');
@@ -174,16 +178,16 @@ class _TasksListState extends State<TasksList> {
                       : Theme.of(context).errorColor;
 
                   listItems.add(Dismissible(
-                    key: Key(task.taskId!),
+                    key: ValueKey(DateTime.now().toIso8601String()),
                     confirmDismiss: (direction) async {
                       bool exit = false;
                       bool response = false;
 
                       // swipe right - rapid complete
                       // rapid complete is a quick and easy way to complete standard tasks
-
                       if (direction == DismissDirection.startToEnd) {
                         // if task is inspection
+
                         if (task.type == TaskType.inspection) {
                           await Navigator.of(context).pushNamed(
                               AddInspectionScreen.routeName,
@@ -212,11 +216,12 @@ class _TasksListState extends State<TasksList> {
                             return false;
                           }
                         }
-
+                        // set task date to today
+                        task.date = DateTime.now();
                         if (task.taskInterval != null &&
                             task.taskInterval != 'No') {
-                          DateCalc.getNextDate(
-                              task.nextDate!, task.taskInterval!);
+                          task.nextDate = DateCalc.getNextDate(
+                              task.date, task.taskInterval!);
                         }
 
                         await Provider.of<TaskProvider>(context, listen: false)
@@ -253,6 +258,9 @@ class _TasksListState extends State<TasksList> {
                               ),
                             ),
                           );
+                        // setState(() {
+                        //   _tasks = taskProvider.getAllTasks;
+                        // });
 
                         // swipe left - delete
                       } else if (direction == DismissDirection.endToStart) {
@@ -429,7 +437,6 @@ class _TasksListState extends State<TasksList> {
                   ));
                 }
               }
-              print(keys);
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

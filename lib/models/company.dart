@@ -1,5 +1,5 @@
 class Company {
-  String companyId;
+  String? companyId;
   String name;
   String address;
   String postCode;

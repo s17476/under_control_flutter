@@ -73,32 +73,32 @@ class UserProvider with ChangeNotifier {
         .get()
         .then((DocumentSnapshot documentSnapshot) {
       AppUser? tmpUser;
-      if (documentSnapshot.exists) {
-        final userSnapshot = documentSnapshot.data() as Map<String, dynamic>;
-        if (userSnapshot['company'] == null) {
-          tmpUser = AppUser(
-              userId: documentSnapshot.id,
-              email: userSnapshot['email'],
-              userName: userSnapshot['userName'],
-              userImage: userSnapshot['imgUrl']);
-        } else {
-          tmpUser = AppUser.company(
+      // if (documentSnapshot.exists) {
+      final userSnapshot = documentSnapshot.data() as Map<String, dynamic>;
+      if (userSnapshot['company'] == null) {
+        tmpUser = AppUser(
             userId: documentSnapshot.id,
             email: userSnapshot['email'],
             userName: userSnapshot['userName'],
-            userImage: userSnapshot['imgUrl'],
-            company: userSnapshot['company'],
-            companyId: userSnapshot['companyId'],
-          );
-        }
+            userImage: userSnapshot['imgUrl']);
       } else {
-        ScaffoldMessenger.of(context)
-          ..removeCurrentSnackBar()
-          ..showSnackBar(SnackBar(
-            content: const Text('Unable get user data. Try again later...'),
-            backgroundColor: Theme.of(context).errorColor,
-          ));
+        tmpUser = AppUser.company(
+          userId: documentSnapshot.id,
+          email: userSnapshot['email'],
+          userName: userSnapshot['userName'],
+          userImage: userSnapshot['imgUrl'],
+          company: userSnapshot['company'],
+          companyId: userSnapshot['companyId'],
+        );
       }
+      // } else {
+      //   ScaffoldMessenger.of(context)
+      //     ..removeCurrentSnackBar()
+      //     ..showSnackBar(SnackBar(
+      //       content: const Text('Unable get user data. Try again later...'),
+      //       backgroundColor: Theme.of(context).errorColor,
+      //     ));
+      // }
       _isLoading = false;
       _hasData = true;
       return tmpUser;

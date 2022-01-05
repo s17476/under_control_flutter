@@ -137,7 +137,7 @@ class ChooseCompanyScreen extends StatelessWidget {
                   });
                 },
                 title: Text(company.name),
-                subtitle: Text(company.companyId),
+                subtitle: Text(company.companyId!),
               );
             }).toList(),
           );

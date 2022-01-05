@@ -6,7 +6,7 @@ class CompanyProvider with ChangeNotifier {
   Company? _company;
 
   Company get company => Company(
-        companyId: _company!.companyId,
+        companyId: _company?.companyId,
         name: _company!.name,
         address: _company!.address,
         postCode: _company!.postCode,

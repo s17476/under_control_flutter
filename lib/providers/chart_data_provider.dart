@@ -32,8 +32,11 @@ class ChartDataProvider with ChangeNotifier {
         .limit(1)
         .get()
         .then((QuerySnapshot querySnapshot) {
-      var doc = querySnapshot.docs[0];
-      return DateTime.parse(doc['date']);
+      if (querySnapshot.docs.isNotEmpty) {
+        var doc = querySnapshot.docs[0];
+        return DateTime.parse(doc['date']);
+      }
+      return DateTime(DateTime.now().year - 1);
     });
   }
 

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/task.dart';
 
@@ -140,6 +141,7 @@ class TaskProvider with ChangeNotifier {
       } else {
         _tasks[date] = [tmpTask];
       }
+
       notifyListeners();
       return tmpTask;
     });
@@ -191,27 +193,9 @@ class TaskProvider with ChangeNotifier {
 
     // update next task date
     if (task.taskInterval != 'No') {
-      List<String> duration = task.taskInterval!.split(' ');
       DateTime nextDate = DateTime.now();
-      if (duration[1] == 'week' || duration[1] == 'weeks') {
-        nextDate = DateTime(
-          task.nextDate!.year,
-          task.nextDate!.month,
-          task.nextDate!.day + (int.parse(duration[0]) * 7),
-        );
-      } else if (duration[1] == 'month' || duration[1] == 'months') {
-        nextDate = DateTime(
-          task.nextDate!.year,
-          task.nextDate!.month + int.parse(duration[0]),
-          task.nextDate!.day,
-        );
-      } else if (duration[1] == 'year' || duration[1] == 'years') {
-        nextDate = DateTime(
-          task.nextDate!.year + int.parse(duration[0]),
-          task.nextDate!.month,
-          task.nextDate!.day,
-        );
-      }
+
+      nextDate = DateCalc.getNextDate(task.nextDate!, task.taskInterval!)!;
       nextTask = task.copyWith(
         date: task.nextDate,
         nextDate: nextDate,
@@ -222,6 +206,7 @@ class TaskProvider with ChangeNotifier {
     if (nextTask == null) {
       return null;
     }
+    notifyListeners();
     return await addTask(nextTask);
   }
 
