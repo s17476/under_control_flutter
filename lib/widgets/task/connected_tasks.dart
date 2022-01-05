@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
-import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
-import 'package:under_control_flutter/widgets/status_icon.dart';
 import 'package:under_control_flutter/widgets/task/tasks_list.dart';
 
 class ConnectedTasks extends StatefulWidget {
@@ -31,43 +28,68 @@ class _ConnectedTasksState extends State<ConnectedTasks> {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
         children: [
-          Container(
-            alignment: Alignment.topLeft,
-            child: showTasks
-                ? TextButton.icon(
-                    icon: const Icon(
-                      Icons.keyboard_arrow_up_rounded,
-                      color: Colors.green,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        showTasks = !showTasks;
-                      });
-                    },
-                    label: Text(
-                      'Hide upcomming tasks',
-                      style: buttonStyle.copyWith(
-                        color: Colors.black,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                alignment: Alignment.topLeft,
+                child: showTasks
+                    ? TextButton.icon(
+                        icon: const Icon(
+                          Icons.keyboard_arrow_up_rounded,
+                          color: Colors.green,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            showTasks = !showTasks;
+                          });
+                        },
+                        label: Text(
+                          'Hide upcomming tasks',
+                          style: buttonStyle.copyWith(
+                            color: Colors.black,
+                          ),
+                        ),
+                      )
+                    : TextButton.icon(
+                        icon: const Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: Colors.green,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            showTasks = !showTasks;
+                          });
+                        },
+                        label: Text(
+                          'Show upcomming tasks',
+                          style: buttonStyle.copyWith(
+                            color: Colors.black,
+                          ),
+                        ),
                       ),
-                    ),
-                  )
-                : TextButton.icon(
-                    icon: const Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: Colors.green,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        showTasks = !showTasks;
-                      });
-                    },
-                    label: Text(
-                      'Show upcomming tasks',
-                      style: buttonStyle.copyWith(
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
+              ),
+              if (showTasks)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Builder(builder: (context) {
+                    final taskProvider = Provider.of<TaskProvider>(context);
+                    return TextButton(
+                      onPressed: taskProvider.toggleIsActive,
+                      child: taskProvider.isActive
+                          ? const Text(
+                              'Active tasks',
+                            )
+                          : const Text(
+                              'Done tasks',
+                              style: TextStyle(
+                                color: Colors.amber,
+                              ),
+                            ),
+                    );
+                  }),
+                ),
+            ],
           ),
 
           // if (showTasks)

@@ -119,10 +119,33 @@ class _MainScreenState extends State<MainScreen> {
                 SliverAppBar(
                   iconTheme:
                       IconThemeData(color: Theme.of(context).primaryColor),
-                  title: Text(
-                    BottomNaviBar.tabs[_selectedPageIndex]['title'] as String,
-                  ),
+                  title: (_selectedPageIndex == 0 || _selectedPageIndex == 1)
+                      ? const Text('')
+                      : Text(
+                          BottomNaviBar.tabs[_selectedPageIndex]['title']
+                              as String,
+                        ),
                   actions: [
+                    // show toggle button in task and calendar screen
+                    if (_selectedPageIndex == 0 || _selectedPageIndex == 1)
+                      Builder(builder: (context) {
+                        final taskProvider = Provider.of<TaskProvider>(context);
+                        return TextButton(
+                          onPressed: taskProvider.toggleIsActive,
+                          child: taskProvider.isActive
+                              ? const Text(
+                                  'Active tasks',
+                                  style: TextStyle(fontSize: 18),
+                                )
+                              : const Text(
+                                  'Done tasks',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.amber,
+                                  ),
+                                ),
+                        );
+                      }),
                     // chat icon in dashboard screen
                     if (_selectedPageIndex == 2)
                       IconButton(

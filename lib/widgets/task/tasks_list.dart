@@ -159,10 +159,10 @@ class _TasksListState extends State<TasksList> {
             itemCount: keys.length,
             itemBuilder: (ctx, index) {
               List<Widget> listItems = [];
+              final dateFormat = DateFormat('dd/MM/yyyy');
+              keys.sort(
+                  (a, b) => dateFormat.parse(a).compareTo(dateFormat.parse(b)));
               if (filteredTasks[keys[index]] != null) {
-                final dateFormat = DateFormat('dd/MM/yyyy');
-                keys.sort((a, b) =>
-                    dateFormat.parse(a).compareTo(dateFormat.parse(b)));
                 for (var task in filteredTasks[keys[index]]!) {
                   // if task date is after today date change status icon color
                   final dateFormat = DateFormat('dd/MM/yyyy');

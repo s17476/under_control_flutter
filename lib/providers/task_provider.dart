@@ -14,6 +14,8 @@ class TaskProvider with ChangeNotifier {
   Task? _undoTask;
   BuildContext? _undoContext;
 
+  bool _isActive = true;
+
   List<Task> _upcomingTasks = [];
 
   TaskExecutor calendarExecutor = TaskExecutor.all;
@@ -32,6 +34,14 @@ class TaskProvider with ChangeNotifier {
     calendarExecutor = taskExecutor;
     notifyListeners();
   }
+
+  void toggleIsActive() {
+    _isActive = !isActive;
+    fetchAndSetTasks();
+    notifyListeners();
+  }
+
+  bool get isActive => _isActive;
 
   List<Task> get upcomingTasks => _upcomingTasks;
 
@@ -61,12 +71,19 @@ class TaskProvider with ChangeNotifier {
 
   Future<void> fetchAndSetTasks() async {
     Map<String, List<Task>> tmpTasks = {};
-    final taskRef = FirebaseFirestore.instance
-        .collection('companies')
-        .doc(_user!.companyId)
-        .collection('tasks')
-        .orderBy('date', descending: false)
-        .get();
+    final taskRef = isActive
+        ? FirebaseFirestore.instance
+            .collection('companies')
+            .doc(_user!.companyId)
+            .collection('tasks')
+            .orderBy('date', descending: false)
+            .get()
+        : FirebaseFirestore.instance
+            .collection('companies')
+            .doc(_user!.companyId)
+            .collection('archive')
+            .orderBy('date', descending: true)
+            .get();
 
     await taskRef.then((QuerySnapshot querySnapshot) {
       for (var doc in querySnapshot.docs) {
