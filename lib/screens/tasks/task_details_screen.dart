@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
@@ -262,27 +263,29 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
         }
 
         if (transferObjectTask!.taskInterval != 'No') {
-          List<String> duration = transferObjectTask!.taskInterval!.split(' ');
-          task.taskInterval = transferObjectTask!.taskInterval;
-          if (duration[1] == 'week' || duration[1] == 'weeks') {
-            task.nextDate = DateTime(
-              transferObjectTask!.date.year,
-              transferObjectTask!.date.month,
-              transferObjectTask!.date.day + (int.parse(duration[0]) * 7),
-            );
-          } else if (duration[1] == 'month' || duration[1] == 'months') {
-            task.nextDate = DateTime(
-              transferObjectTask!.date.year,
-              transferObjectTask!.date.month + int.parse(duration[0]),
-              transferObjectTask!.date.day,
-            );
-          } else if (duration[1] == 'year' || duration[1] == 'years') {
-            task.nextDate = DateTime(
-              transferObjectTask!.date.year + int.parse(duration[0]),
-              transferObjectTask!.date.month,
-              transferObjectTask!.date.day,
-            );
-          }
+          task.nextDate = DateCalc.getNextDate(
+              transferObjectTask!.date, transferObjectTask!.taskInterval!);
+          // List<String> duration = transferObjectTask!.taskInterval!.split(' ');
+          // task.taskInterval = transferObjectTask!.taskInterval;
+          // if (duration[1] == 'week' || duration[1] == 'weeks') {
+          //   task.nextDate = DateTime(
+          //     transferObjectTask!.date.year,
+          //     transferObjectTask!.date.month,
+          //     transferObjectTask!.date.day + (int.parse(duration[0]) * 7),
+          //   );
+          // } else if (duration[1] == 'month' || duration[1] == 'months') {
+          //   task.nextDate = DateTime(
+          //     transferObjectTask!.date.year,
+          //     transferObjectTask!.date.month + int.parse(duration[0]),
+          //     transferObjectTask!.date.day,
+          //   );
+          // } else if (duration[1] == 'year' || duration[1] == 'years') {
+          //   task.nextDate = DateTime(
+          //     transferObjectTask!.date.year + int.parse(duration[0]),
+          //     transferObjectTask!.date.month,
+          //     transferObjectTask!.date.day,
+          //   );
+          // }
         } else {
           task.nextDate = null;
           task.taskInterval = 'No';
@@ -344,9 +347,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
     final textStyle = Theme.of(context).textTheme.headline6!.copyWith(
         // fontSize: SizeConfig.blockSizeHorizontal * 4.5,
         );
-    final expiredTextStyle = textStyle.copyWith(
-      color: Theme.of(context).errorColor,
-    );
+    //
+
     final labelTextStyle = Theme.of(context).textTheme.headline6!.copyWith(
           fontSize: SizeConfig.blockSizeHorizontal * 3,
           color: Theme.of(context).hintColor,
@@ -381,7 +383,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
             ),
           ),
           // done appbar button
-          if (_isInEditMode)
+          if (_isInEditMode && task.status != TaskStatus.completed)
             IconButton(
               onPressed: () {
                 FocusScope.of(context).unfocus();
@@ -393,6 +395,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                 }
 
                 _completeTask(false);
+
                 ScaffoldMessenger.of(context)
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
@@ -411,18 +414,49 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
           // SizedBox(
           //   width: SizeConfig.blockSizeHorizontal * 3,
           // ),
-          if (_isInEditMode)
+          if (_isInEditMode && task.status != TaskStatus.completed)
             IconButton(
-              onPressed: () {
+              onPressed: () async {
                 FocusScope.of(context).unfocus();
-                _showCompleteDialog(context, task).then((value) {
+                bool exit = false;
+                _showCompleteDialog(context, task).then((value) async {
                   if (value == true) {
-                    _completeTask(true);
-                    Navigator.of(context).pop('completed');
+                    // if task is inspection
+                    if (task.type == TaskType.inspection) {
+                      await Navigator.of(context)
+                          .pushNamed(AddInspectionScreen.routeName, arguments: [
+                        Provider.of<ItemProvider>(context, listen: false)
+                            .items
+                            .firstWhere(
+                                (element) => element.itemId == task.itemId),
+                        task
+                      ]).then((value) {
+                        if (value != null) {
+                          exit = value as bool;
+                        }
+                      });
+                      if (exit == false) {
+                        ScaffoldMessenger.of(context)
+                          ..removeCurrentSnackBar()
+                          ..showSnackBar(
+                            SnackBar(
+                              content: const Text('Complete canceled!'),
+                              backgroundColor: Theme.of(context).errorColor,
+                            ),
+                          );
+                        return false;
+                      } else {
+                        _completeTask(true);
+                        Navigator.of(context).pop('completed');
+                      }
+                    } else {
+                      _completeTask(true);
+                      Navigator.of(context).pop('completed');
+                    }
                   }
                 });
-                Provider.of<TaskProvider>(context, listen: false)
-                    .fetchAndSetTasks();
+                // Provider.of<TaskProvider>(context, listen: false)
+                //     .fetchAndSetTasks();
               },
               icon: Icon(
                 Icons.done,
@@ -800,90 +834,51 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
               ),
 
               // action buttons bar
-              AnimatedContainer(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                duration: const Duration(milliseconds: 500),
-                color: _isInEditMode
-                    ? Theme.of(context).appBarTheme.backgroundColor
-                    : null,
-                width: double.infinity,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // complete / cancel button
-                    TextButton.icon(
-                      onPressed: () {
-                        FocusScope.of(context).unfocus();
-                        _toggleEditMode();
-                        if (_isInEditMode) {
-                          _animationController!.forward();
-                          _scrollController.animateTo(
-                            600,
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeIn,
-                          );
-                        } else {
-                          _animationController!.reverse();
-                          // _scrollController.animateTo(
-                          //   -200,
-                          //   duration: Duration(milliseconds: 500),
-                          //   curve: Curves.easeIn,
-                          // );
-                        }
-                      },
-                      icon: _isInEditMode
-                          ? Icon(
-                              Icons.cancel,
-                              size: SizeConfig.blockSizeHorizontal * 6,
-                              color: Theme.of(context).errorColor,
-                            )
-                          : Icon(
-                              Icons.keyboard_arrow_down_outlined,
-                              size: SizeConfig.blockSizeHorizontal * 8,
-                            ),
-                      label: Text(
-                        _isInEditMode ? 'Cancel' : 'Complete the task',
-                        style: textStyle.copyWith(
-                          color: _isInEditMode
-                              ? Theme.of(context).appBarTheme.foregroundColor
-                              : Theme.of(context).appBarTheme.backgroundColor,
-                          fontSize: SizeConfig.blockSizeHorizontal * 4.5,
-                        ),
-                      ),
-                    ),
-                    //save task button
-                    if (_isInEditMode)
+              if (task.status != TaskStatus.completed)
+                AnimatedContainer(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  duration: const Duration(milliseconds: 500),
+                  color: _isInEditMode
+                      ? Theme.of(context).appBarTheme.backgroundColor
+                      : null,
+                  width: double.infinity,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // complete / cancel button
                       TextButton.icon(
                         onPressed: () {
                           FocusScope.of(context).unfocus();
                           _toggleEditMode();
                           if (_isInEditMode) {
                             _animationController!.forward();
+                            _scrollController.animateTo(
+                              600,
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeIn,
+                            );
                           } else {
                             _animationController!.reverse();
+                            // _scrollController.animateTo(
+                            //   -200,
+                            //   duration: Duration(milliseconds: 500),
+                            //   curve: Curves.easeIn,
+                            // );
                           }
-
-                          _completeTask(false);
-
-                          ScaffoldMessenger.of(context)
-                            ..removeCurrentSnackBar()
-                            ..showSnackBar(
-                              SnackBar(
-                                content: const Text('Data saved'),
-                                backgroundColor: Theme.of(context)
-                                    .appBarTheme
-                                    .backgroundColor,
-                              ),
-                            );
                         },
-                        icon: Icon(
-                          Icons.save,
-                          size: SizeConfig.blockSizeHorizontal * 6,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                        icon: _isInEditMode
+                            ? Icon(
+                                Icons.cancel,
+                                size: SizeConfig.blockSizeHorizontal * 6,
+                                color: Theme.of(context).errorColor,
+                              )
+                            : Icon(
+                                Icons.keyboard_arrow_down_outlined,
+                                size: SizeConfig.blockSizeHorizontal * 8,
+                              ),
                         label: Text(
-                          'Save',
+                          _isInEditMode ? 'Cancel' : 'Complete the task',
                           style: textStyle.copyWith(
                             color: _isInEditMode
                                 ? Theme.of(context).appBarTheme.foregroundColor
@@ -892,74 +887,122 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                           ),
                         ),
                       ),
-                    //complete task button
-                    if (_isInEditMode)
-                      TextButton.icon(
-                        onPressed: () async {
-                          FocusScope.of(context).unfocus();
-                          bool exit = false;
-                          _showCompleteDialog(context, task)
-                              .then((value) async {
-                            if (value == true) {
-                              // if task is inspection
-                              if (task.type == TaskType.inspection) {
-                                await Navigator.of(context).pushNamed(
-                                    AddInspectionScreen.routeName,
-                                    arguments: [
-                                      Provider.of<ItemProvider>(context,
-                                              listen: false)
-                                          .items
-                                          .firstWhere((element) =>
-                                              element.itemId == task.itemId),
-                                      task
-                                    ]).then((value) {
-                                  if (value != null) {
-                                    exit = value as bool;
+                      //save task button
+                      if (_isInEditMode)
+                        TextButton.icon(
+                          onPressed: () {
+                            FocusScope.of(context).unfocus();
+                            _toggleEditMode();
+                            if (_isInEditMode) {
+                              _animationController!.forward();
+                            } else {
+                              _animationController!.reverse();
+                            }
+
+                            _completeTask(false);
+
+                            ScaffoldMessenger.of(context)
+                              ..removeCurrentSnackBar()
+                              ..showSnackBar(
+                                SnackBar(
+                                  content: const Text('Data saved'),
+                                  backgroundColor: Theme.of(context)
+                                      .appBarTheme
+                                      .backgroundColor,
+                                ),
+                              );
+                          },
+                          icon: Icon(
+                            Icons.save,
+                            size: SizeConfig.blockSizeHorizontal * 6,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          label: Text(
+                            'Save',
+                            style: textStyle.copyWith(
+                              color: _isInEditMode
+                                  ? Theme.of(context)
+                                      .appBarTheme
+                                      .foregroundColor
+                                  : Theme.of(context)
+                                      .appBarTheme
+                                      .backgroundColor,
+                              fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                            ),
+                          ),
+                        ),
+                      //complete task button
+                      if (_isInEditMode)
+                        TextButton.icon(
+                          onPressed: () async {
+                            FocusScope.of(context).unfocus();
+                            bool exit = false;
+                            _showCompleteDialog(context, task)
+                                .then((value) async {
+                              if (value == true) {
+                                // if task is inspection
+                                if (task.type == TaskType.inspection) {
+                                  await Navigator.of(context).pushNamed(
+                                      AddInspectionScreen.routeName,
+                                      arguments: [
+                                        Provider.of<ItemProvider>(context,
+                                                listen: false)
+                                            .items
+                                            .firstWhere((element) =>
+                                                element.itemId == task.itemId),
+                                        task
+                                      ]).then((value) {
+                                    if (value != null) {
+                                      exit = value as bool;
+                                    }
+                                  });
+                                  if (exit == false) {
+                                    ScaffoldMessenger.of(context)
+                                      ..removeCurrentSnackBar()
+                                      ..showSnackBar(
+                                        SnackBar(
+                                          content:
+                                              const Text('Complete canceled!'),
+                                          backgroundColor:
+                                              Theme.of(context).errorColor,
+                                        ),
+                                      );
+                                    return false;
+                                  } else {
+                                    _completeTask(true);
+                                    Navigator.of(context).pop('completed');
                                   }
-                                });
-                                if (exit == false) {
-                                  ScaffoldMessenger.of(context)
-                                    ..removeCurrentSnackBar()
-                                    ..showSnackBar(
-                                      SnackBar(
-                                        content:
-                                            const Text('Complete canceled!'),
-                                        backgroundColor:
-                                            Theme.of(context).errorColor,
-                                      ),
-                                    );
-                                  return false;
                                 } else {
                                   _completeTask(true);
                                   Navigator.of(context).pop('completed');
                                 }
-                              } else {
-                                _completeTask(true);
-                                Navigator.of(context).pop('completed');
                               }
-                            }
-                          });
-                          // Provider.of<TaskProvider>(context, listen: false)
-                          //     .fetchAndSetTasks();
-                        },
-                        icon: Icon(
-                          Icons.done,
-                          size: SizeConfig.blockSizeHorizontal * 6,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        label: Text(
-                          'Complete',
-                          style: textStyle.copyWith(
-                            color: _isInEditMode
-                                ? Theme.of(context).appBarTheme.foregroundColor
-                                : Theme.of(context).appBarTheme.backgroundColor,
-                            fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                            });
+                            // Provider.of<TaskProvider>(context, listen: false)
+                            //     .fetchAndSetTasks();
+                          },
+                          icon: Icon(
+                            Icons.done,
+                            size: SizeConfig.blockSizeHorizontal * 6,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          label: Text(
+                            'Complete',
+                            style: textStyle.copyWith(
+                              color: _isInEditMode
+                                  ? Theme.of(context)
+                                      .appBarTheme
+                                      .foregroundColor
+                                  : Theme.of(context)
+                                      .appBarTheme
+                                      .backgroundColor,
+                              fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                            ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
             ],
           ),
         ),

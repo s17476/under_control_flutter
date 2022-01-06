@@ -85,6 +85,10 @@ class _AddTaskScreenState extends State<AddTaskScreen>
         item =
             ((ModalRoute.of(context)!.settings.arguments as List)[1] as Item);
         selectedAsset = item;
+        if (titleController!.text == '') {
+          titleController!.text =
+              '${item?.producer} ${item?.model} ${item?.internalId}';
+        }
       }
     }
   }
@@ -453,7 +457,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         keyboardType: TextInputType.name,
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
-                          errorStyle: TextStyle(color: Colors.black),
+                          errorStyle: const TextStyle(color: Colors.black),
                           labelText: 'Task title',
                           labelStyle: TextStyle(
                             color:

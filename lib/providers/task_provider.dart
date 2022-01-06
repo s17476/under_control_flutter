@@ -9,12 +9,13 @@ class TaskProvider with ChangeNotifier {
   AppUser? _user;
 
   Map<String, List<Task>> _tasks = {};
-  Map<String, List<Task>> _tasksArchive = {};
+  final Map<String, List<Task>> _tasksArchive = {};
 
   Task? _undoTask;
   BuildContext? _undoContext;
 
   bool _isActive = true;
+  bool _isLoading = false;
 
   List<Task> _upcomingTasks = [];
 
@@ -43,6 +44,8 @@ class TaskProvider with ChangeNotifier {
 
   bool get isActive => _isActive;
 
+  bool get isLoading => _isLoading;
+
   List<Task> get upcomingTasks => _upcomingTasks;
 
   TaskExecutor get executor => calendarExecutor;
@@ -70,6 +73,7 @@ class TaskProvider with ChangeNotifier {
   }
 
   Future<void> fetchAndSetTasks() async {
+    _isLoading = true;
     Map<String, List<Task>> tmpTasks = {};
     final taskRef = isActive
         ? FirebaseFirestore.instance
@@ -119,6 +123,7 @@ class TaskProvider with ChangeNotifier {
         }
       }
       _tasks = tmpTasks;
+      _isLoading = false;
       notifyListeners();
     });
   }
@@ -191,13 +196,21 @@ class TaskProvider with ChangeNotifier {
       'cost': task.cost,
       'duration': task.duration,
     });
-    _tasks.forEach((key, val) {
-      var index = val.indexWhere((element) => element.taskId == task.taskId);
-      if (index > -1) {
-        _tasks[key]![index] = task;
-      }
-    });
-    notifyListeners();
+    // _tasks.forEach((key, val) {
+    //   var index = val.indexWhere((element) => element.taskId == task.taskId);
+    //   if (index > -1) {
+    //     // _tasks[key]!.removeAt(index);
+    //     // if (_tasks[DateFormat('dd/MM/yyyy').format(task.date)] != null) {
+    //     //   _tasks[DateFormat('dd/MM/yyyy').format(task.date)]!.add(task);
+    //     // } else {
+    //     //   _tasks[DateFormat('dd/MM/yyyy').format(task.date)] = [task];
+    //     // }
+
+    //     _tasks[key]![index] = task;
+    //   }
+    // });
+    fetchAndSetTasks();
+    // notifyListeners();
   }
 
   Future<void> completeTask(Task task, Task oldTask) async {
@@ -270,13 +283,19 @@ class TaskProvider with ChangeNotifier {
 
   Future<bool> deleteTask(Task task) async {
     var response = true;
-    await FirebaseFirestore.instance
-        .collection('companies')
-        .doc(_user!.companyId)
-        .collection('tasks')
-        .doc(task.taskId)
-        .delete()
-        .then((_) {
+    final taskRef = task.status == TaskStatus.completed
+        ? FirebaseFirestore.instance
+            .collection('companies')
+            .doc(_user!.companyId)
+            .collection('archive')
+            .doc(task.taskId)
+        : FirebaseFirestore.instance
+            .collection('companies')
+            .doc(_user!.companyId)
+            .collection('tasks')
+            .doc(task.taskId);
+
+    await taskRef.delete().then((_) {
       final key = DateFormat('dd/MM/yyyy').format(task.date);
       _tasks[key]!.removeWhere((element) => element.taskId == task.taskId);
       if (_tasks[key] != null && _tasks[key]!.isEmpty) {
