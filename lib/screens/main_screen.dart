@@ -263,14 +263,15 @@ class _MainScreenState extends State<MainScreen> {
                                         .push(_createRute(
                                             () => const AddEquipmentScreen()))
                                         .then((resultItem) {
-                                      print('new item:   $resultItem');
+                                      // print('new item:   $resultItem');
                                       if (resultItem != null) {
                                         ScaffoldMessenger.of(context)
                                           ..removeCurrentSnackBar()
                                           ..showSnackBar(
                                             SnackBar(
                                               content: const Text(
-                                                  'New asset added!'),
+                                                'New asset added!',
+                                              ),
                                               backgroundColor: Theme.of(context)
                                                   .appBarTheme
                                                   .backgroundColor,
@@ -314,31 +315,35 @@ class _MainScreenState extends State<MainScreen> {
                                     });
                                   }
                                 // in tasks screen
-                                //TODO uuuuuuuuuuuuuuuuussssssssssseeeeeeeeeeeerrrrrrrrrrr
-                                : () {
-                                    Navigator.of(context)
-                                        .push(_createRute(
-                                            () => const AddTaskScreen()))
-                                        .then((value) {
-                                      if (value != null) {
-                                        ScaffoldMessenger.of(context)
-                                          ..removeCurrentSnackBar()
-                                          ..showSnackBar(
-                                            SnackBar(
-                                              content:
-                                                  const Text('New task added'),
-                                              backgroundColor: Theme.of(context)
-                                                  .appBarTheme
-                                                  .backgroundColor,
-                                            ),
-                                          );
+                                : Provider.of<TaskProvider>(context).isActive
+                                    ? () {
+                                        Navigator.of(context)
+                                            .push(_createRute(
+                                                () => const AddTaskScreen()))
+                                            .then((value) {
+                                          if (value != null) {
+                                            ScaffoldMessenger.of(context)
+                                              ..removeCurrentSnackBar()
+                                              ..showSnackBar(
+                                                SnackBar(
+                                                  content: const Text(
+                                                      'New task added'),
+                                                  backgroundColor:
+                                                      Theme.of(context)
+                                                          .appBarTheme
+                                                          .backgroundColor,
+                                                ),
+                                              );
+                                          }
+                                        });
                                       }
-                                    });
-                                  },
+                                    : null,
                         icon: Icon(
                           Icons.add,
                           size: SizeConfig.blockSizeVertical * 5,
-                          color: Theme.of(context).primaryColor,
+                          color: Provider.of<TaskProvider>(context).isActive
+                              ? Theme.of(context).primaryColor
+                              : Theme.of(context).appBarTheme.backgroundColor,
                         ),
                       ),
                     SizedBox(

@@ -6,6 +6,7 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/chart_data_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
+import 'package:under_control_flutter/providers/task_provider.dart';
 
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({Key? key}) : super(key: key);
@@ -32,7 +33,16 @@ class _OverviewScreenState extends State<OverviewScreen> {
   List<Item> allAssets = [];
   String? selectedAsset;
 
+  double maxBarWidth = (SizeConfig.blockSizeHorizontal * 100) - 16;
+  double costsWidthBlock = 0;
+  double timeWidthBlock = 0;
+
   RangeValues _currentRangeValues = const RangeValues(0, 0);
+
+  double _totalCost = 0;
+  int _totalTime = 0;
+  Map<String, double> assetsCosts = {};
+  Map<String, int> assetsTime = {};
 
   @override
   void initState() {
@@ -42,9 +52,23 @@ class _OverviewScreenState extends State<OverviewScreen> {
         setState(() {
           _fromDate = value;
         });
-
+        final taskProvider = Provider.of<TaskProvider>(context, listen: false);
+        taskProvider.getCosts(_fromDate!, _toDate, selectedAsset);
         DateTime tmpDate =
             DateTime(_fromDate!.year, _fromDate!.month, _fromDate!.day);
+        assetsCosts = taskProvider.assetsCosts;
+        assetsTime = taskProvider.assetsTime;
+        assetsCosts.entries.toList()
+          ..sort((e1, e2) {
+            var diff = e2.value.compareTo(e1.value);
+            if (diff == 0) diff = e2.key.compareTo(e1.key);
+            return diff;
+          });
+        if (assetsCosts.isNotEmpty) {
+          costsWidthBlock =
+              maxBarWidth / assetsCosts[assetsCosts.keys.toList()[0]]!;
+        }
+        print(assetsCosts);
 
         // make range slider labels
         while (tmpDate.isBefore(_toDate)) {
@@ -193,6 +217,31 @@ class _OverviewScreenState extends State<OverviewScreen> {
     var chartDataProvider = Provider.of<ChartDataProvider>(context);
     chartData = chartDataProvider.chartValues;
     // print('oldest date $_fromDate');
+    final taskProvider = Provider.of<TaskProvider>(context);
+    _totalCost = taskProvider.totalCost;
+    _totalTime = taskProvider.totalTime;
+    assetsCosts = taskProvider.assetsCosts;
+    assetsTime = taskProvider.assetsTime;
+    assetsCosts.entries.toList()
+      ..sort((e1, e2) {
+        var diff = e2.value.compareTo(e1.value);
+        if (diff == 0) diff = e2.key.compareTo(e1.key);
+        return diff;
+      });
+    if (assetsCosts.isNotEmpty) {
+      costsWidthBlock =
+          maxBarWidth / assetsCosts[assetsCosts.keys.toList()[0]]!;
+    }
+
+    assetsTime.entries.toList()
+      ..sort((e1, e2) {
+        var diff = e2.value.compareTo(e1.value);
+        if (diff == 0) diff = e2.key.compareTo(e1.key);
+        return diff;
+      });
+    if (assetsTime.isNotEmpty) {
+      timeWidthBlock = maxBarWidth / assetsTime[assetsTime.keys.toList()[0]]!;
+    }
 
     return _fromDate == null
         ? const Center(
@@ -200,225 +249,291 @@ class _OverviewScreenState extends State<OverviewScreen> {
               color: Colors.green,
             ),
           )
-        : Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.only(top: 16),
-                child: Text(
-                  'Cost chart',
-                  style: TextStyle(
-                    fontSize: SizeConfig.blockSizeHorizontal * 6,
+        : SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Text(
+                    'Cost chart',
+                    style: TextStyle(
+                      fontSize: SizeConfig.blockSizeHorizontal * 6,
+                    ),
                   ),
                 ),
-              ),
-              AspectRatio(
-                aspectRatio: 1.30,
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    right: 18.0,
-                    left: 4.0,
-                    top: 24,
-                    bottom: 12,
+                AspectRatio(
+                  aspectRatio: 1.30,
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      right: 18.0,
+                      left: 4.0,
+                      top: 16,
+                      bottom: 12,
+                    ),
+                    child: chartDataProvider.isLoading
+                        // show spinner if data is loading
+                        ? const Center(
+                            child: SizedBox(
+                              child: CircularProgressIndicator(
+                                color: Colors.green,
+                              ),
+                            ),
+                          )
+                        // show chart if loaded and has data
+                        : chartData.values.any((element) => element > 0)
+                            ? LineChart(
+                                mainData(),
+                              )
+                            // show info if  loded but no data to show
+                            : Builder(builder: (context) {
+                                for (var key in chartData.keys) {
+                                  chartData[key] = -2;
+                                }
+                                return Stack(children: [
+                                  LineChart(
+                                    mainData(),
+                                  ),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.query_stats,
+                                          color: Colors.black.withOpacity(0.5),
+                                          size: SizeConfig.blockSizeHorizontal *
+                                              15,
+                                        ),
+                                        Text(
+                                          'No data found',
+                                          style: TextStyle(
+                                              fontSize: SizeConfig
+                                                      .blockSizeHorizontal *
+                                                  8,
+                                              color:
+                                                  Colors.black.withOpacity(0.5),
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ]);
+                              }),
                   ),
-                  child: chartDataProvider.isLoading
-                      // show spinner if data is loading
-                      ? const Center(
-                          child: SizedBox(
-                            child: CircularProgressIndicator(
+                ),
+                if (labels.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.only(
+                      top: 16,
+                      left: 28,
+                    ),
+                    width: double.infinity,
+                    child: const Text(
+                      'Range:',
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
+                // chart range slider
+                if (labels.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    child: RangeSlider(
+                      values: _currentRangeValues,
+                      min: 0,
+                      max: labels.length.toDouble() - 1,
+                      divisions: labels.length,
+                      labels: RangeLabels(
+                        labels[_currentRangeValues.start.round()],
+                        labels[_currentRangeValues.end.round()],
+                      ),
+                      onChanged: (RangeValues values) {
+                        setState(() {
+                          _currentRangeValues = values;
+                          sliderFromDate = DateFormat('MMM yyyy')
+                              .parse(labels[_currentRangeValues.start.round()]);
+
+                          sliderToDate = DateFormat('MMM yyyy')
+                              .parse(labels[_currentRangeValues.end.round()]);
+                        });
+                      },
+                      // onChangeEnd: (_) {
+                      //   chartDataProvider.getAssetExpenses(
+                      //     itemId: selectedAsset,
+                      //     fromDate: sliderFromDate,
+                      //     toDate: sliderToDate,
+                      //   );
+                      //   if (sliderFromDate != null) {
+                      //     _fromDate = sliderFromDate;
+                      //   }
+                      // },
+                      activeColor: Colors.green,
+                      inactiveColor: Colors.green.shade900,
+                    ),
+                  ),
+                // Asset dropdown
+                Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            left: 16.0,
+                            // right: 16.0,
+                            top: 16,
+                            bottom: 8.0,
+                          ),
+                          child: DropdownButtonFormField(
+                            isExpanded: true,
+                            icon: Icon(
+                              Icons.keyboard_arrow_down_rounded,
+                              color: Theme.of(context).primaryIconTheme.color,
+                              size: SizeConfig.blockSizeHorizontal * 8,
+                            ),
+                            alignment: AlignmentDirectional.centerStart,
+                            decoration: InputDecoration(
+                              labelText: 'Asset',
+                              labelStyle: TextStyle(
+                                color: Theme.of(context)
+                                    .appBarTheme
+                                    .foregroundColor,
+                                fontSize: 20,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).splashColor,
+                                  width: 0,
+                                ),
+                              ),
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).splashColor,
+                                  width: 0,
+                                ),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              filled: true,
+                              fillColor: Theme.of(context).splashColor,
+                            ),
+                            dropdownColor: Colors.grey.shade800,
+                            value: 'All assets',
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedAsset =
+                                    newValue == 'All assets' ? null : newValue;
+                              });
+                            },
+                            items: allAssets.map((Item item) {
+                              return DropdownMenuItem<String>(
+                                value: '${item.itemId}',
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    left: SizeConfig.blockSizeHorizontal * 2,
+                                  ),
+                                  child: Text(
+                                    '${item.producer} ${item.model} ${item.internalId}',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize:
+                                          SizeConfig.blockSizeHorizontal * 4,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    // chart refresh button
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(top: 8.0, left: 4, right: 8),
+                      child: IconButton(
+                        iconSize: SizeConfig.blockSizeHorizontal * 14,
+                        onPressed: () {
+                          chartDataProvider.getAssetExpenses(
+                            itemId: selectedAsset,
+                            fromDate: sliderFromDate,
+                            toDate: sliderToDate,
+                          );
+                          if (sliderFromDate != null) {
+                            _fromDate = sliderFromDate;
+                          }
+                          Provider.of<TaskProvider>(context, listen: false)
+                              .getCosts(
+                                  _fromDate!, sliderToDate, selectedAsset);
+                        },
+                        icon: Icon(
+                          Icons.refresh,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      const Divider(),
+                      const Padding(
+                        padding: EdgeInsets.only(top: 12, bottom: 20),
+                        child: Text(
+                          'Data from the selected period',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                      const Divider(
+                        height: 1,
+                      ),
+                      ////////////////////////////////////////
+                      const Divider(
+                        height: 1,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Total cost:'),
+                            Text(_totalCost.toString()),
+                          ],
+                        ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Total time:'),
+                            Text(
+                                '${_totalTime ~/ 60} hrs, ${_totalTime % 60} min'),
+                          ],
+                        ),
+                      ),
+                      const Divider(
+                        height: 1,
+                      ),
+                      for (var key in assetsCosts.keys)
+                        Column(
+                          children: [
+                            Container(
+                              width: assetsCosts[key]! * costsWidthBlock,
+                              height: 30,
                               color: Colors.green,
                             ),
-                          ),
+                            const SizedBox(height: 15),
+                          ],
                         )
-                      // show chart if loaded and has data
-                      : chartData.values.any((element) => element > 0)
-                          ? LineChart(
-                              mainData(),
-                            )
-                          // show info if  loded but no data to show
-                          : Builder(builder: (context) {
-                              for (var key in chartData.keys) {
-                                chartData[key] = -2;
-                              }
-                              return Stack(children: [
-                                LineChart(
-                                  mainData(),
-                                ),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.query_stats,
-                                        color: Colors.black.withOpacity(0.5),
-                                        size:
-                                            SizeConfig.blockSizeHorizontal * 15,
-                                      ),
-                                      Text(
-                                        'No data found',
-                                        style: TextStyle(
-                                            fontSize:
-                                                SizeConfig.blockSizeHorizontal *
-                                                    8,
-                                            color:
-                                                Colors.black.withOpacity(0.5),
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ]);
-                            }),
-                ),
-              ),
-              if (labels.isNotEmpty)
-                Container(
-                  padding: const EdgeInsets.only(
-                    top: 16,
-                    left: 28,
-                  ),
-                  width: double.infinity,
-                  child: const Text(
-                    'Range:',
-                    textAlign: TextAlign.start,
+                    ],
                   ),
                 ),
-              // chart range slider
-              if (labels.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: RangeSlider(
-                    values: _currentRangeValues,
-                    min: 0,
-                    max: labels.length.toDouble() - 1,
-                    divisions: labels.length,
-                    labels: RangeLabels(
-                      labels[_currentRangeValues.start.round()],
-                      labels[_currentRangeValues.end.round()],
-                    ),
-                    onChanged: (RangeValues values) {
-                      setState(() {
-                        _currentRangeValues = values;
-                        sliderFromDate = DateFormat('MMM yyyy')
-                            .parse(labels[_currentRangeValues.start.round()]);
-
-                        sliderToDate = DateFormat('MMM yyyy')
-                            .parse(labels[_currentRangeValues.end.round()]);
-                      });
-                    },
-                    // onChangeEnd: (_) {
-                    //   chartDataProvider.getAssetExpenses(
-                    //     itemId: selectedAsset,
-                    //     fromDate: sliderFromDate,
-                    //     toDate: sliderToDate,
-                    //   );
-                    //   if (sliderFromDate != null) {
-                    //     _fromDate = sliderFromDate;
-                    //   }
-                    // },
-                    activeColor: Colors.green,
-                    inactiveColor: Colors.green.shade900,
-                  ),
-                ),
-              // Asset dropdown
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          left: 16.0,
-                          // right: 16.0,
-                          top: 16,
-                          bottom: 8.0,
-                        ),
-                        child: DropdownButtonFormField(
-                          isExpanded: true,
-                          icon: Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            color: Theme.of(context).primaryIconTheme.color,
-                            size: SizeConfig.blockSizeHorizontal * 8,
-                          ),
-                          alignment: AlignmentDirectional.centerStart,
-                          decoration: InputDecoration(
-                            labelText: 'Asset',
-                            labelStyle: TextStyle(
-                              color:
-                                  Theme.of(context).appBarTheme.foregroundColor,
-                              fontSize: 20,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Theme.of(context).splashColor,
-                                width: 0,
-                              ),
-                            ),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Theme.of(context).splashColor,
-                                width: 0,
-                              ),
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            filled: true,
-                            fillColor: Theme.of(context).splashColor,
-                          ),
-                          dropdownColor: Colors.grey.shade800,
-                          value: 'All assets',
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedAsset =
-                                  newValue == 'All assets' ? null : newValue;
-                            });
-                          },
-                          items: allAssets.map((Item item) {
-                            return DropdownMenuItem<String>(
-                              value: '${item.itemId}',
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                  left: SizeConfig.blockSizeHorizontal * 2,
-                                ),
-                                child: Text(
-                                  '${item.producer} ${item.model} ${item.internalId}',
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize:
-                                        SizeConfig.blockSizeHorizontal * 4,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ),
-                  ),
-                  // chart refresh button
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0, left: 4, right: 8),
-                    child: IconButton(
-                      iconSize: SizeConfig.blockSizeHorizontal * 14,
-                      onPressed: () {
-                        chartDataProvider.getAssetExpenses(
-                          itemId: selectedAsset,
-                          fromDate: sliderFromDate,
-                          toDate: sliderToDate,
-                        );
-                        if (sliderFromDate != null) {
-                          _fromDate = sliderFromDate;
-                        }
-                      },
-                      icon: Icon(
-                        Icons.refresh,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           );
   }
 }
