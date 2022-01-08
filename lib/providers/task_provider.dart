@@ -354,7 +354,7 @@ class TaskProvider with ChangeNotifier {
 
   Future<bool> deleteTask(Task task) async {
     var response = true;
-    final taskRef = task.status == TaskStatus.completed
+    final taskRef = !isActive
         ? FirebaseFirestore.instance
             .collection('companies')
             .doc(_user!.companyId)
@@ -412,8 +412,32 @@ class TaskProvider with ChangeNotifier {
     task.comments = 'Rapid Complete';
 
     var response = false;
-    await addToArchive(task)
-        .then((_) => deleteTask(task).then((value) => response = value));
+    await addToArchive(task).then((_) => deleteTask(task).then((value) {
+          addNextTask(task).then(
+            (nextTask) => // undo rapid complete
+                ScaffoldMessenger.of(context)
+                  ..removeCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      backgroundColor:
+                          Theme.of(context).appBarTheme.backgroundColor,
+                      content: Text('${task.title} - Rapid Complete done!'),
+                      duration: const Duration(seconds: 4),
+                      action: SnackBarAction(
+                        textColor: Colors.amber,
+                        label: 'UNDO',
+                        onPressed: () async {
+                          await undoRapidComplete();
+                          if (nextTask != null) {
+                            await deleteTask(nextTask);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+          );
+          response = value;
+        }));
     // print('rapid      $_undoTask');
     return response;
   }

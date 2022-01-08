@@ -177,17 +177,23 @@ class _TasksListState extends State<TasksList> {
                   if (filteredTasks[keys[index]] != null) {
                     for (var task in filteredTasks[keys[index]]!) {
                       // if task date is after today date change status icon color
-                      final dateFormat = DateFormat('dd/MM/yyyy');
-                      final taskDate =
-                          dateFormat.parse(dateFormat.format(task.date));
-                      final nowDate = DateTime(
-                        DateTime.now().year,
-                        DateTime.now().month,
-                        DateTime.now().day - 1,
-                      );
-                      final statusColor = taskDate.isAfter(nowDate)
-                          ? Theme.of(context).hintColor
-                          : Theme.of(context).errorColor;
+                      // final dateFormat = DateFormat('dd/MM/yyyy');
+                      // final taskDate =
+                      //     dateFormat.parse(dateFormat.format(task.date));
+                      // final nowDate = DateTime(
+                      //   DateTime.now().year,
+                      //   DateTime.now().month,
+                      //   DateTime.now().day - 1,
+                      // );
+                      // final statusColor = taskDate.isAfter(nowDate)
+                      //     ? Theme.of(context).hintColor
+                      //     : Theme.of(context).errorColor;
+
+                      final item =
+                          Provider.of<ItemProvider>(context, listen: false)
+                              .items
+                              .firstWhere(
+                                  (element) => element.itemId == task.itemId);
 
                       listItems.add(!Provider.of<TaskProvider>(context).isActive
                           ? GestureDetector(
@@ -365,45 +371,11 @@ class _TasksListState extends State<TasksList> {
                                   await Provider.of<TaskProvider>(context,
                                           listen: false)
                                       .rapidComplete(context, task)
-                                      .then((value) => response = value);
+                                      .then((value) {
+                                    response = value;
 
-                                  var nextTask =
-                                      await Provider.of<TaskProvider>(context,
-                                              listen: false)
-                                          .addNextTask(task);
-
-                                  // undo rapid complete
-                                  ScaffoldMessenger.of(context)
-                                    ..removeCurrentSnackBar()
-                                    ..showSnackBar(
-                                      SnackBar(
-                                        backgroundColor: Theme.of(context)
-                                            .appBarTheme
-                                            .backgroundColor,
-                                        content: Text(
-                                            '${task.title} - Rapid Complete done!'),
-                                        duration: const Duration(seconds: 4),
-                                        action: SnackBarAction(
-                                          textColor: Colors.amber,
-                                          label: 'UNDO',
-                                          onPressed: () async {
-                                            await Provider.of<TaskProvider>(
-                                                    context,
-                                                    listen: false)
-                                                .undoRapidComplete();
-                                            if (nextTask != null) {
-                                              await Provider.of<TaskProvider>(
-                                                      context,
-                                                      listen: false)
-                                                  .deleteTask(nextTask);
-                                            }
-                                          },
-                                        ),
-                                      ),
-                                    );
-                                  // setState(() {
-                                  //   _tasks = taskProvider.getAllTasks;
-                                  // });
+                                    filteredTasks[keys[index]]?.remove(task);
+                                  });
 
                                   // swipe left - delete
                                 } else if (direction ==
@@ -554,34 +526,64 @@ class _TasksListState extends State<TasksList> {
                                                 if (task.location != null &&
                                                     task.location != '')
                                                   Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
                                                     children: [
-                                                      Icon(
-                                                        Icons.location_on,
-                                                        color: Theme.of(context)
-                                                            .hintColor,
-                                                      ),
-                                                      Text(
-                                                        task.location!,
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                          color:
-                                                              Theme.of(context)
+                                                      Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.location_on,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .hintColor,
+                                                          ),
+                                                          Text(
+                                                            task.location!,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                              color: Theme.of(
+                                                                      context)
                                                                   .hintColor,
-                                                        ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.handyman,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .hintColor,
+                                                          ),
+                                                          Text(
+                                                            '${item.producer} ${item.model}',
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .hintColor,
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ],
                                                   ),
                                               ],
                                             ),
                                           ),
-                                          Icon(
-                                            statusIcons[task.status.index],
-                                            color: statusColor,
-                                            size:
-                                                SizeConfig.blockSizeHorizontal *
-                                                    9,
-                                          ),
+                                          // Icon(
+                                          //   statusIcons[task.status.index],
+                                          //   color: statusColor,
+                                          //   size:
+                                          //       SizeConfig.blockSizeHorizontal *
+                                          //           9,
+                                          // ),
                                           const SizedBox(
                                             width: 5,
                                           ),

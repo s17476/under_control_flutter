@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
@@ -96,18 +97,11 @@ class CalendarEventsList extends StatelessWidget {
                   padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal),
                   itemCount: value.length,
                   itemBuilder: (ctx, index) {
-                    // if task date is after today date change status icon color
-                    final dateFormat = DateFormat('dd/MM/yyyy');
-                    final taskDate =
-                        dateFormat.parse(dateFormat.format(value[index].date));
-                    final nowDate = DateTime(
-                      DateTime.now().year,
-                      DateTime.now().month,
-                      DateTime.now().day - 1,
-                    );
-                    final statusColor = taskDate.isAfter(nowDate)
-                        ? Theme.of(context).hintColor
-                        : Theme.of(context).errorColor;
+                    final item = Provider.of<ItemProvider>(context,
+                            listen: false)
+                        .items
+                        .firstWhere(
+                            (element) => element.itemId == value[index].itemId);
                     return Dismissible(
                       key: Key(value[index].taskId!),
                       confirmDismiss: (direction) async {
@@ -147,70 +141,22 @@ class CalendarEventsList extends StatelessWidget {
                               return false;
                             }
                           }
-                          List<String> duration =
-                              value[index].taskInterval!.split(' ');
-                          final today = DateTime.now();
-                          if (duration[1] == 'week' || duration[1] == 'weeks') {
-                            value[index].nextDate = DateTime(
-                              today.year,
-                              today.month,
-                              today.day + (int.parse(duration[0]) * 7),
-                            );
-                          } else if (duration[1] == 'month' ||
-                              duration[1] == 'months') {
-                            value[index].nextDate = DateTime(
-                              today.year,
-                              today.month + int.parse(duration[0]),
-                              today.day,
-                            );
-                          } else if (duration[1] == 'year' ||
-                              duration[1] == 'years') {
-                            value[index].nextDate = DateTime(
-                              today.year + int.parse(duration[0]),
-                              today.month,
-                              today.day,
-                            );
+
+                          // set task date to today
+                          value[index].date = DateTime.now();
+                          if (value[index].taskInterval != null &&
+                              value[index].taskInterval != 'No') {
+                            value[index].nextDate = DateCalc.getNextDate(
+                                value[index].date, value[index].taskInterval!);
                           }
+
                           Task tmpTask = value[index];
                           await Provider.of<TaskProvider>(context,
                                   listen: false)
                               .rapidComplete(context, value[index])
-                              .then((val) => response = val);
-
-                          var nextTask = await Provider.of<TaskProvider>(
-                                  context,
-                                  listen: false)
-                              .addNextTask(tmpTask);
-
-                          // undo rapid complete
-
-                          ScaffoldMessenger.of(context)
-                            ..removeCurrentSnackBar()
-                            ..showSnackBar(
-                              SnackBar(
-                                backgroundColor: Theme.of(context)
-                                    .appBarTheme
-                                    .backgroundColor,
-                                content: Text(
-                                  '${tmpTask.title} - Rapid Complete done!',
-                                ),
-                                duration: const Duration(seconds: 4),
-                                action: SnackBarAction(
-                                  textColor: Colors.amber,
-                                  label: 'UNDO',
-                                  onPressed: () async {
-                                    await Provider.of<TaskProvider>(context,
-                                            listen: false)
-                                        .undoRapidComplete();
-                                    if (nextTask != null) {
-                                      await Provider.of<TaskProvider>(context,
-                                              listen: false)
-                                          .deleteTask(nextTask);
-                                    }
-                                  },
-                                ),
-                              ),
-                            );
+                              .then((val) {
+                            response = val;
+                          });
 
                           // swipe left - delete
                         } else if (direction == DismissDirection.endToStart) {
@@ -339,35 +285,57 @@ class CalendarEventsList extends StatelessWidget {
                                         if (value[index].location != null &&
                                             value[index].location != '')
                                           Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Icon(
-                                                Icons.location_on,
-                                                color:
-                                                    Theme.of(context).hintColor,
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.location_on,
+                                                    color: Theme.of(context)
+                                                        .hintColor,
+                                                  ),
+                                                  Text(
+                                                    value[index].location!,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .hintColor,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              Text(
-                                                value[index].location!,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .hintColor,
-                                                ),
+                                              Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.handyman,
+                                                    color: Theme.of(context)
+                                                        .hintColor,
+                                                  ),
+                                                  Text(
+                                                    '${item.producer} ${item.model}',
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      color: Theme.of(context)
+                                                          .hintColor,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ],
                                           ),
                                       ],
                                     ),
                                   ),
-                                  Icon(
-                                    statusIcons[value[index].status.index],
-                                    color: statusColor,
-                                    size: SizeConfig.blockSizeHorizontal * 9,
-                                  ),
                                   const SizedBox(
                                     width: 5,
                                   ),
-                                  Icon(Icons.arrow_forward_ios,
-                                      color: Theme.of(context).primaryColor),
+                                  Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
                                   const SizedBox(
                                     width: 5,
                                   ),
