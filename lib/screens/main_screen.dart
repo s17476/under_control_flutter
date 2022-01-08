@@ -45,7 +45,9 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
 
     // initialize providers
-    Provider.of<TaskProvider>(context, listen: false).fetchAndSetTasks();
+    Provider.of<TaskProvider>(context, listen: false)
+      ..fetchAndSetTasks()
+      ..fetchAndSetCompletedTasks();
     Provider.of<ItemProvider>(context, listen: false)
       ..fetchAndSetItems()
       ..fetchInspectionsStatus();

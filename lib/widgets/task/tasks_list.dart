@@ -9,6 +9,7 @@ import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
 import 'package:under_control_flutter/screens/tasks/task_details_screen.dart';
+import 'package:under_control_flutter/widgets/task/task_list_item.dart';
 
 class TasksList extends StatefulWidget {
   TasksList({Key? key}) : super(key: key);
@@ -27,20 +28,6 @@ class TasksList extends StatefulWidget {
 class _TasksListState extends State<TasksList> {
   Map<String, List<Task>> _tasks = {};
   var executor = TaskExecutor.all;
-
-  final List<Color?> darkTheme = const [
-    Colors.green,
-    Colors.blue,
-    Colors.indigo,
-    Colors.red,
-  ];
-
-  final List<IconData> eventIcons = const [
-    Icons.health_and_safety_outlined,
-    Icons.event,
-    Icons.search_outlined,
-    Icons.handyman_outlined,
-  ];
 
   final List<IconData> statusIcons = const [
     Icons.pending_actions_outlined,
@@ -176,432 +163,202 @@ class _TasksListState extends State<TasksList> {
 
                   if (filteredTasks[keys[index]] != null) {
                     for (var task in filteredTasks[keys[index]]!) {
-                      // if task date is after today date change status icon color
-                      // final dateFormat = DateFormat('dd/MM/yyyy');
-                      // final taskDate =
-                      //     dateFormat.parse(dateFormat.format(task.date));
-                      // final nowDate = DateTime(
-                      //   DateTime.now().year,
-                      //   DateTime.now().month,
-                      //   DateTime.now().day - 1,
-                      // );
-                      // final statusColor = taskDate.isAfter(nowDate)
-                      //     ? Theme.of(context).hintColor
-                      //     : Theme.of(context).errorColor;
+                      Item? item;
+                      try {
+                        item = Provider.of<ItemProvider>(context, listen: false)
+                            .items
+                            .firstWhere(
+                                (element) => element.itemId == task.itemId);
+                      } catch (e) {
+                        item = null;
+                      }
 
-                      final item =
-                          Provider.of<ItemProvider>(context, listen: false)
-                              .items
-                              .firstWhere(
-                                  (element) => element.itemId == task.itemId);
-
-                      listItems.add(!Provider.of<TaskProvider>(context).isActive
-                          ? GestureDetector(
-                              onTap: () => Navigator.of(context)
-                                  .pushNamed(TaskDetailsScreen.routeName,
-                                      arguments: task)
-                                  .then((value) {
-                                if (value != null) {
-                                  String msg = '';
-                                  Color color = Theme.of(context)
-                                      .appBarTheme
-                                      .backgroundColor!;
-                                  if (value == 'deleted') {
-                                    msg = 'Task has been deleted!';
-                                  } else if (value == 'completed') {
-                                    msg = 'Task completed. Well done!';
-                                    color = Theme.of(context).primaryColor;
-                                  }
-                                  ScaffoldMessenger.of(context)
-                                    ..removeCurrentSnackBar()
-                                    ..showSnackBar(
-                                      SnackBar(
-                                        content: Text(msg),
-                                        backgroundColor: color,
-                                      ),
-                                    );
-                                }
-                              }),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 3.0,
-                                  horizontal: 8.0,
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(15),
-                                  child: Container(
-                                    // height: 50,
-                                    color: Theme.of(context).splashColor,
-                                    child: Row(
-                                      children: <Widget>[
-                                        Hero(
-                                          tag: task.taskId!,
-                                          child: Container(
-                                            color: darkTheme[task.type.index]!,
-                                            width:
-                                                SizeConfig.blockSizeHorizontal *
-                                                    16,
-                                            height:
-                                                SizeConfig.blockSizeHorizontal *
-                                                    18,
-                                            child: Icon(
-                                              eventIcons[task.type.index],
-                                              color: Colors.white,
-                                              size: SizeConfig
-                                                      .blockSizeHorizontal *
-                                                  12,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                            width:
-                                                SizeConfig.blockSizeHorizontal *
-                                                    3),
-                                        Expanded(
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(
-                                                task.title,
-                                                style: TextStyle(
-                                                  fontSize: SizeConfig
-                                                          .blockSizeHorizontal *
-                                                      4,
-                                                  // fontWeight: FontWeight.w400,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              if (task.location != null &&
-                                                  task.location != '')
-                                                SizedBox(
-                                                  height: SizeConfig
-                                                      .blockSizeHorizontal,
-                                                ),
-                                              if (task.location != null &&
-                                                  task.location != '')
-                                                Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.location_on,
-                                                      color: Theme.of(context)
-                                                          .hintColor,
-                                                    ),
-                                                    Text(
-                                                      task.location!,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .hintColor,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                        Icon(
-                                          statusIcons[task.status.index],
-                                          color: Colors.green,
-                                          size: SizeConfig.blockSizeHorizontal *
-                                              9,
-                                        ),
-                                        const SizedBox(
-                                          width: 16,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            )
-                          // shows active tasks
-                          : Dismissible(
-                              key: ValueKey(DateTime.now().toIso8601String()),
-                              confirmDismiss: (direction) async {
-                                bool exit = false;
-                                bool response = false;
-
-                                // swipe right - rapid complete
-                                // rapid complete is a quick and easy way to complete standard tasks
-                                if (direction == DismissDirection.startToEnd) {
-                                  // if task is inspection
-
-                                  if (task.type == TaskType.inspection) {
-                                    await Navigator.of(context).pushNamed(
-                                        AddInspectionScreen.routeName,
-                                        arguments: [
-                                          Provider.of<ItemProvider>(context,
-                                                  listen: false)
-                                              .items
-                                              .firstWhere((element) =>
-                                                  element.itemId ==
-                                                  task.itemId),
-                                          task
-                                        ]).then((value) {
+                      listItems.add(
+                        !Provider.of<TaskProvider>(context).isActive
+                            ? GestureDetector(
+                                onTap: () => Navigator.of(context)
+                                        .pushNamed(TaskDetailsScreen.routeName,
+                                            arguments: task)
+                                        .then((value) {
                                       if (value != null) {
-                                        exit = value as bool;
+                                        String msg = '';
+                                        Color color = Theme.of(context)
+                                            .appBarTheme
+                                            .backgroundColor!;
+                                        if (value == 'deleted') {
+                                          msg = 'Task has been deleted!';
+                                        } else if (value == 'completed') {
+                                          msg = 'Task completed. Well done!';
+                                          color =
+                                              Theme.of(context).primaryColor;
+                                        }
+                                        ScaffoldMessenger.of(context)
+                                          ..removeCurrentSnackBar()
+                                          ..showSnackBar(
+                                            SnackBar(
+                                              content: Text(msg),
+                                              backgroundColor: color,
+                                            ),
+                                          );
+                                      }
+                                    }),
+                                child: TaskListItem(
+                                  task: task,
+                                  item: item,
+                                ))
+                            // shows active tasks
+                            : Dismissible(
+                                key: ValueKey(DateTime.now().toIso8601String()),
+                                confirmDismiss: (direction) async {
+                                  bool exit = false;
+                                  bool response = false;
+
+                                  // swipe right - rapid complete
+                                  // rapid complete is a quick and easy way to complete standard tasks
+                                  if (direction ==
+                                      DismissDirection.startToEnd) {
+                                    // if task is inspection
+
+                                    if (task.type == TaskType.inspection) {
+                                      await Navigator.of(context).pushNamed(
+                                          AddInspectionScreen.routeName,
+                                          arguments: [
+                                            Provider.of<ItemProvider>(context,
+                                                    listen: false)
+                                                .items
+                                                .firstWhere((element) =>
+                                                    element.itemId ==
+                                                    task.itemId),
+                                            task
+                                          ]).then((value) {
+                                        if (value != null) {
+                                          exit = value as bool;
+                                        }
+                                      });
+                                      if (exit == false) {
+                                        ScaffoldMessenger.of(context)
+                                          ..removeCurrentSnackBar()
+                                          ..showSnackBar(
+                                            SnackBar(
+                                              content: const Text(
+                                                  'Rapid Complete canceled!'),
+                                              backgroundColor:
+                                                  Theme.of(context).errorColor,
+                                            ),
+                                          );
+                                        return false;
+                                      }
+                                    }
+                                    // set task date to today
+                                    task.date = DateTime.now();
+                                    if (task.taskInterval != null &&
+                                        task.taskInterval != 'No') {
+                                      task.nextDate = DateCalc.getNextDate(
+                                          task.date, task.taskInterval!);
+                                    }
+
+                                    await Provider.of<TaskProvider>(context,
+                                            listen: false)
+                                        .rapidComplete(context, task)
+                                        .then((value) {
+                                      response = value;
+
+                                      filteredTasks[keys[index]]?.remove(task);
+                                    });
+
+                                    // swipe left - delete
+                                  } else if (direction ==
+                                      DismissDirection.endToStart) {
+                                    await _showDeleteDialog(context, task)
+                                        .then((value) {
+                                      if (value) {
+                                        Provider.of<TaskProvider>(context,
+                                                listen: false)
+                                            .deleteTask(task);
+                                        response = value;
+                                      } else {
+                                        response = false;
                                       }
                                     });
-                                    if (exit == false) {
+
+                                    if (response) {
                                       ScaffoldMessenger.of(context)
                                         ..removeCurrentSnackBar()
                                         ..showSnackBar(
                                           SnackBar(
-                                            content: const Text(
-                                                'Rapid Complete canceled!'),
+                                            content:
+                                                const Text('Task deleted!'),
                                             backgroundColor:
                                                 Theme.of(context).errorColor,
                                           ),
                                         );
-                                      return false;
                                     }
                                   }
-                                  // set task date to today
-                                  task.date = DateTime.now();
-                                  if (task.taskInterval != null &&
-                                      task.taskInterval != 'No') {
-                                    task.nextDate = DateCalc.getNextDate(
-                                        task.date, task.taskInterval!);
-                                  }
-
-                                  await Provider.of<TaskProvider>(context,
-                                          listen: false)
-                                      .rapidComplete(context, task)
-                                      .then((value) {
-                                    response = value;
-
-                                    filteredTasks[keys[index]]?.remove(task);
-                                  });
-
-                                  // swipe left - delete
-                                } else if (direction ==
-                                    DismissDirection.endToStart) {
-                                  await _showDeleteDialog(context, task)
-                                      .then((value) {
-                                    if (value) {
-                                      Provider.of<TaskProvider>(context,
-                                              listen: false)
-                                          .deleteTask(task);
-                                      response = value;
-                                    } else {
-                                      response = false;
-                                    }
-                                  });
-
-                                  if (response) {
-                                    ScaffoldMessenger.of(context)
-                                      ..removeCurrentSnackBar()
-                                      ..showSnackBar(
-                                        SnackBar(
-                                          content: const Text('Task deleted!'),
-                                          backgroundColor:
-                                              Theme.of(context).errorColor,
-                                        ),
-                                      );
-                                  }
-                                }
-                                return response;
-                              },
-                              secondaryBackground: Container(
-                                padding: const EdgeInsets.only(right: 10),
-                                alignment: Alignment.centerRight,
-                                color: Colors.red,
-                                child: Icon(
-                                  Icons.delete,
-                                  color: Colors.white,
-                                  size: SizeConfig.blockSizeHorizontal * 15,
-                                ),
-                              ),
-                              background: Container(
-                                padding: const EdgeInsets.only(left: 10),
-                                alignment: Alignment.centerLeft,
-                                color: Colors.green,
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.done,
-                                      color: Colors.white,
-                                      size: SizeConfig.blockSizeHorizontal * 20,
-                                    ),
-                                    Text(
-                                      'Rapid Complete',
-                                      style: TextStyle(
-                                        fontSize:
-                                            SizeConfig.blockSizeHorizontal * 5,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              child: GestureDetector(
-                                onTap: () => Navigator.of(context)
-                                    .pushNamed(TaskDetailsScreen.routeName,
-                                        arguments: task)
-                                    .then((value) {
-                                  if (value != null) {
-                                    String msg = '';
-                                    Color color = Theme.of(context)
-                                        .appBarTheme
-                                        .backgroundColor!;
-                                    if (value == 'deleted') {
-                                      msg = 'Task has been deleted!';
-                                    } else if (value == 'completed') {
-                                      msg = 'Task completed. Well done!';
-                                      color = Theme.of(context).primaryColor;
-                                    }
-                                    ScaffoldMessenger.of(context)
-                                      ..removeCurrentSnackBar()
-                                      ..showSnackBar(
-                                        SnackBar(
-                                          content: Text(msg),
-                                          backgroundColor: color,
-                                        ),
-                                      );
-                                  }
-                                }),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 3.0,
-                                    horizontal: 8.0,
-                                  ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(15),
-                                    child: Container(
-                                      // height: 50,
-                                      color: Theme.of(context).splashColor,
-                                      child: Row(
-                                        children: <Widget>[
-                                          Hero(
-                                            tag: task.taskId!,
-                                            child: Container(
-                                              color:
-                                                  darkTheme[task.type.index]!,
-                                              width: SizeConfig
-                                                      .blockSizeHorizontal *
-                                                  16,
-                                              height: SizeConfig
-                                                      .blockSizeHorizontal *
-                                                  18,
-                                              child: Icon(
-                                                eventIcons[task.type.index],
-                                                color: Colors.white,
-                                                size: SizeConfig
-                                                        .blockSizeHorizontal *
-                                                    12,
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                              width: SizeConfig
-                                                      .blockSizeHorizontal *
-                                                  3),
-                                          Expanded(
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Text(
-                                                  task.title,
-                                                  style: TextStyle(
-                                                    fontSize: SizeConfig
-                                                            .blockSizeHorizontal *
-                                                        4,
-                                                    // fontWeight: FontWeight.w400,
-                                                  ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                                if (task.location != null &&
-                                                    task.location != '')
-                                                  SizedBox(
-                                                    height: SizeConfig
-                                                        .blockSizeHorizontal,
-                                                  ),
-                                                if (task.location != null &&
-                                                    task.location != '')
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Row(
-                                                        children: [
-                                                          Icon(
-                                                            Icons.location_on,
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .hintColor,
-                                                          ),
-                                                          Text(
-                                                            task.location!,
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            style: TextStyle(
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .hintColor,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                      Row(
-                                                        children: [
-                                                          Icon(
-                                                            Icons.handyman,
-                                                            color: Theme.of(
-                                                                    context)
-                                                                .hintColor,
-                                                          ),
-                                                          Text(
-                                                            '${item.producer} ${item.model}',
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            style: TextStyle(
-                                                              color: Theme.of(
-                                                                      context)
-                                                                  .hintColor,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ],
-                                                  ),
-                                              ],
-                                            ),
-                                          ),
-                                          // Icon(
-                                          //   statusIcons[task.status.index],
-                                          //   color: statusColor,
-                                          //   size:
-                                          //       SizeConfig.blockSizeHorizontal *
-                                          //           9,
-                                          // ),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          Icon(
-                                            Icons.arrow_forward_ios,
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                          ),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
+                                  return response;
+                                },
+                                secondaryBackground: Container(
+                                  padding: const EdgeInsets.only(right: 10),
+                                  alignment: Alignment.centerRight,
+                                  color: Colors.red,
+                                  child: Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                    size: SizeConfig.blockSizeHorizontal * 15,
                                   ),
                                 ),
+                                background: Container(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  alignment: Alignment.centerLeft,
+                                  color: Colors.green,
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.done,
+                                        color: Colors.white,
+                                        size:
+                                            SizeConfig.blockSizeHorizontal * 20,
+                                      ),
+                                      Text(
+                                        'Rapid Complete',
+                                        style: TextStyle(
+                                          fontSize:
+                                              SizeConfig.blockSizeHorizontal *
+                                                  5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                child: GestureDetector(
+                                  onTap: () => Navigator.of(context)
+                                      .pushNamed(TaskDetailsScreen.routeName,
+                                          arguments: task)
+                                      .then((value) {
+                                    if (value != null) {
+                                      String msg = '';
+                                      Color color = Theme.of(context)
+                                          .appBarTheme
+                                          .backgroundColor!;
+                                      if (value == 'deleted') {
+                                        msg = 'Task has been deleted!';
+                                      } else if (value == 'completed') {
+                                        msg = 'Task completed. Well done!';
+                                        color = Theme.of(context).primaryColor;
+                                      }
+                                      ScaffoldMessenger.of(context)
+                                        ..removeCurrentSnackBar()
+                                        ..showSnackBar(
+                                          SnackBar(
+                                            content: Text(msg),
+                                            backgroundColor: color,
+                                          ),
+                                        );
+                                    }
+                                  }),
+                                  child: TaskListItem(task: task, item: item),
+                                ),
                               ),
-                            ));
+                      );
                     }
                   }
 

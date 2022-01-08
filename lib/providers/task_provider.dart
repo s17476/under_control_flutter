@@ -9,7 +9,7 @@ class TaskProvider with ChangeNotifier {
   AppUser? _user;
 
   Map<String, List<Task>> _tasks = {};
-  final Map<String, List<Task>> _tasksArchive = {};
+  Map<String, List<Task>> _tasksArchive = {};
 
   Task? _undoTask;
   BuildContext? _undoContext;
@@ -23,6 +23,7 @@ class TaskProvider with ChangeNotifier {
   Map<String, double> _assetsCost = {};
 
   List<Task> _upcomingTasks = [];
+  // List<Task> _completedTasks = [];
 
   TaskExecutor calendarExecutor = TaskExecutor.all;
 
@@ -59,7 +60,7 @@ class TaskProvider with ChangeNotifier {
 
   TaskExecutor get executor => calendarExecutor;
 
-  Map<String, List<Task>> get getAllTasks => _tasks;
+  Map<String, List<Task>> get getAllTasks => isActive ? _tasks : _tasksArchive;
 
   Map<String, int> get assetsTime => _assetsTime;
 
@@ -143,6 +144,27 @@ class TaskProvider with ChangeNotifier {
     return _upcomingTasks;
   }
 
+  Future<List<Task>> fetchAndGetCompletedTasks() async {
+    var keys = _tasksArchive.keys.toList();
+    DateFormat format = DateFormat("dd/MM/yyyy");
+    var dates = keys.map((e) => format.parse(e)).toList();
+    dates = dates..sort((a, b) => b.compareTo(a));
+    var formatedKeys =
+        dates.map((e) => DateFormat('dd/MM/yyyy').format(e)).toList();
+    int count = 0;
+    List<Task> result = [];
+    for (var i = 0; i < formatedKeys.length && count < 5; i++) {
+      for (var j = 0;
+          j < _tasksArchive[formatedKeys[i]]!.length && count < 5;
+          j++) {
+        result.add(_tasksArchive[formatedKeys[i]]![j]);
+        count++;
+      }
+    }
+    _upcomingTasks = result;
+    return _upcomingTasks;
+  }
+
   Future<void> fetchAndSetTasks() async {
     _isLoading = true;
     Map<String, List<Task>> tmpTasks = {};
@@ -193,7 +215,63 @@ class TaskProvider with ChangeNotifier {
           tmpTasks[stringDate] = [tmpTask];
         }
       }
-      _tasks = tmpTasks;
+      if (isActive) {
+        _tasks = tmpTasks;
+      } else {
+        _tasksArchive = tmpTasks;
+      }
+
+      _isLoading = false;
+      notifyListeners();
+    });
+  }
+
+  Future<void> fetchAndSetCompletedTasks() async {
+    _isLoading = true;
+    Map<String, List<Task>> tmpTasks = {};
+    final taskRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(_user!.companyId)
+        .collection('archive')
+        .orderBy('date', descending: true)
+        .get();
+
+    await taskRef.then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        final date = DateTime.parse(doc['date']);
+        final stringDate = DateFormat('dd/MM/yyyy').format(date);
+        final nextDate =
+            doc['nextDate'] != null ? DateTime.parse(doc['nextDate']) : null;
+
+        final tmpTask = Task(
+          taskId: doc.id,
+          title: doc['title'],
+          date: date,
+          nextDate: nextDate,
+          taskInterval: doc['taskInterval'],
+          executor: TaskExecutor.values[doc['executor']],
+          executorId: doc['executorId'],
+          userId: doc['userId'],
+          itemId: doc['itemId'],
+          location: doc['location'],
+          description: doc['description'],
+          comments: doc['comments'],
+          status: TaskStatus.values[doc['status']],
+          type: TaskType.values[doc['type']],
+          images: doc['images'],
+          cost: doc['cost'],
+          duration: doc['duration'],
+        );
+        // print('f\ne\nt\nc\nh\n ${tmpTask.cost}  ${tmpTask.duration}');
+        if (tmpTasks.containsKey(stringDate)) {
+          tmpTasks[stringDate]!.add(tmpTask);
+        } else {
+          tmpTasks[stringDate] = [tmpTask];
+        }
+      }
+
+      _tasksArchive = tmpTasks;
+
       _isLoading = false;
       notifyListeners();
     });
@@ -267,19 +345,7 @@ class TaskProvider with ChangeNotifier {
       'cost': task.cost,
       'duration': task.duration,
     });
-    // _tasks.forEach((key, val) {
-    //   var index = val.indexWhere((element) => element.taskId == task.taskId);
-    //   if (index > -1) {
-    //     // _tasks[key]!.removeAt(index);
-    //     // if (_tasks[DateFormat('dd/MM/yyyy').format(task.date)] != null) {
-    //     //   _tasks[DateFormat('dd/MM/yyyy').format(task.date)]!.add(task);
-    //     // } else {
-    //     //   _tasks[DateFormat('dd/MM/yyyy').format(task.date)] = [task];
-    //     // }
 
-    //     _tasks[key]![index] = task;
-    //   }
-    // });
     fetchAndSetTasks();
     // notifyListeners();
   }
@@ -376,6 +442,8 @@ class TaskProvider with ChangeNotifier {
     }).catchError((error) {
       // print(error);
     });
+
+    fetchAndSetCompletedTasks();
     return response;
   }
 

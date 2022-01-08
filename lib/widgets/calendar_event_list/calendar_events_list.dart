@@ -3,11 +3,13 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
+import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
 import 'package:under_control_flutter/screens/tasks/task_details_screen.dart';
+import 'package:under_control_flutter/widgets/task/task_list_item.dart';
 
 class CalendarEventsList extends StatelessWidget {
   const CalendarEventsList({
@@ -97,255 +99,165 @@ class CalendarEventsList extends StatelessWidget {
                   padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal),
                   itemCount: value.length,
                   itemBuilder: (ctx, index) {
-                    final item = Provider.of<ItemProvider>(context,
-                            listen: false)
-                        .items
-                        .firstWhere(
-                            (element) => element.itemId == value[index].itemId);
-                    return Dismissible(
-                      key: Key(value[index].taskId!),
-                      confirmDismiss: (direction) async {
-                        bool response = false;
-                        bool exit = false;
-                        // swipe right - rapid complete
-                        // rapid complete is a quick and easy way to complete standard tasks
-                        if (direction == DismissDirection.startToEnd) {
-                          // if task is inspection
-                          if (value[index].type == TaskType.inspection) {
-                            await Navigator.of(context).pushNamed(
-                                AddInspectionScreen.routeName,
-                                arguments: [
-                                  Provider.of<ItemProvider>(context,
-                                          listen: false)
-                                      .items
-                                      .firstWhere((element) =>
-                                          element.itemId ==
-                                          value[index].itemId),
-                                  value[index]
-                                ]).then((value) {
-                              if (value != null) {
-                                exit = value as bool;
-                              }
-                            });
-                            if (exit == false) {
-                              ScaffoldMessenger.of(context)
-                                ..removeCurrentSnackBar()
-                                ..showSnackBar(
-                                  SnackBar(
-                                    content:
-                                        const Text('Rapid Complete canceled!'),
-                                    backgroundColor:
-                                        Theme.of(context).errorColor,
-                                  ),
-                                );
-                              return false;
-                            }
-                          }
-
-                          // set task date to today
-                          value[index].date = DateTime.now();
-                          if (value[index].taskInterval != null &&
-                              value[index].taskInterval != 'No') {
-                            value[index].nextDate = DateCalc.getNextDate(
-                                value[index].date, value[index].taskInterval!);
-                          }
-
-                          Task tmpTask = value[index];
-                          await Provider.of<TaskProvider>(context,
-                                  listen: false)
-                              .rapidComplete(context, value[index])
-                              .then((val) {
-                            response = val;
-                          });
-
-                          // swipe left - delete
-                        } else if (direction == DismissDirection.endToStart) {
-                          await _showDeleteDialog(context, value[index])
-                              .then((val) {
-                            if (val) {
-                              Provider.of<TaskProvider>(context, listen: false)
-                                  .deleteTask(value[index]);
-                              response = val;
-                            } else {
-                              response = false;
-                            }
-                          });
-
-                          if (response) {
-                            ScaffoldMessenger.of(context)
-                              ..removeCurrentSnackBar()
-                              ..showSnackBar(
-                                SnackBar(
-                                  content: const Text('Task deleted!'),
-                                  backgroundColor: Theme.of(context).errorColor,
-                                ),
-                              );
-                          }
-                        }
-                        return response;
-                      },
-                      secondaryBackground: Container(
-                        padding: const EdgeInsets.only(right: 10),
-                        alignment: Alignment.centerRight,
-                        color: Colors.red,
-                        child: Icon(
-                          Icons.delete,
-                          color: Colors.white,
-                          size: SizeConfig.blockSizeHorizontal * 15,
-                        ),
-                      ),
-                      background: Container(
-                        padding: const EdgeInsets.only(left: 10),
-                        alignment: Alignment.centerLeft,
-                        color: Colors.green,
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.done,
-                              color: Colors.white,
-                              size: SizeConfig.blockSizeHorizontal * 15,
-                            ),
-                            Text(
-                              'Rapid Complete',
-                              style: TextStyle(
-                                fontSize: SizeConfig.blockSizeHorizontal * 5,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      child: GestureDetector(
-                        onTap: () => Navigator.of(context)
-                            .pushNamed(TaskDetailsScreen.routeName,
-                                arguments: value[index])
-                            .then((value) {
-                          if (value != null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Item deleted'),
-                              ),
-                            );
-                          }
-                        }),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 3.0,
-                            horizontal: 8.0,
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
-                            child: Container(
-                              // height: 50,
-                              color: Theme.of(context).splashColor,
-                              child: Row(
-                                children: <Widget>[
-                                  Hero(
-                                    tag: value[index].taskId!,
-                                    child: Container(
-                                      color:
-                                          darkTheme[value[index].type.index]!,
-                                      width:
-                                          SizeConfig.blockSizeHorizontal * 15,
-                                      height:
-                                          SizeConfig.blockSizeHorizontal * 17,
-                                      child: Icon(
-                                        eventIcons[value[index].type.index],
-                                        color: Colors.white,
-                                        size:
-                                            SizeConfig.blockSizeHorizontal * 10,
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: SizeConfig.blockSizeHorizontal * 3,
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(
-                                          value[index].title,
-                                          style: TextStyle(
-                                            fontSize:
-                                                SizeConfig.blockSizeHorizontal *
-                                                    4,
-                                            // fontWeight: FontWeight.w400,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
+                    Item? item;
+                    try {
+                      item = Provider.of<ItemProvider>(context, listen: false)
+                          .items
+                          .firstWhere((element) =>
+                              element.itemId == value[index].itemId);
+                    } catch (e) {
+                      item = null;
+                    }
+                    return Provider.of<TaskProvider>(context).isActive
+                        ? Dismissible(
+                            key: Key(value[index].taskId!),
+                            confirmDismiss: (direction) async {
+                              bool response = false;
+                              bool exit = false;
+                              // swipe right - rapid complete
+                              // rapid complete is a quick and easy way to complete standard tasks
+                              if (direction == DismissDirection.startToEnd) {
+                                // if task is inspection
+                                if (value[index].type == TaskType.inspection) {
+                                  await Navigator.of(context).pushNamed(
+                                      AddInspectionScreen.routeName,
+                                      arguments: [
+                                        Provider.of<ItemProvider>(context,
+                                                listen: false)
+                                            .items
+                                            .firstWhere((element) =>
+                                                element.itemId ==
+                                                value[index].itemId),
+                                        value[index]
+                                      ]).then((value) {
+                                    if (value != null) {
+                                      exit = value as bool;
+                                    }
+                                  });
+                                  if (exit == false) {
+                                    ScaffoldMessenger.of(context)
+                                      ..removeCurrentSnackBar()
+                                      ..showSnackBar(
+                                        SnackBar(
+                                          content: const Text(
+                                              'Rapid Complete canceled!'),
+                                          backgroundColor:
+                                              Theme.of(context).errorColor,
                                         ),
-                                        if (value[index].location != null &&
-                                            value[index].location != '')
-                                          SizedBox(
-                                            height:
-                                                SizeConfig.blockSizeHorizontal,
-                                          ),
-                                        if (value[index].location != null &&
-                                            value[index].location != '')
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.location_on,
-                                                    color: Theme.of(context)
-                                                        .hintColor,
-                                                  ),
-                                                  Text(
-                                                    value[index].location!,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .hintColor,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.handyman,
-                                                    color: Theme.of(context)
-                                                        .hintColor,
-                                                  ),
-                                                  Text(
-                                                    '${item.producer} ${item.model}',
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .hintColor,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
+                                      );
+                                    return false;
+                                  }
+                                }
+
+                                // set task date to today
+                                value[index].date = DateTime.now();
+                                if (value[index].taskInterval != null &&
+                                    value[index].taskInterval != 'No') {
+                                  value[index].nextDate = DateCalc.getNextDate(
+                                      value[index].date,
+                                      value[index].taskInterval!);
+                                }
+
+                                Task tmpTask = value[index];
+                                await Provider.of<TaskProvider>(context,
+                                        listen: false)
+                                    .rapidComplete(context, value[index])
+                                    .then((val) {
+                                  response = val;
+                                });
+
+                                // swipe left - delete
+                              } else if (direction ==
+                                  DismissDirection.endToStart) {
+                                await _showDeleteDialog(context, value[index])
+                                    .then((val) {
+                                  if (val) {
+                                    Provider.of<TaskProvider>(context,
+                                            listen: false)
+                                        .deleteTask(value[index]);
+                                    response = val;
+                                  } else {
+                                    response = false;
+                                  }
+                                });
+
+                                if (response) {
+                                  ScaffoldMessenger.of(context)
+                                    ..removeCurrentSnackBar()
+                                    ..showSnackBar(
+                                      SnackBar(
+                                        content: const Text('Task deleted!'),
+                                        backgroundColor:
+                                            Theme.of(context).errorColor,
+                                      ),
+                                    );
+                                }
+                              }
+                              return response;
+                            },
+                            secondaryBackground: Container(
+                              padding: const EdgeInsets.only(right: 10),
+                              alignment: Alignment.centerRight,
+                              color: Colors.red,
+                              child: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                                size: SizeConfig.blockSizeHorizontal * 15,
+                              ),
+                            ),
+                            background: Container(
+                              padding: const EdgeInsets.only(left: 10),
+                              alignment: Alignment.centerLeft,
+                              color: Colors.green,
+                              child: Row(
+                                children: [
                                   Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: Theme.of(context).primaryColor,
+                                    Icons.done,
+                                    color: Colors.white,
+                                    size: SizeConfig.blockSizeHorizontal * 15,
                                   ),
-                                  const SizedBox(
-                                    width: 5,
+                                  Text(
+                                    'Rapid Complete',
+                                    style: TextStyle(
+                                      fontSize:
+                                          SizeConfig.blockSizeHorizontal * 5,
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                        ),
-                      ),
-                    );
+                            child: GestureDetector(
+                              onTap: () => Navigator.of(context)
+                                  .pushNamed(TaskDetailsScreen.routeName,
+                                      arguments: value[index])
+                                  .then((value) {
+                                if (value != null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Item deleted'),
+                                    ),
+                                  );
+                                }
+                              }),
+                              child:
+                                  TaskListItem(task: value[index], item: item),
+                            ),
+                          )
+                        : GestureDetector(
+                            onTap: () => Navigator.of(context)
+                                .pushNamed(TaskDetailsScreen.routeName,
+                                    arguments: value[index])
+                                .then((value) {
+                              if (value != null) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Item deleted'),
+                                  ),
+                                );
+                              }
+                            }),
+                            child: TaskListItem(task: value[index], item: item),
+                          );
                   },
                 )
               : Padding(
