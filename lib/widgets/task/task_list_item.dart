@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
+import 'package:under_control_flutter/providers/task_provider.dart';
 
 class TaskListItem extends StatelessWidget {
   const TaskListItem({
@@ -64,9 +66,14 @@ class TaskListItem extends StatelessWidget {
                     Text(
                       task.title,
                       style: TextStyle(
-                        fontSize: SizeConfig.blockSizeHorizontal * 4,
-                        // fontWeight: FontWeight.w400,
-                      ),
+                          fontSize: SizeConfig.blockSizeHorizontal * 4,
+                          color: DateTime(
+                            DateTime.now().year,
+                            DateTime.now().month,
+                            DateTime.now().day,
+                          ).isAfter(task.date)
+                              ? Colors.red
+                              : Colors.white),
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (task.location != null && task.location != '')
@@ -114,20 +121,20 @@ class TaskListItem extends StatelessWidget {
                   ],
                 ),
               ),
-              // Icon(
-              //   statusIcons[task.status.index],
-              //   color: statusColor,
-              //   size:
-              //       SizeConfig.blockSizeHorizontal *
-              //           9,
-              // ),
               const SizedBox(
                 width: 5,
               ),
-              Icon(
-                Icons.arrow_forward_ios,
-                color: Theme.of(context).primaryColor,
-              ),
+              Provider.of<TaskProvider>(context).isActive
+                  ? Icon(
+                      Icons.arrow_forward_ios,
+                      color: Theme.of(context).primaryColor,
+                      size: 35,
+                    )
+                  : Icon(
+                      Icons.done,
+                      color: Theme.of(context).primaryColor,
+                      size: 45,
+                    ),
               const SizedBox(
                 width: 5,
               ),
