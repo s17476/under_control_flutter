@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
+import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/inspection_provider.dart';
+import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/widgets/status_icon.dart';
 
 class InspectionsList extends StatefulWidget {
@@ -27,11 +29,17 @@ class _InspectionsListState extends State<InspectionsList> {
     super.initState();
   }
 
+  // String getUserData(Future<AppUser> user)async{
+  //   return await use
+  // }
+
   @override
   Widget build(BuildContext context) {
     final buttonStyle = Theme.of(widget.context).textTheme.headline6!.copyWith(
         fontSize: SizeConfig.blockSizeHorizontal * 4.5,
         color: Theme.of(context).primaryColor);
+    final userProvider = Provider.of<UserProvider>(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Column(
@@ -173,6 +181,49 @@ class _InspectionsListState extends State<InspectionsList> {
                           ),
                         ),
                       ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            'Comments',
+                            textAlign: TextAlign.start,
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          Text(
+                            insp.comments == '' ? '----' : insp.comments,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            'Done by',
+                            textAlign: TextAlign.start,
+                            style: TextStyle(fontSize: 12),
+                          ),
+                          FutureBuilder(
+                              future:
+                                  userProvider.getUserById(context, insp.user),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  return Text(
+                                    (snapshot.data as AppUser).userName,
+                                    style: const TextStyle(fontSize: 16),
+                                  );
+                                } else {
+                                  return const Text('No data');
+                                }
+                              }),
+                        ],
+                      ),
                     ),
                     const Divider(),
                   ],

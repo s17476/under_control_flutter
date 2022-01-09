@@ -52,30 +52,32 @@ class _OverviewScreenState extends State<OverviewScreen> {
         setState(() {
           _fromDate = value;
         });
-        final taskProvider = Provider.of<TaskProvider>(context, listen: false);
-        taskProvider.getCosts(_fromDate!, _toDate, selectedAsset);
+        final chartDataProvider =
+            Provider.of<ChartDataProvider>(context, listen: false);
+        chartDataProvider.getCosts(_fromDate!, _toDate, selectedAsset);
         DateTime tmpDate =
             DateTime(_fromDate!.year, _fromDate!.month, _fromDate!.day);
-        assetsCosts = taskProvider.assetsCosts;
-        assetsTime = taskProvider.assetsTime;
+        assetsCosts = chartDataProvider.assetsCosts;
+        assetsTime = chartDataProvider.assetsTime;
         assetsCosts.entries.toList()
           ..sort((e1, e2) {
             var diff = e2.value.compareTo(e1.value);
             if (diff == 0) diff = e2.key.compareTo(e1.key);
             return diff;
-          });
+          })
+          ..toList();
         if (assetsCosts.isNotEmpty) {
           costsWidthBlock =
               maxBarWidth / assetsCosts[assetsCosts.keys.toList()[0]]!;
         }
-        print(assetsCosts);
+        // print(assetsCosts);
 
         // make range slider labels
         while (tmpDate.isBefore(_toDate)) {
           labels.add(DateFormat('MMM yyyy').format(tmpDate));
           tmpDate = DateTime(tmpDate.year, tmpDate.month + 1, 1);
         }
-        // print(labels);
+        // print('labels $labels');
         _currentRangeValues = RangeValues(0, labels.length.toDouble() - 1);
       });
 
@@ -217,7 +219,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
     var chartDataProvider = Provider.of<ChartDataProvider>(context);
     chartData = chartDataProvider.chartValues;
     // print('oldest date $_fromDate');
-    final taskProvider = Provider.of<TaskProvider>(context);
+    final taskProvider = Provider.of<ChartDataProvider>(context);
     _totalCost = taskProvider.totalCost;
     _totalTime = taskProvider.totalTime;
     assetsCosts = taskProvider.assetsCosts;
@@ -227,7 +229,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
         var diff = e2.value.compareTo(e1.value);
         if (diff == 0) diff = e2.key.compareTo(e1.key);
         return diff;
-      });
+      })
+      ..toList();
     if (assetsCosts.isNotEmpty) {
       costsWidthBlock =
           maxBarWidth / assetsCosts[assetsCosts.keys.toList()[0]]!;
@@ -238,7 +241,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
         var diff = e2.value.compareTo(e1.value);
         if (diff == 0) diff = e2.key.compareTo(e1.key);
         return diff;
-      });
+      })
+      ..toList();
     if (assetsTime.isNotEmpty) {
       timeWidthBlock = maxBarWidth / assetsTime[assetsTime.keys.toList()[0]]!;
     }
@@ -344,7 +348,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                       values: _currentRangeValues,
                       min: 0,
                       max: labels.length.toDouble() - 1,
-                      divisions: labels.length,
+                      divisions: labels.length - 1,
                       labels: RangeLabels(
                         labels[_currentRangeValues.start.round()],
                         labels[_currentRangeValues.end.round()],
@@ -462,9 +466,12 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           if (sliderFromDate != null) {
                             _fromDate = sliderFromDate;
                           }
-                          Provider.of<TaskProvider>(context, listen: false)
+                          Provider.of<ChartDataProvider>(context, listen: false)
                               .getCosts(
-                                  _fromDate!, sliderToDate, selectedAsset);
+                            _fromDate!,
+                            sliderToDate,
+                            selectedAsset,
+                          );
                         },
                         icon: Icon(
                           Icons.refresh,

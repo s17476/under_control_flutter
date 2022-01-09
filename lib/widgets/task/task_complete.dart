@@ -89,7 +89,7 @@ class _TaskCompleteState extends State<TaskComplete> {
             fillColor: Theme.of(context).splashColor,
             labelText: 'Comments',
             labelStyle:
-                TextStyle(color: Theme.of(context).appBarTheme.backgroundColor),
+                TextStyle(color: Theme.of(context).appBarTheme.foregroundColor),
           ),
           onSaved: (value) {
             if (value != null && value != '') {
@@ -118,7 +118,7 @@ class _TaskCompleteState extends State<TaskComplete> {
               fillColor: Theme.of(context).splashColor,
               labelText: 'Cost',
               labelStyle: TextStyle(
-                color: Theme.of(context).appBarTheme.backgroundColor,
+                color: Theme.of(context).appBarTheme.foregroundColor,
               ),
             ),
             onSaved: (value) {
@@ -229,7 +229,7 @@ class _TaskCompleteState extends State<TaskComplete> {
           padding: EdgeInsets.only(
             left: SizeConfig.blockSizeHorizontal * 8,
             right: SizeConfig.blockSizeHorizontal * 8,
-            bottom: SizeConfig.blockSizeHorizontal * 8,
+            // bottom: SizeConfig.blockSizeHorizontal * 8,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

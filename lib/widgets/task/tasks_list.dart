@@ -174,40 +174,11 @@ class _TasksListState extends State<TasksList> {
                       }
 
                       listItems.add(
-                        !Provider.of<TaskProvider>(context).isActive
-                            ? GestureDetector(
-                                onTap: () => Navigator.of(context)
-                                        .pushNamed(TaskDetailsScreen.routeName,
-                                            arguments: task)
-                                        .then((value) {
-                                      if (value != null) {
-                                        String msg = '';
-                                        Color color = Theme.of(context)
-                                            .appBarTheme
-                                            .backgroundColor!;
-                                        if (value == 'deleted') {
-                                          msg = 'Task has been deleted!';
-                                        } else if (value == 'completed') {
-                                          msg = 'Task completed. Well done!';
-                                          color =
-                                              Theme.of(context).primaryColor;
-                                        }
-                                        ScaffoldMessenger.of(context)
-                                          ..removeCurrentSnackBar()
-                                          ..showSnackBar(
-                                            SnackBar(
-                                              content: Text(msg),
-                                              backgroundColor: color,
-                                            ),
-                                          );
-                                      }
-                                    }),
-                                child: TaskListItem(
-                                  task: task,
-                                  item: item,
-                                ))
+                        (Provider.of<TaskProvider>(context).isActive &&
+                                task.type != TaskType.inspection)
+                            ?
                             // shows active tasks
-                            : Dismissible(
+                            Dismissible(
                                 key: ValueKey(DateTime.now().toIso8601String()),
                                 confirmDismiss: (direction) async {
                                   bool exit = false;
@@ -356,6 +327,37 @@ class _TasksListState extends State<TasksList> {
                                     }
                                   }),
                                   child: TaskListItem(task: task, item: item),
+                                ),
+                              )
+                            : GestureDetector(
+                                onTap: () => Navigator.of(context)
+                                    .pushNamed(TaskDetailsScreen.routeName,
+                                        arguments: task)
+                                    .then((value) {
+                                  if (value != null) {
+                                    String msg = '';
+                                    Color color = Theme.of(context)
+                                        .appBarTheme
+                                        .backgroundColor!;
+                                    if (value == 'deleted') {
+                                      msg = 'Task has been deleted!';
+                                    } else if (value == 'completed') {
+                                      msg = 'Task completed. Well done!';
+                                      color = Theme.of(context).primaryColor;
+                                    }
+                                    ScaffoldMessenger.of(context)
+                                      ..removeCurrentSnackBar()
+                                      ..showSnackBar(
+                                        SnackBar(
+                                          content: Text(msg),
+                                          backgroundColor: color,
+                                        ),
+                                      );
+                                  }
+                                }),
+                                child: TaskListItem(
+                                  task: task,
+                                  item: item,
                                 ),
                               ),
                       );

@@ -17,11 +17,6 @@ class TaskProvider with ChangeNotifier {
   bool _isActive = true;
   bool _isLoading = false;
 
-  double _totalCost = 0;
-  int _totalTime = 0;
-  Map<String, int> _assetsTime = {};
-  Map<String, double> _assetsCost = {};
-
   List<Task> _upcomingTasks = [];
   // List<Task> _completedTasks = [];
 
@@ -52,77 +47,11 @@ class TaskProvider with ChangeNotifier {
 
   bool get isLoading => _isLoading;
 
-  double get totalCost => _totalCost;
-
-  int get totalTime => _totalTime;
-
   List<Task> get upcomingTasks => _upcomingTasks;
 
   TaskExecutor get executor => calendarExecutor;
 
   Map<String, List<Task>> get getAllTasks => isActive ? _tasks : _tasksArchive;
-
-  Map<String, int> get assetsTime => _assetsTime;
-
-  Map<String, double> get assetsCosts => _assetsCost;
-
-  Future<void> getCosts(
-    DateTime? fromDate,
-    DateTime? toDate,
-    String? itemId,
-  ) async {
-    double tmpTotalCost = 0;
-    int tmpTotalTime = 0;
-    Map<String, double> tmpAssetsCosts = {};
-    Map<String, int> tmpAssetsTime = {};
-
-    final nowDate = DateTime.now();
-    toDate ??= DateTime(nowDate.year, nowDate.month, 31);
-    toDate = DateTime(toDate.year, toDate.month, 31);
-
-    FirebaseFirestore.instance
-        .collection('companies')
-        .doc(_user!.companyId)
-        .collection('archive')
-        .where('date', isGreaterThanOrEqualTo: fromDate?.toIso8601String())
-        .where('date', isLessThanOrEqualTo: toDate.toIso8601String())
-        .where('itemId', isEqualTo: itemId)
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        if (doc['cost'] != null) {
-          tmpTotalCost += doc['cost'];
-          if (doc['itemId'] != null) {
-            if (tmpAssetsCosts.keys.contains(doc['itemId'])) {
-              tmpAssetsCosts[doc['itemId']] =
-                  tmpAssetsCosts[doc['itemId']]! + doc['cost'];
-            } else {
-              tmpAssetsCosts[doc['itemId']] = doc['cost'];
-            }
-          }
-        }
-        if (doc['duration'] != null) {
-          tmpTotalTime += doc['duration'] as int;
-          if (doc['itemId'] != null) {
-            if (tmpAssetsTime.keys.contains(doc['itemId'])) {
-              tmpAssetsTime[doc['itemId']] =
-                  tmpAssetsTime[doc['itemId']]! + doc['duration'] as int;
-            } else {
-              tmpAssetsTime[doc['itemId']] = doc['duration'] as int;
-            }
-          }
-        }
-      }
-      _totalCost = tmpTotalCost;
-      _totalTime = tmpTotalTime;
-      _assetsCost = tmpAssetsCosts;
-      _assetsTime = tmpAssetsTime;
-      notifyListeners();
-
-      // print(tmpAssetsTime);
-      // print(tmpAssetsCosts);
-    });
-  }
 
   Future<List<Task>> fetchAndGetUpcomingTasks() async {
     var keys = _tasks.keys.toList();

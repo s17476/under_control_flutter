@@ -45,7 +45,7 @@ class _ConnectedTasksState extends State<ConnectedTasks> {
                           });
                         },
                         label: Text(
-                          'Hide upcomming tasks',
+                          'Hide connected tasks',
                           style: buttonStyle.copyWith(
                             color: Colors.black,
                           ),
@@ -62,7 +62,7 @@ class _ConnectedTasksState extends State<ConnectedTasks> {
                           });
                         },
                         label: Text(
-                          'Show upcomming tasks',
+                          'Show connected tasks',
                           style: buttonStyle.copyWith(
                             color: Colors.black,
                           ),

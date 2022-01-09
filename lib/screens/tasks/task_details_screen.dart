@@ -3,8 +3,10 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
+import 'package:under_control_flutter/models/inspection.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
+import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
@@ -27,6 +29,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
 
   late Task task;
   Item? item;
+  Inspection? inspection;
 
   String _executorName = '';
   String _creatorName = '';
@@ -254,7 +257,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
 
   // save changes if completed == false
   // complete task if completed == true
-  void _completeTask(bool completed) {
+  void _completeTask(bool completed) async {
     if (_formKey.currentState != null) {
       // validate user input
       final isValid = _formKey.currentState!.validate();
@@ -267,9 +270,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
         // executor ID
         task.executorId =
             Provider.of<UserProvider>(context, listen: false).user!.userId;
+        inspection?.user = task.executorId!;
 
         // date
         task.date = transferObjectTask!.date;
+        inspection?.date = task.date;
 
         // next date if cyclic task
         if (transferObjectTask!.taskInterval != 'No') {
@@ -286,6 +291,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
 
         // comments
         task.comments = transferObjectTask!.comments;
+        inspection?.comments = task.comments;
 
         // task is started, but not finished
         task.status = TaskStatus.started;
@@ -306,6 +312,40 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
         }
       }
     }
+
+    if (task.type == TaskType.inspection) {
+      await Provider.of<InspectionProvider>(context, listen: false)
+          .addInspection(
+        item!,
+        inspection!,
+      )
+          .then((value) {
+        if (!value) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text(
+                    'Error occured while adding to Data Base. Please try again later.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+        } else {
+          item!.inspectionStatus = inspection!.status;
+
+          item!.nextInspection =
+              DateCalc.getNextDate(item!.lastInspection, item!.interval)!;
+
+          Provider.of<ItemProvider>(context, listen: false).updateItem(item!);
+
+          Provider.of<ItemProvider>(context, listen: false)
+              .fetchInspectionsStatus();
+          Provider.of<InspectionProvider>(context, listen: false)
+              .fetchByItem(item!);
+        }
+      });
+    }
+    Navigator.of(context).pop('completed');
   }
 
   @override
@@ -317,6 +357,16 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
       item = Provider.of<ItemProvider>(context, listen: false)
           .items
           .firstWhere((element) => element.itemId == task.itemId);
+    }
+
+    if (task.type == TaskType.inspection && inspection == null) {
+      inspection = Inspection(
+        user: Provider.of<UserProvider>(context, listen: false).user!.userId,
+        date: DateTime.now(),
+        comments: '',
+        status: InspectionStatus.ok.index,
+        taskId: task.taskId,
+      );
     }
 
     if (task.executorId != null && _executorName == '') {
@@ -373,7 +423,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
             ),
           ),
           // done appbar button
-          if (_isInEditMode && task.status != TaskStatus.completed)
+          if (_isInEditMode &&
+              task.status != TaskStatus.completed &&
+              task.type != TaskType.inspection)
             IconButton(
               onPressed: () {
                 FocusScope.of(context).unfocus();
@@ -412,37 +464,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                 _showCompleteDialog(context, task).then((value) async {
                   if (value == true) {
                     // if task is inspection
-                    if (task.type == TaskType.inspection) {
-                      await Navigator.of(context)
-                          .pushNamed(AddInspectionScreen.routeName, arguments: [
-                        Provider.of<ItemProvider>(context, listen: false)
-                            .items
-                            .firstWhere(
-                                (element) => element.itemId == task.itemId),
-                        task
-                      ]).then((value) {
-                        if (value != null) {
-                          exit = value as bool;
-                        }
-                      });
-                      if (exit == false) {
-                        ScaffoldMessenger.of(context)
-                          ..removeCurrentSnackBar()
-                          ..showSnackBar(
-                            SnackBar(
-                              content: const Text('Complete canceled!'),
-                              backgroundColor: Theme.of(context).errorColor,
-                            ),
-                          );
-                        return false;
-                      } else {
-                        _completeTask(true);
-                        Navigator.of(context).pop('completed');
-                      }
-                    } else {
-                      _completeTask(true);
-                      Navigator.of(context).pop('completed');
-                    }
+
+                    _completeTask(true);
                   }
                 });
                 // Provider.of<TaskProvider>(context, listen: false)
@@ -827,22 +850,20 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                             _isInEditMode && task.type == TaskType.inspection
                                 ? null
                                 : 0,
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 16),
-                          child: Column(
-                            children: [
-                              FadeTransition(
-                                opacity: _opacityAnimation!,
-                                child: SlideTransition(
-                                  position: _userSlideAnimation!,
-                                  child: InspectionForm(
-                                    task: task,
-                                    item: item!,
-                                  ),
+                        child: Column(
+                          children: [
+                            FadeTransition(
+                              opacity: _opacityAnimation!,
+                              child: SlideTransition(
+                                position: _userSlideAnimation!,
+                                child: InspectionForm(
+                                  inspection: inspection!,
+                                  task: task,
+                                  item: item!,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                   ],
@@ -899,7 +920,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                         ),
                       ),
                       //save task button
-                      if (_isInEditMode)
+                      if (_isInEditMode && task.type != TaskType.inspection)
                         TextButton.icon(
                           onPressed: () {
                             FocusScope.of(context).unfocus();
@@ -947,46 +968,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                         TextButton.icon(
                           onPressed: () async {
                             FocusScope.of(context).unfocus();
-                            bool exit = false;
+
                             _showCompleteDialog(context, task)
                                 .then((value) async {
                               if (value == true) {
-                                // if task is inspection
-                                if (task.type == TaskType.inspection) {
-                                  await Navigator.of(context).pushNamed(
-                                      AddInspectionScreen.routeName,
-                                      arguments: [
-                                        Provider.of<ItemProvider>(context,
-                                                listen: false)
-                                            .items
-                                            .firstWhere((element) =>
-                                                element.itemId == task.itemId),
-                                        task
-                                      ]).then((value) {
-                                    if (value != null) {
-                                      exit = value as bool;
-                                    }
-                                  });
-                                  if (exit == false) {
-                                    ScaffoldMessenger.of(context)
-                                      ..removeCurrentSnackBar()
-                                      ..showSnackBar(
-                                        SnackBar(
-                                          content:
-                                              const Text('Complete canceled!'),
-                                          backgroundColor:
-                                              Theme.of(context).errorColor,
-                                        ),
-                                      );
-                                    return false;
-                                  } else {
-                                    _completeTask(true);
-                                    Navigator.of(context).pop('completed');
-                                  }
-                                } else {
-                                  _completeTask(true);
-                                  Navigator.of(context).pop('completed');
-                                }
+                                _completeTask(true);
                               }
                             });
                             // Provider.of<TaskProvider>(context, listen: false)

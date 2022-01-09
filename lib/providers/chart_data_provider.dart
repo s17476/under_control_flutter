@@ -2,13 +2,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:under_control_flutter/models/app_user.dart';
-import 'package:under_control_flutter/models/item.dart';
 
 class ChartDataProvider with ChangeNotifier {
   Map<String, double> _chartValues = {};
   AppUser? _user;
 
   bool _isLoading = false;
+
+  double _totalCost = 0;
+  int _totalTime = 0;
+  Map<String, int> _assetsTime = {};
+  Map<String, double> _assetsCost = {};
+
+  Map<String, int> get assetsTime => _assetsTime;
+
+  Map<String, double> get assetsCosts => _assetsCost;
+
+  double get totalCost => _totalCost;
+
+  int get totalTime => _totalTime;
 
   bool get isLoading => _isLoading;
 
@@ -82,9 +94,68 @@ class ChartDataProvider with ChangeNotifier {
           result[stringDate] = result[stringDate]! + doc['cost'];
         }
       }
+
       _chartValues = result;
       notifyListeners();
       _isLoading = false;
+    });
+  }
+
+  Future<void> getCosts(
+    DateTime? fromDate,
+    DateTime? toDate,
+    String? itemId,
+  ) async {
+    double tmpTotalCost = 0;
+    int tmpTotalTime = 0;
+    Map<String, double> tmpAssetsCosts = {};
+    Map<String, int> tmpAssetsTime = {};
+
+    final nowDate = DateTime.now();
+    toDate ??= DateTime(nowDate.year, nowDate.month, 31);
+    toDate = DateTime(toDate.year, toDate.month, 31);
+
+    FirebaseFirestore.instance
+        .collection('companies')
+        .doc(_user!.companyId)
+        .collection('archive')
+        .where('date', isGreaterThanOrEqualTo: fromDate?.toIso8601String())
+        .where('date', isLessThanOrEqualTo: toDate.toIso8601String())
+        .where('itemId', isEqualTo: itemId)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        if (doc['cost'] != null) {
+          tmpTotalCost += doc['cost'];
+          if (doc['itemId'] != null) {
+            if (tmpAssetsCosts.keys.contains(doc['itemId'])) {
+              tmpAssetsCosts[doc['itemId']] =
+                  tmpAssetsCosts[doc['itemId']]! + doc['cost'];
+            } else {
+              tmpAssetsCosts[doc['itemId']] = doc['cost'];
+            }
+          }
+        }
+        if (doc['duration'] != null) {
+          tmpTotalTime += doc['duration'] as int;
+          if (doc['itemId'] != null) {
+            if (tmpAssetsTime.keys.contains(doc['itemId'])) {
+              tmpAssetsTime[doc['itemId']] =
+                  tmpAssetsTime[doc['itemId']]! + doc['duration'] as int;
+            } else {
+              tmpAssetsTime[doc['itemId']] = doc['duration'] as int;
+            }
+          }
+        }
+      }
+      _totalCost = tmpTotalCost;
+      _totalTime = tmpTotalTime;
+      _assetsCost = tmpAssetsCosts;
+      _assetsTime = tmpAssetsTime;
+      notifyListeners();
+
+      // print(tmpAssetsTime);
+      // print(tmpAssetsCosts);
     });
   }
 }

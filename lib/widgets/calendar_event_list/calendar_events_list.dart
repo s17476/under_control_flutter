@@ -108,7 +108,8 @@ class CalendarEventsList extends StatelessWidget {
                     } catch (e) {
                       item = null;
                     }
-                    return Provider.of<TaskProvider>(context).isActive
+                    return Provider.of<TaskProvider>(context).isActive &&
+                            value[index].type != TaskType.inspection
                         ? Dismissible(
                             key: Key(value[index].taskId!),
                             confirmDismiss: (direction) async {
