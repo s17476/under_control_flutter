@@ -345,7 +345,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
         }
       });
     }
-    Navigator.of(context).pop('completed');
+    if (completed) {
+      Navigator.of(context).pop('completed');
+    }
   }
 
   @override

@@ -209,6 +209,13 @@ class _OverviewScreenState extends State<OverviewScreen> {
     assetsCosts = taskProvider.assetsCosts;
     assetsTime = taskProvider.assetsTime;
 
+    if (chartData.length == 1) {
+      chartData[chartData.keys.toList()[0].split(' ')[0]] =
+          chartData[chartData.keys.toList()[0]]!;
+    }
+
+    print(chartData.length);
+
     return _fromDate == null
         ? const Center(
             child: CircularProgressIndicator(
@@ -306,37 +313,39 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 if (labels.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: RangeSlider(
-                      values: _currentRangeValues,
-                      min: 0,
-                      max: labels.length.toDouble() - 1,
-                      divisions: labels.length - 1,
-                      labels: RangeLabels(
-                        labels[_currentRangeValues.start.round()],
-                        labels[_currentRangeValues.end.round()],
-                      ),
-                      onChanged: (RangeValues values) {
-                        setState(() {
-                          _currentRangeValues = values;
-                          sliderFromDate = DateFormat('MMM yyyy')
-                              .parse(labels[_currentRangeValues.start.round()]);
+                    child: Center(
+                      child: RangeSlider(
+                        values: _currentRangeValues,
+                        // min: 0,
+                        max: labels.length.toDouble() - 1,
+                        divisions: 200,
+                        labels: RangeLabels(
+                          labels[_currentRangeValues.start.round()],
+                          labels[_currentRangeValues.end.round()],
+                        ),
+                        onChanged: (RangeValues values) {
+                          setState(() {
+                            _currentRangeValues = values;
+                            sliderFromDate = DateFormat('MMM yyyy').parse(
+                                labels[_currentRangeValues.start.round()]);
 
-                          sliderToDate = DateFormat('MMM yyyy')
-                              .parse(labels[_currentRangeValues.end.round()]);
-                        });
-                      },
-                      // onChangeEnd: (_) {
-                      //   chartDataProvider.getAssetExpenses(
-                      //     itemId: selectedAsset,
-                      //     fromDate: sliderFromDate,
-                      //     toDate: sliderToDate,
-                      //   );
-                      //   if (sliderFromDate != null) {
-                      //     _fromDate = sliderFromDate;
-                      //   }
-                      // },
-                      activeColor: Colors.green,
-                      inactiveColor: Colors.green.shade900,
+                            sliderToDate = DateFormat('MMM yyyy')
+                                .parse(labels[_currentRangeValues.end.round()]);
+                          });
+                        },
+                        // onChangeEnd: (_) {
+                        //   chartDataProvider.getAssetExpenses(
+                        //     itemId: selectedAsset,
+                        //     fromDate: sliderFromDate,
+                        //     toDate: sliderToDate,
+                        //   );
+                        //   if (sliderFromDate != null) {
+                        //     _fromDate = sliderFromDate;
+                        //   }
+                        // },
+                        activeColor: Colors.green,
+                        inactiveColor: Colors.green.shade900,
+                      ),
                     ),
                   ),
                 // Asset dropdown

@@ -55,8 +55,11 @@ class TimeBarChart extends StatelessWidget {
                       ),
                     ],
                   ),
-                  Text('${item.producer} ${item.model} ${item.internalId}'),
-                  const SizedBox(height: 15),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2, bottom: 8),
+                    child: Text(
+                        '${item.producer} ${item.model} ${item.internalId}'),
+                  ),
                 ],
               );
             })

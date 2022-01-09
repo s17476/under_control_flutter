@@ -67,6 +67,10 @@ class ChartDataProvider with ChangeNotifier {
     toDate ??= DateTime(nowDate.year, nowDate.month, 31);
     toDate = DateTime(toDate.year, toDate.month, 31);
 
+    if (fromDate == toDate) {
+      fromDate = DateTime(fromDate.year, fromDate.month, 1);
+    }
+
     // prepare keys
     DateTime tmpDate = DateTime(fromDate.year, fromDate.month, fromDate.day);
     while (tmpDate.isBefore(toDate)) {
