@@ -127,20 +127,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
         if (_taskInterval != 'No') {
           // set inspections interval
           nextDate = DateCalc.getNextDate(_taskDate!, _taskInterval);
-          // List<String> duration = _taskInterval.split(' ');
-          // if (duration[1] == 'week' || duration[1] == 'weeks') {
-          //   nextDate = DateTime(
-          //     _taskDate!.year,
-          //     _taskDate!.month,
-          //     _taskDate!.day + (int.parse(duration[0]) * 7),
-          //   );
-          // } else if (duration[1] == 'month' || duration[1] == 'months') {
-          //   nextDate = DateTime(_taskDate!.year,
-          //       _taskDate!.month + int.parse(duration[0]), _taskDate!.day);
-          // } else if (duration[1] == 'year' || duration[1] == 'years') {
-          //   nextDate = DateTime(_taskDate!.year + int.parse(duration[0]),
-          //       _taskDate!.month, _taskDate!.day);
-          // }
         }
 
         if (executorDropdown == 'Company') {
@@ -255,7 +241,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create new task'),
-        iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+        iconTheme: const IconThemeData(color: Colors.green),
         actions: [
           IconButton(
             onPressed: _addNewTask,

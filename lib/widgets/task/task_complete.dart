@@ -63,7 +63,7 @@ class _TaskCompleteState extends State<TaskComplete> {
 
   @override
   Widget build(BuildContext context) {
-    print('duration ${widget.task.duration}');
+    print('duration ${widget.task.taskInterval}');
     if (widget.task.duration != null && widget.task.duration != 0) {
       _hour = (widget.task.duration! ~/ 60);
       _min = widget.task.duration! % 60;
@@ -200,6 +200,7 @@ class _TaskCompleteState extends State<TaskComplete> {
                 onChanged: (String? newValue) {
                   FocusScope.of(context).requestFocus(FocusNode());
                   setState(() {
+                    print(newValue);
                     widget.task.taskInterval = newValue!;
                   });
                 },
@@ -294,7 +295,6 @@ class _TaskCompleteState extends State<TaskComplete> {
                       duration = (picker.getSelectedValues()[0] * 60) +
                           picker.getSelectedValues()[1];
                       setState(() {
-                        print('set state $duration');
                         widget.task.duration = duration;
                       });
                     },

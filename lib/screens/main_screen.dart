@@ -343,7 +343,8 @@ class _MainScreenState extends State<MainScreen> {
                         icon: Icon(
                           Icons.add,
                           size: SizeConfig.blockSizeVertical * 5,
-                          color: Provider.of<TaskProvider>(context).isActive
+                          color: Provider.of<TaskProvider>(context).isActive ||
+                                  _selectedPageIndex == 3
                               ? Theme.of(context).primaryColor
                               : Theme.of(context).appBarTheme.backgroundColor,
                         ),

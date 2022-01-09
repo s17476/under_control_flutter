@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:intl/intl.dart';
 import 'package:under_control_flutter/models/item.dart';
@@ -51,25 +52,27 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
         _formKey.currentState!.save();
 
         // set inspections interval
-        List<String> duration = _inspectionInterval.split(' ');
-        if (duration[1] == 'week' || duration[1] == 'weeks') {
-          _nextInspection = DateTime(
-            _lastInspection!.year,
-            _lastInspection!.month,
-            _lastInspection!.day + (int.parse(duration[0]) * 7),
-          );
-        } else if (duration[1] == 'month' || duration[1] == 'months') {
-          _nextInspection = DateTime(
-              _lastInspection!.year,
-              _lastInspection!.month + int.parse(duration[0]),
-              _lastInspection!.day);
-        } else if (duration[1] == 'year' || duration[1] == 'years') {
-          _nextInspection = DateTime(
-            _lastInspection!.year + int.parse(duration[0]),
-            _lastInspection!.month,
-            _lastInspection!.day,
-          );
-        }
+        _nextInspection =
+            DateCalc.getNextDate(_lastInspection!, _inspectionInterval);
+        // List<String> duration = _inspectionInterval.split(' ');
+        // if (duration[1] == 'week' || duration[1] == 'weeks') {
+        //   _nextInspection = DateTime(
+        //     _lastInspection!.year,
+        //     _lastInspection!.month,
+        //     _lastInspection!.day + (int.parse(duration[0]) * 7),
+        //   );
+        // } else if (duration[1] == 'month' || duration[1] == 'months') {
+        //   _nextInspection = DateTime(
+        //       _lastInspection!.year,
+        //       _lastInspection!.month + int.parse(duration[0]),
+        //       _lastInspection!.day);
+        // } else if (duration[1] == 'year' || duration[1] == 'years') {
+        //   _nextInspection = DateTime(
+        //     _lastInspection!.year + int.parse(duration[0]),
+        //     _lastInspection!.month,
+        //     _lastInspection!.day,
+        //   );
+        // }
 
         // create new asset
         Item item = Item(
@@ -90,14 +93,18 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
         await Provider.of<ItemProvider>(context, listen: false)
             .addNewItem(item)
             .then((resultItem) {
+          // add initial inspection
           Navigator.of(context).pushNamed(AddInspectionScreen.routeName,
               arguments: [resultItem, null]).then(
             (value) {
-              if (value != null) Navigator.of(context).pop(resultItem);
+              if (value != null) {
+                Navigator.of(context).pop(resultItem);
+              } else {
+                Provider.of<ItemProvider>(context, listen: false)
+                    .deleteItem(context, item.itemId);
+              }
             },
           );
-
-          // Navigator.of(context).pop(resultItem);
         }).catchError((_) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(

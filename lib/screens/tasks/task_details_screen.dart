@@ -262,6 +262,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
           task.duration = transferObjectTask!.duration;
         }
 
+        print('date          ${task.taskInterval}');
+
         if (transferObjectTask!.taskInterval != 'No') {
           task.nextDate = DateCalc.getNextDate(
               transferObjectTask!.date, transferObjectTask!.taskInterval!);

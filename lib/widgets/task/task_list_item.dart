@@ -32,6 +32,11 @@ class TaskListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isExpired = DateTime(
+      DateTime.now().year,
+      DateTime.now().month,
+      DateTime.now().day,
+    ).isAfter(task.date);
     return Padding(
       padding: const EdgeInsets.symmetric(
         vertical: 3.0,
@@ -67,11 +72,10 @@ class TaskListItem extends StatelessWidget {
                       task.title,
                       style: TextStyle(
                           fontSize: SizeConfig.blockSizeHorizontal * 4,
-                          color: DateTime(
-                            DateTime.now().year,
-                            DateTime.now().month,
-                            DateTime.now().day,
-                          ).isAfter(task.date)
+                          color: isExpired &&
+                                  Provider.of<TaskProvider>(context,
+                                          listen: false)
+                                      .isActive
                               ? Colors.red
                               : Colors.white),
                       overflow: TextOverflow.ellipsis,

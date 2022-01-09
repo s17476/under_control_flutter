@@ -61,7 +61,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
     checklists = Provider.of<ChecklistProvider>(context).checklists;
     _animationControllers.clear();
     _animations.clear();
-    _inspectionInterval = item.interval;
+    // _inspectionInterval = item.interval;
     // print('keys lenght ${_selectedChecklist.fields.keys.length}');
     _updateAnimationControllers();
     super.didChangeDependencies();
@@ -697,6 +697,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                             onChanged: (String? newValue) {
                               FocusScope.of(context).requestFocus(FocusNode());
                               setState(() {
+                                print(newValue);
                                 _inspectionInterval = newValue!;
                               });
                             },
