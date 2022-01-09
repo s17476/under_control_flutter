@@ -6,7 +6,8 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/chart_data_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
-import 'package:under_control_flutter/providers/task_provider.dart';
+import 'package:under_control_flutter/widgets/overview/costs_bar_chart.dart';
+import 'package:under_control_flutter/widgets/overview/time_bar_chart.dart';
 
 class OverviewScreen extends StatefulWidget {
   const OverviewScreen({Key? key}) : super(key: key);
@@ -34,8 +35,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
   String? selectedAsset;
 
   double maxBarWidth = (SizeConfig.blockSizeHorizontal * 100) - 16;
-  double costsWidthBlock = 0;
-  double timeWidthBlock = 0;
+  // double costsWidthBlock = 0;
+  // double timeWidthBlock = 0;
 
   RangeValues _currentRangeValues = const RangeValues(0, 0);
 
@@ -59,17 +60,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
             DateTime(_fromDate!.year, _fromDate!.month, _fromDate!.day);
         assetsCosts = chartDataProvider.assetsCosts;
         assetsTime = chartDataProvider.assetsTime;
-        assetsCosts.entries.toList()
-          ..sort((e1, e2) {
-            var diff = e2.value.compareTo(e1.value);
-            if (diff == 0) diff = e2.key.compareTo(e1.key);
-            return diff;
-          })
-          ..toList();
-        if (assetsCosts.isNotEmpty) {
-          costsWidthBlock =
-              maxBarWidth / assetsCosts[assetsCosts.keys.toList()[0]]!;
-        }
+
+        // if (assetsCosts.isNotEmpty) {
+        //   costsWidthBlock =
+        //       maxBarWidth / assetsCosts[assetsCosts.keys.toList()[0]]!;
+        // }
         // print(assetsCosts);
 
         // make range slider labels
@@ -154,18 +149,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
               : chartData.keys.length < 13
                   ? -45
                   : -90,
-          // chartData.keys.length > 12 ? -90 : -45,
           getTitles: (value) {
-            // if (value.toInt() % 2 == 0) {
-            // TODO
-            // if (sliderFromDate != null) {
-            //   return DateFormat('MMM').format(
-            //     DateTime(
-            //       sliderFromDate!.year,
-            //       sliderFromDate!.month + value.toInt(),
-            //     ),
-            //   );
-            // }
             return DateFormat('MMM').format(
               DateTime(_fromDate!.year, _fromDate!.month + value.toInt()),
             );
@@ -224,28 +208,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
     _totalTime = taskProvider.totalTime;
     assetsCosts = taskProvider.assetsCosts;
     assetsTime = taskProvider.assetsTime;
-    assetsCosts.entries.toList()
-      ..sort((e1, e2) {
-        var diff = e2.value.compareTo(e1.value);
-        if (diff == 0) diff = e2.key.compareTo(e1.key);
-        return diff;
-      })
-      ..toList();
-    if (assetsCosts.isNotEmpty) {
-      costsWidthBlock =
-          maxBarWidth / assetsCosts[assetsCosts.keys.toList()[0]]!;
-    }
-
-    assetsTime.entries.toList()
-      ..sort((e1, e2) {
-        var diff = e2.value.compareTo(e1.value);
-        if (diff == 0) diff = e2.key.compareTo(e1.key);
-        return diff;
-      })
-      ..toList();
-    if (assetsTime.isNotEmpty) {
-      timeWidthBlock = maxBarWidth / assetsTime[assetsTime.keys.toList()[0]]!;
-    }
 
     return _fromDate == null
         ? const Center(
@@ -381,73 +343,70 @@ class _OverviewScreenState extends State<OverviewScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: Container(
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            left: 16.0,
-                            // right: 16.0,
-                            top: 16,
-                            bottom: 8.0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 16.0,
+                          // right: 16.0,
+                          top: 16,
+                          bottom: 8.0,
+                        ),
+                        child: DropdownButtonFormField(
+                          isExpanded: true,
+                          icon: Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: Theme.of(context).primaryIconTheme.color,
+                            size: SizeConfig.blockSizeHorizontal * 8,
                           ),
-                          child: DropdownButtonFormField(
-                            isExpanded: true,
-                            icon: Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: Theme.of(context).primaryIconTheme.color,
-                              size: SizeConfig.blockSizeHorizontal * 8,
+                          alignment: AlignmentDirectional.centerStart,
+                          decoration: InputDecoration(
+                            labelText: 'Asset',
+                            labelStyle: TextStyle(
+                              color:
+                                  Theme.of(context).appBarTheme.foregroundColor,
+                              fontSize: 20,
                             ),
-                            alignment: AlignmentDirectional.centerStart,
-                            decoration: InputDecoration(
-                              labelText: 'Asset',
-                              labelStyle: TextStyle(
-                                color: Theme.of(context)
-                                    .appBarTheme
-                                    .foregroundColor,
-                                fontSize: 20,
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Theme.of(context).splashColor,
+                                width: 0,
                               ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).splashColor,
-                                  width: 0,
-                                ),
-                              ),
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).splashColor,
-                                  width: 0,
-                                ),
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              filled: true,
-                              fillColor: Theme.of(context).splashColor,
                             ),
-                            dropdownColor: Colors.grey.shade800,
-                            value: 'All assets',
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedAsset =
-                                    newValue == 'All assets' ? null : newValue;
-                              });
-                            },
-                            items: allAssets.map((Item item) {
-                              return DropdownMenuItem<String>(
-                                value: '${item.itemId}',
-                                child: Padding(
-                                  padding: EdgeInsets.only(
-                                    left: SizeConfig.blockSizeHorizontal * 2,
-                                  ),
-                                  child: Text(
-                                    '${item.producer} ${item.model} ${item.internalId}',
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize:
-                                          SizeConfig.blockSizeHorizontal * 4,
-                                    ),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Theme.of(context).splashColor,
+                                width: 0,
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            filled: true,
+                            fillColor: Theme.of(context).splashColor,
+                          ),
+                          dropdownColor: Colors.grey.shade800,
+                          value: 'All assets',
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedAsset =
+                                  newValue == 'All assets' ? null : newValue;
+                            });
+                          },
+                          items: allAssets.map((Item item) {
+                            return DropdownMenuItem<String>(
+                              value: '${item.itemId}',
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: SizeConfig.blockSizeHorizontal * 2,
+                                ),
+                                child: Text(
+                                  '${item.producer} ${item.model} ${item.internalId}',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize:
+                                        SizeConfig.blockSizeHorizontal * 4,
                                   ),
                                 ),
-                              );
-                            }).toList(),
-                          ),
+                              ),
+                            );
+                          }).toList(),
                         ),
                       ),
                     ),
@@ -518,24 +477,23 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           children: [
                             const Text('Total time:'),
                             Text(
-                                '${_totalTime ~/ 60} hrs, ${_totalTime % 60} min'),
+                              '${_totalTime ~/ 60} hrs, ${_totalTime % 60} min',
+                            ),
                           ],
                         ),
                       ),
                       const Divider(
                         height: 1,
                       ),
-                      for (var key in assetsCosts.keys)
-                        Column(
-                          children: [
-                            Container(
-                              width: assetsCosts[key]! * costsWidthBlock,
-                              height: 30,
-                              color: Colors.green,
-                            ),
-                            const SizedBox(height: 15),
-                          ],
-                        )
+                      if (assetsCosts.isNotEmpty)
+                        CostsBarChart(
+                          assetsCost: assetsCosts,
+                        ),
+                      if (assetsCosts.isNotEmpty) const Divider(),
+                      if (assetsTime.isNotEmpty)
+                        TimeBarChart(
+                          assetsTime: assetsTime,
+                        ),
                     ],
                   ),
                 ),
