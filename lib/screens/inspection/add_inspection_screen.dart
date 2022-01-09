@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/checklist.dart';
 import 'package:under_control_flutter/models/inspection.dart';
@@ -163,28 +164,9 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
         item.lastInspection = inspection.date;
         item.interval = _inspectionInterval;
 
-// TODO make one function
-        List<String> duration = item.interval.split(' ');
+        item.nextInspection =
+            DateCalc.getNextDate(item.lastInspection, item.interval)!;
 
-        if (duration[1] == 'week' || duration[1] == 'weeks') {
-          item.nextInspection = DateTime(
-            item.lastInspection.year,
-            item.lastInspection.month,
-            item.lastInspection.day + (int.parse(duration[0]) * 7),
-          );
-        } else if (duration[1] == 'month' || duration[1] == 'months') {
-          item.nextInspection = DateTime(
-            item.lastInspection.year,
-            item.lastInspection.month + int.parse(duration[0]),
-            item.lastInspection.day,
-          );
-        } else if (duration[1] == 'year' || duration[1] == 'years') {
-          item.nextInspection = DateTime(
-            item.lastInspection.year + int.parse(duration[0]),
-            item.lastInspection.month,
-            item.lastInspection.day,
-          );
-        }
         Provider.of<ItemProvider>(context, listen: false)
             .updateItem(item)
             .then((_) => Navigator.of(context).pop(value));

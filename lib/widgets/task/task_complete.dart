@@ -63,7 +63,6 @@ class _TaskCompleteState extends State<TaskComplete> {
 
   @override
   Widget build(BuildContext context) {
-    print('duration ${widget.task.taskInterval}');
     if (widget.task.duration != null && widget.task.duration != 0) {
       _hour = (widget.task.duration! ~/ 60);
       _min = widget.task.duration! % 60;
@@ -166,6 +165,7 @@ class _TaskCompleteState extends State<TaskComplete> {
           ),
         ),
         // inspection interval
+
         Padding(
           padding: EdgeInsets.symmetric(
             horizontal: SizeConfig.blockSizeHorizontal * 8,
@@ -183,6 +183,7 @@ class _TaskCompleteState extends State<TaskComplete> {
               // date picker
 
               // task interval
+
               DropdownButton<String>(
                 borderRadius: BorderRadius.circular(10),
                 value: _taskInterval,
@@ -200,7 +201,6 @@ class _TaskCompleteState extends State<TaskComplete> {
                 onChanged: (String? newValue) {
                   FocusScope.of(context).requestFocus(FocusNode());
                   setState(() {
-                    print(newValue);
                     widget.task.taskInterval = newValue!;
                   });
                 },

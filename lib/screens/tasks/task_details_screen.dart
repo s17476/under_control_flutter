@@ -9,6 +9,7 @@ import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
+import 'package:under_control_flutter/widgets/inspection_form.dart';
 import 'package:under_control_flutter/widgets/task/task_complete.dart';
 
 class TaskDetailsScreen extends StatefulWidget {
@@ -25,6 +26,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
   final _formKey = GlobalKey<FormState>();
 
   late Task task;
+  Item? item;
 
   String _executorName = '';
   String _creatorName = '';
@@ -262,42 +264,22 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
           task.duration = transferObjectTask!.duration;
         }
 
-        print('date          ${task.taskInterval}');
-
-        if (transferObjectTask!.taskInterval != 'No') {
-          task.nextDate = DateCalc.getNextDate(
-              transferObjectTask!.date, transferObjectTask!.taskInterval!);
-          // List<String> duration = transferObjectTask!.taskInterval!.split(' ');
-          // task.taskInterval = transferObjectTask!.taskInterval;
-          // if (duration[1] == 'week' || duration[1] == 'weeks') {
-          //   task.nextDate = DateTime(
-          //     transferObjectTask!.date.year,
-          //     transferObjectTask!.date.month,
-          //     transferObjectTask!.date.day + (int.parse(duration[0]) * 7),
-          //   );
-          // } else if (duration[1] == 'month' || duration[1] == 'months') {
-          //   task.nextDate = DateTime(
-          //     transferObjectTask!.date.year,
-          //     transferObjectTask!.date.month + int.parse(duration[0]),
-          //     transferObjectTask!.date.day,
-          //   );
-          // } else if (duration[1] == 'year' || duration[1] == 'years') {
-          //   task.nextDate = DateTime(
-          //     transferObjectTask!.date.year + int.parse(duration[0]),
-          //     transferObjectTask!.date.month,
-          //     transferObjectTask!.date.day,
-          //   );
-          // }
-        } else {
-          task.nextDate = null;
-          task.taskInterval = 'No';
-        }
         // executor ID
         task.executorId =
             Provider.of<UserProvider>(context, listen: false).user!.userId;
 
         // date
         task.date = transferObjectTask!.date;
+
+        // next date if cyclic task
+        if (transferObjectTask!.taskInterval != 'No') {
+          task.taskInterval = transferObjectTask!.taskInterval;
+          task.nextDate = DateCalc.getNextDate(
+              transferObjectTask!.date, transferObjectTask!.taskInterval!);
+        } else {
+          task.nextDate = null;
+          task.taskInterval = 'No';
+        }
 
         // cost
         task.cost = transferObjectTask!.cost;
@@ -330,6 +312,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
   void didChangeDependencies() {
     task = ModalRoute.of(context)!.settings.arguments as Task;
     oldTask = task.copyWith();
+
+    if (task.type == TaskType.inspection) {
+      item = Provider.of<ItemProvider>(context, listen: false)
+          .items
+          .firstWhere((element) => element.itemId == task.itemId);
+    }
 
     if (task.executorId != null && _executorName == '') {
       _getExecutorName();
@@ -831,6 +819,32 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                         ),
                       ),
                     ),
+
+                    if (item != null)
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 500),
+                        height:
+                            _isInEditMode && task.type == TaskType.inspection
+                                ? null
+                                : 0,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 16),
+                          child: Column(
+                            children: [
+                              FadeTransition(
+                                opacity: _opacityAnimation!,
+                                child: SlideTransition(
+                                  position: _userSlideAnimation!,
+                                  child: InspectionForm(
+                                    task: task,
+                                    item: item!,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -862,11 +876,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                             );
                           } else {
                             _animationController!.reverse();
-                            // _scrollController.animateTo(
-                            //   -200,
-                            //   duration: Duration(milliseconds: 500),
-                            //   curve: Curves.easeIn,
-                            // );
                           }
                         },
                         icon: _isInEditMode
