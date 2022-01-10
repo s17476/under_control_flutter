@@ -22,6 +22,7 @@ import 'package:under_control_flutter/screens/start/initialize_went_wrong_screen
 import 'package:under_control_flutter/screens/main_screen.dart';
 import 'package:under_control_flutter/screens/start/loading_screen.dart';
 import 'package:under_control_flutter/screens/tasks/add_task_screen.dart';
+import 'package:under_control_flutter/screens/tasks/choose_shared_company_screen.dart';
 import 'package:under_control_flutter/screens/tasks/task_details_screen.dart';
 
 void main() {
@@ -180,6 +181,8 @@ class _AppState extends State<App> {
         ),
         routes: {
           ChooseCompanyScreen.routeName: (ctx) => const ChooseCompanyScreen(),
+          ChooseSharedCompanyScreen.routeName: (ctx) =>
+              const ChooseSharedCompanyScreen(),
           AddCompanyScreen.routeName: (ctx) => const AddCompanyScreen(),
           AddEquipmentScreen.routeName: (ctx) => const AddEquipmentScreen(),
           EditEquipmentScreen.routeName: (ctx) => const EditEquipmentScreen(),

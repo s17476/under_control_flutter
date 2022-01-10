@@ -4,11 +4,14 @@ import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:intl/intl.dart';
 import 'package:under_control_flutter/models/app_user.dart';
+import 'package:under_control_flutter/models/company.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
+import 'package:under_control_flutter/screens/start/choose_company_screen.dart';
+import 'package:under_control_flutter/screens/tasks/choose_shared_company_screen.dart';
 
 class AddTaskScreen extends StatefulWidget {
   const AddTaskScreen({Key? key}) : super(key: key);
@@ -58,6 +61,9 @@ class _AddTaskScreenState extends State<AddTaskScreen>
   Item? selectedAsset;
   String executorDropdown = 'Company';
   AppUser? selectedUser;
+
+  String? choosenCompanyName;
+  Company? choosenCompanyData;
 
   List<Item> allAssets = [];
   List<AppUser?> allUsers = [];
@@ -232,6 +238,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
     userDropdownValue =
         Provider.of<UserProvider>(context, listen: false).user!.userName;
     String choosenDate;
+    choosenCompanyName ??= 'No company selected';
 
     _taskDate ??= DateTime.now();
 
@@ -645,72 +652,47 @@ class _AddTaskScreenState extends State<AddTaskScreen>
 
                       // Task executor dropdown - shared option
                       if (executorDropdown == 'Shared')
-                        DropdownButtonFormField(
-                          icon: Icon(
-                            Icons.keyboard_arrow_down_rounded,
-                            color: Theme.of(context).primaryIconTheme.color,
-                            size: SizeConfig.blockSizeHorizontal * 8,
-                          ),
-                          alignment: AlignmentDirectional.centerStart,
-                          decoration: InputDecoration(
-                            labelText: '  Company',
-                            labelStyle: TextStyle(
-                              color:
-                                  Theme.of(context).appBarTheme.foregroundColor,
-                              fontSize: 20,
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Theme.of(context).splashColor,
-                                width: 0,
+                        /////////////////////////////////////////////////////////////////////////////////////////////
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              choosenCompanyName!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: SizeConfig.blockSizeHorizontal * 4,
+                                color: Theme.of(context)
+                                    .textTheme
+                                    .headline6!
+                                    .color,
                               ),
-                              borderRadius: BorderRadius.circular(30),
                             ),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Theme.of(context).splashColor,
-                                width: 0,
-                              ),
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            filled: true,
-                            fillColor: Theme.of(context).splashColor,
-                          ),
-                          dropdownColor: Colors.grey.shade800,
-                          value:
-                              Provider.of<UserProvider>(context, listen: false)
-                                  .user!
-                                  .userId,
-                          onChanged: (String? newValue) {
-                            FocusScope.of(context).requestFocus(FocusNode());
-                            setState(() {
-                              selectedUser = allUsers.firstWhere(
-                                  (element) => element!.userId == newValue);
-                            });
-                            // print('user ${selectedUser!.userId}');
-                            // print('user ${selectedUser!.userName}');
-                          },
-                          items: allUsers.map((AppUser? user) {
-                            return DropdownMenuItem<String>(
-                              value: user!.userId,
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                  left: SizeConfig.blockSizeHorizontal * 2,
-                                ),
-                                child: Text(
-                                  user.userName,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize:
-                                        SizeConfig.blockSizeHorizontal * 4,
-                                    // overflow: TextOverflow.ellipsis,
-                                  ),
+                            SizedBox(width: SizeConfig.blockSizeHorizontal * 3),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context)
+                                    .pushNamed(
+                                        ChooseSharedCompanyScreen.routeName)
+                                    .then((value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      choosenCompanyData = value as Company;
+                                      choosenCompanyName =
+                                          choosenCompanyData!.name;
+                                    });
+                                  }
+                                });
+                              },
+                              child: Text(
+                                'Pick a company',
+                                style: TextStyle(
+                                  fontSize: SizeConfig.blockSizeHorizontal * 4,
+                                  color: Colors.black,
                                 ),
                               ),
-                            );
-                          }).toList(),
+                            ),
+                          ],
                         ),
-
                       // execution date - date picker
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

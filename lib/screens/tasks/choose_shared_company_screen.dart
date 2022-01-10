@@ -5,13 +5,11 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/company.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
-import 'package:under_control_flutter/screens/start/add_company_screen.dart';
-import 'package:under_control_flutter/screens/start/add_company_screen.dart';
 
-class ChooseCompanyScreen extends StatelessWidget {
-  const ChooseCompanyScreen({Key? key}) : super(key: key);
+class ChooseSharedCompanyScreen extends StatelessWidget {
+  const ChooseSharedCompanyScreen({Key? key}) : super(key: key);
 
-  static const routeName = '/choose_company';
+  static const routeName = '/choose_shared_company';
 
   // confirm company choice
   Future<dynamic> _showDialog(
@@ -26,7 +24,7 @@ class ChooseCompanyScreen extends StatelessWidget {
           title: const Text('Confirm your choice'),
           content: SingleChildScrollView(
             child: Text(
-              'Do You work for ${company.name}?',
+              'Do You want to share this task with ${company.name}?',
             ),
           ),
           actions: [
@@ -65,44 +63,7 @@ class ChooseCompanyScreen extends StatelessWidget {
     CompanyProvider companyProwider = Provider.of<CompanyProvider>(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Choose your company'),
-        actions: [
-          // logout button
-          Padding(
-            padding: EdgeInsets.only(right: SizeConfig.blockSizeHorizontal * 3),
-            child: IconButton(
-              onPressed: Provider.of<UserProvider>(context).signout,
-              icon: Icon(
-                Icons.logout,
-                size: SizeConfig.blockSizeVertical * 4,
-                color: Theme.of(context).errorColor,
-              ),
-            ),
-          ),
-          // add company button
-          Padding(
-            padding: EdgeInsets.only(right: SizeConfig.blockSizeHorizontal * 3),
-            child: IconButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .pushNamed(AddCompanyScreen.routeName)
-                    .then(
-                  (company) {
-                    if (company != null) {
-                      Provider.of<UserProvider>(context, listen: false)
-                          .setCompany(context, company as Company);
-                    }
-                  },
-                );
-              },
-              icon: Icon(
-                Icons.add,
-                size: SizeConfig.blockSizeVertical * 5,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
-        ],
+        title: const Text('Choose company'),
       ),
       // build all companies list
       body: FutureBuilder(
@@ -125,6 +86,7 @@ class ChooseCompanyScreen extends StatelessWidget {
             // map data to list elements
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
               var data = document.data() as Map<String, dynamic>;
+
               final Company company = Company.dto(
                 companyId: document.id,
                 name: data['name'],
@@ -132,16 +94,31 @@ class ChooseCompanyScreen extends StatelessWidget {
                 city: data['city'],
                 postCode: data['postCode'],
               );
+
               return Column(
                 children: [
                   ListTile(
                     onTap: () {
-                      _showDialog(context, company).then((choosenCompany) {
-                        if (choosenCompany != null) {
+                      if (company.companyId !=
                           Provider.of<UserProvider>(context, listen: false)
-                              .setCompany(context, choosenCompany);
-                        }
-                      });
+                              .user!
+                              .companyId) {
+                        _showDialog(context, company).then((choosenCompany) {
+                          if (choosenCompany != null) {
+                            Navigator.of(context).pop(choosenCompany);
+                          }
+                        });
+                      } else {
+                        ScaffoldMessenger.of(context)
+                          ..hideCurrentSnackBar()
+                          ..showSnackBar(
+                            const SnackBar(
+                              content:
+                                  Text('You can\'t choose your own company.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                      }
                     },
                     title: Text(company.name),
                     subtitle: Column(
