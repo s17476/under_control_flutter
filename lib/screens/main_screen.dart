@@ -12,7 +12,7 @@ import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/equipment/add_equipment_screen.dart';
 import 'package:under_control_flutter/screens/tasks/add_task_screen.dart';
-import 'package:under_control_flutter/widgets/bottom_navi_bar.dart';
+import 'package:under_control_flutter/widgets/start/bottom_navi_bar.dart';
 import 'package:under_control_flutter/widgets/main_drawer.dart';
 
 class MainScreen extends StatefulWidget {
@@ -28,7 +28,7 @@ class _MainScreenState extends State<MainScreen> {
   late ScrollController _scrollController;
   late bool _isBottomNavBarVisible;
 
-  DateTime pre_backpress = DateTime.now();
+  DateTime preBackpress = DateTime.now();
 
   int _selectedPageIndex = 2;
 
@@ -87,15 +87,15 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     SizeConfig.init(context);
     UserProvider userProvider = Provider.of<UserProvider>(context);
-    CompanyProvider companyProvider = Provider.of<CompanyProvider>(context);
+    // CompanyProvider companyProvider = Provider.of<CompanyProvider>(context);
     // print(companyProvider.company);
 
     return WillPopScope(
       // double click to exit the app
       onWillPop: () async {
-        final timegap = DateTime.now().difference(pre_backpress);
+        final timegap = DateTime.now().difference(preBackpress);
         final cantExit = timegap >= const Duration(seconds: 2);
-        pre_backpress = DateTime.now();
+        preBackpress = DateTime.now();
         if (cantExit) {
           ScaffoldMessenger.of(context)
             ..removeCurrentSnackBar()
@@ -148,10 +148,7 @@ class _MainScreenState extends State<MainScreen> {
                                 ),
                         );
                       }),
-                    // chat icon in dashboard screen
-                    if (_selectedPageIndex == 2)
-                      IconButton(
-                          onPressed: () {}, icon: const Icon(Icons.chat)),
+
                     // show by category icon in assets screen
                     if (_selectedPageIndex == 3)
                       IconButton(
@@ -184,7 +181,7 @@ class _MainScreenState extends State<MainScreen> {
                             NetworkImage(userProvider.user!.userImage),
                         maxRadius: SizeConfig.blockSizeHorizontal * 4,
                       ),
-                    // show by status button in assets screen
+                    // sort by status - button in assets screen
                     if (_selectedPageIndex == 3)
                       IconButton(
                         onPressed: () {

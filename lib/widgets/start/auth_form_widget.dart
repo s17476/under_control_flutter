@@ -6,7 +6,7 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/pickers/user_image_picker.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/start/choose_company_screen.dart';
-import 'package:under_control_flutter/widgets/logo_widget.dart';
+import 'package:under_control_flutter/widgets/start/logo_widget.dart';
 
 class AuthFormWidget extends StatefulWidget {
   const AuthFormWidget({

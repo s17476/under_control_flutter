@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
-import 'package:under_control_flutter/widgets/logo_widget.dart';
+import 'package:under_control_flutter/widgets/start/logo_widget.dart';
 
 class LoadingScreen extends StatelessWidget {
   const LoadingScreen({Key? key}) : super(key: key);

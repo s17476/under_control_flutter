@@ -6,7 +6,7 @@ import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
-import 'package:under_control_flutter/widgets/status_icon.dart';
+import 'package:under_control_flutter/widgets/start/status_icon.dart';
 
 class InspectionsList extends StatefulWidget {
   const InspectionsList({Key? key, required this.context, required this.item})

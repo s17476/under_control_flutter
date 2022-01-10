@@ -5,7 +5,7 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/screens/equipment/equipment_details_screen.dart';
-import 'package:under_control_flutter/widgets/status_icon.dart';
+import 'package:under_control_flutter/widgets/start/status_icon.dart';
 
 // this screen shows a list of all registred in DB assets
 class EquipmentScreen extends StatefulWidget {
