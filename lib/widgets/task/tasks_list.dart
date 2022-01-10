@@ -7,6 +7,7 @@ import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
+import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
 import 'package:under_control_flutter/screens/tasks/task_details_screen.dart';
 import 'package:under_control_flutter/widgets/task/task_list_item.dart';
@@ -103,6 +104,8 @@ class _TasksListState extends State<TasksList> {
 
     final keys = _tasks.keys.toList();
 
+    final user = Provider.of<UserProvider>(context).user;
+
     if (widget.item != null) {
       for (var key in keys) {
         if (_tasks[key] != null) {
@@ -119,7 +122,35 @@ class _TasksListState extends State<TasksList> {
       }
     } else if (executor == TaskExecutor.all) {
       filteredTasks = _tasks;
-    } else {
+    } else if (executor == TaskExecutor.company) {
+      for (var key in keys) {
+        if (_tasks[key] != null) {
+          for (var task in _tasks[key]!) {
+            if (task.executor == executor) {
+              if (filteredTasks.containsKey(key)) {
+                filteredTasks[key]!.add(task);
+              } else {
+                filteredTasks[key] = [task];
+              }
+            }
+          }
+        }
+      }
+    } else if (executor == TaskExecutor.user) {
+      for (var key in keys) {
+        if (_tasks[key] != null) {
+          for (var task in _tasks[key]!) {
+            if (task.executor == executor && task.executorId == user!.userId) {
+              if (filteredTasks.containsKey(key)) {
+                filteredTasks[key]!.add(task);
+              } else {
+                filteredTasks[key] = [task];
+              }
+            }
+          }
+        }
+      }
+    } else if (executor == TaskExecutor.shared) {
       for (var key in keys) {
         if (_tasks[key] != null) {
           for (var task in _tasks[key]!) {

@@ -24,6 +24,20 @@ class CompanyProvider with ChangeNotifier {
         .get();
   }
 
+  Future<String> getCompanyById(String companyId) {
+    return FirebaseFirestore.instance
+        .collection('companies')
+        .doc(companyId)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      if (documentSnapshot.exists) {
+        final companySnapshot = documentSnapshot.data() as Map<String, dynamic>;
+        return companySnapshot['name'];
+      }
+      return '';
+    });
+  }
+
   Future<Company?> initializeCompany(
     BuildContext context,
     String companyId,

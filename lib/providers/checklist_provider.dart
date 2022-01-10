@@ -24,10 +24,21 @@ class ChecklistProvider with ChangeNotifier {
   // add new checklist
   Future<Checklist> addChecklist(Checklist checklist) async {
     Checklist result;
+
     var checklistsRef = FirebaseFirestore.instance
         .collection('companies')
         .doc(_user!.companyId)
         .collection('checklists');
+
+    await checklistsRef
+        .where('name', isEqualTo: checklist.name)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      if (querySnapshot.docs.isNotEmpty) {
+        final id = querySnapshot.docs[0].id;
+        checklistsRef.doc(id).delete();
+      }
+    });
 
     Map<String, dynamic> values = {
       'name': checklist.name,

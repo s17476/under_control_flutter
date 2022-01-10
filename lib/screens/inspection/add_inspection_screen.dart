@@ -48,6 +48,8 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
   void initState() {
     super.initState();
     _inspectionDate = DateTime.now();
+    Provider.of<ChecklistProvider>(context, listen: false)
+        .fetchAndSetChecklists();
     checklists =
         Provider.of<ChecklistProvider>(context, listen: false).checklists;
     _selectedChecklist = checklists[0];

@@ -314,6 +314,17 @@ class _MainScreenState extends State<MainScreen> {
                                                 listen: false)
                                             .fetchInspectionsStatus();
                                       }
+                                    }).catchError((e) {
+                                      ScaffoldMessenger.of(context)
+                                        ..removeCurrentSnackBar()
+                                        ..showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Cancelled!',
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
                                     });
                                   }
                                 // in tasks screen

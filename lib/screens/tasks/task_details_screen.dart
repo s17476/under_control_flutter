@@ -6,6 +6,7 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/inspection.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
+import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
@@ -136,12 +137,27 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
 
   //get task executor name
   Future<void> _getExecutorName() async {
-    await Provider.of<UserProvider>(context)
+    await Provider.of<UserProvider>(context, listen: false)
         .getUserById(context, task.executorId!)
         .then((value) {
       setState(() {
         _executorName = value!.userName;
       });
+    });
+  }
+
+  //get task executor name
+  Future<void> _getExecutorCompanyName() async {
+    await Provider.of<CompanyProvider>(context, listen: false)
+        .getCompanyById(task.executorId!)
+        .then((value) {
+      if (value != '') {
+        setState(() {
+          _executorName = value;
+        });
+      } else {
+        _getExecutorName();
+      }
     });
   }
 
@@ -371,8 +387,14 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
       );
     }
 
-    if (task.executorId != null && _executorName == '') {
+    if (task.executor == TaskExecutor.user &&
+        task.executorId != null &&
+        _executorName == '') {
       _getExecutorName();
+    } else if (task.executor == TaskExecutor.shared &&
+        task.executorId != null &&
+        _executorName == '') {
+      _getExecutorCompanyName();
     }
     if (_creatorName == '') {
       _getCreatorName();
@@ -676,7 +698,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                         ],
                       ),
                     // task executor
-                    if (task.executor != TaskExecutor.user)
+                    if (task.executor != TaskExecutor.user &&
+                        task.executor != TaskExecutor.shared)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -705,6 +728,26 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                           ),
                           Text(
                             'Task executor',
+                            style: labelTextStyle,
+                          ),
+                          const SizedBox(
+                            height: 1,
+                          ),
+                          Text(
+                            _executorName,
+                            style: textStyle,
+                          ),
+                        ],
+                      ),
+                    if (task.executor == TaskExecutor.shared)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            'Task executor company',
                             style: labelTextStyle,
                           ),
                           const SizedBox(

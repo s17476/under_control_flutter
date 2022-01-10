@@ -108,7 +108,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
       String? executorId;
       DateTime? nextDate;
       TaskExecutor taskExecutor;
-      String? userId;
+      // String? userId;
       String? selectedItemId;
       String? selectedLocation;
 
@@ -120,14 +120,27 @@ class _AddTaskScreenState extends State<AddTaskScreen>
           ..showSnackBar(
             const SnackBar(
               content: Text('Choose asset to inspect'),
+              backgroundColor: Colors.red,
+            ),
+          );
+      }
+
+      if (executorDropdown == 'Shared' && choosenCompanyData == null) {
+        isValid = false;
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text('Pick a company to share task with'),
+              backgroundColor: Colors.red,
             ),
           );
       }
 
       if (isValid) {
-        if (executorDropdown == 'Specific user') {
-          executorId = selectedUser!.userId;
-        }
+        // if (executorDropdown == 'Specific user') {
+        //   executorId = selectedUser!.userId;
+        // }
         _formKey.currentState!.save();
 
         if (_taskInterval != 'No') {
@@ -139,9 +152,10 @@ class _AddTaskScreenState extends State<AddTaskScreen>
           taskExecutor = TaskExecutor.company;
         } else if (executorDropdown == 'Shared') {
           taskExecutor = TaskExecutor.shared;
+          executorId = choosenCompanyData!.companyId;
         } else if (executorDropdown == 'Specific user') {
           taskExecutor = TaskExecutor.user;
-          userId = selectedUser?.userId;
+          executorId = selectedUser!.userId;
         } else {
           taskExecutor = TaskExecutor.all;
         }

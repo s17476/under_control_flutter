@@ -308,6 +308,7 @@ class TaskProvider with ChangeNotifier {
 
   Future<void> addToArchive(Task task) async {
     Task tmpTask;
+
     // get taskss referance
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')

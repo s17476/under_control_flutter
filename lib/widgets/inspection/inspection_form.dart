@@ -44,6 +44,8 @@ class _InspectionFormState extends State<InspectionForm>
   void initState() {
     super.initState();
     // _inspectionDate = DateTime.now();
+    Provider.of<ChecklistProvider>(context, listen: false)
+        .fetchAndSetChecklists();
     checklists =
         Provider.of<ChecklistProvider>(context, listen: false).checklists;
     _selectedChecklist = checklists[0];
