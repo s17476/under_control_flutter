@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/checklist.dart';
 import 'package:under_control_flutter/models/inspection.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/checklist_provider.dart';
-import 'package:under_control_flutter/providers/inspection_provider.dart';
-import 'package:under_control_flutter/providers/item_provider.dart';
-import 'package:under_control_flutter/providers/user_provider.dart';
 
 class InspectionForm extends StatefulWidget {
   const InspectionForm({

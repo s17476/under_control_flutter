@@ -593,14 +593,84 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                             ),
                             enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
-                                  color: Theme.of(context).splashColor,
-                                  width: 0),
+                                color: Theme.of(context).splashColor,
+                                width: 0,
+                              ),
                               borderRadius: BorderRadius.circular(30),
                             ),
                             border: OutlineInputBorder(
                               borderSide: BorderSide(
-                                  color: Theme.of(context).splashColor,
-                                  width: 0),
+                                color: Theme.of(context).splashColor,
+                                width: 0,
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            filled: true,
+                            fillColor: Theme.of(context).splashColor,
+                          ),
+                          dropdownColor: Colors.grey.shade800,
+                          value:
+                              Provider.of<UserProvider>(context, listen: false)
+                                  .user!
+                                  .userId,
+                          onChanged: (String? newValue) {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                            setState(() {
+                              selectedUser = allUsers.firstWhere(
+                                  (element) => element!.userId == newValue);
+                            });
+                            // print('user ${selectedUser!.userId}');
+                            // print('user ${selectedUser!.userName}');
+                          },
+                          items: allUsers.map((AppUser? user) {
+                            return DropdownMenuItem<String>(
+                              value: user!.userId,
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: SizeConfig.blockSizeHorizontal * 2,
+                                ),
+                                child: Text(
+                                  user.userName,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize:
+                                        SizeConfig.blockSizeHorizontal * 4,
+                                    // overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+
+                      // Task executor dropdown - shared option
+                      if (executorDropdown == 'Shared')
+                        DropdownButtonFormField(
+                          icon: Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: Theme.of(context).primaryIconTheme.color,
+                            size: SizeConfig.blockSizeHorizontal * 8,
+                          ),
+                          alignment: AlignmentDirectional.centerStart,
+                          decoration: InputDecoration(
+                            labelText: '  Company',
+                            labelStyle: TextStyle(
+                              color:
+                                  Theme.of(context).appBarTheme.foregroundColor,
+                              fontSize: 20,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Theme.of(context).splashColor,
+                                width: 0,
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Theme.of(context).splashColor,
+                                width: 0,
+                              ),
                               borderRadius: BorderRadius.circular(30),
                             ),
                             filled: true,
@@ -726,27 +796,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                       SizedBox(
                         height: SizeConfig.blockSizeVertical * 0.5,
                       ),
-                      // save button
-                      // ElevatedButton(
-                      //   //TODO
-                      //   onPressed: _addNewTask,
-                      //   child: Text(
-                      //     'Create task',
-                      //     style: TextStyle(
-                      //       fontSize: SizeConfig.blockSizeHorizontal * 5.5,
-                      //     ),
-                      //   ),
-                      //   style: ElevatedButton.styleFrom(
-                      //     primary:
-                      //         darkTheme[dropdownItems.indexOf(dropdownValue)],
-                      //     shape: RoundedRectangleBorder(
-                      //       borderRadius: BorderRadius.circular(30.0),
-                      //     ),
-                      //   ),
-                      // ),
-                      // SizedBox(
-                      //   height: SizeConfig.blockSizeVertical * 3,
-                      // ),
                     ],
                   ),
                 ),

@@ -11,7 +11,7 @@ import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
-import 'package:under_control_flutter/widgets/inspection_form.dart';
+import 'package:under_control_flutter/widgets/inspection/inspection_form.dart';
 import 'package:under_control_flutter/widgets/task/task_complete.dart';
 
 class TaskDetailsScreen extends StatefulWidget {

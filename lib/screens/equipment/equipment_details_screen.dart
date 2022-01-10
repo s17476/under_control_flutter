@@ -8,7 +8,7 @@ import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/screens/equipment/edit_equipment_screen.dart';
 import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
 import 'package:under_control_flutter/screens/tasks/add_task_screen.dart';
-import 'package:under_control_flutter/widgets/inspections_list.dart';
+import 'package:under_control_flutter/widgets/inspection/inspections_list.dart';
 import 'package:under_control_flutter/widgets/status_icon.dart';
 import 'package:under_control_flutter/widgets/task/connected_tasks.dart';
 
