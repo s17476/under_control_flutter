@@ -29,6 +29,8 @@ class _TaskCompleteState extends State<TaskComplete> {
     Colors.red,
   ];
 
+  List<String> intervalList = [];
+
   // date picker
   void _datePicker() {
     FocusScope.of(context).requestFocus(FocusNode());

@@ -125,6 +125,18 @@ class _AddTaskScreenState extends State<AddTaskScreen>
           );
       }
 
+      if (dropdownValue == 'Inspection' && _taskInterval == 'No') {
+        isValid = false;
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text('Choose inspection interval'),
+              backgroundColor: Colors.red,
+            ),
+          );
+      }
+
       if (executorDropdown == 'Shared' && choosenCompanyData == null) {
         isValid = false;
         ScaffoldMessenger.of(context)

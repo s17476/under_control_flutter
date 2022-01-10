@@ -73,6 +73,9 @@ class InspectionProvider with ChangeNotifier {
   // add new inspection
   Future<bool> addInspection(Item item, Inspection inspection) async {
     bool response;
+    final checklistName =
+        inspection.checklist == null ? '' : inspection.checklist!.name;
+
     final inspectionRef = FirebaseFirestore.instance
         .collection('companies')
         .doc(_user!.companyId)
@@ -85,11 +88,13 @@ class InspectionProvider with ChangeNotifier {
       'date': inspection.date.toIso8601String(),
       'comments': inspection.comments,
       'status': inspection.status,
-      'checklistName': inspection.checklist!.name,
+      'checklistName': checklistName,
       'taskId': inspection.taskId,
     };
 
-    values.addAll(inspection.checklist!.fields);
+    if (inspection.checklist != null) {
+      values.addAll(inspection.checklist!.fields);
+    }
 
     // add to DB
     response = await inspectionRef.add(values).then(

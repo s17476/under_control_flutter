@@ -276,7 +276,21 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
   void _completeTask(bool completed) async {
     if (_formKey.currentState != null) {
       // validate user input
-      final isValid = _formKey.currentState!.validate();
+      bool isValid = _formKey.currentState!.validate();
+
+      if (task.type == TaskType.inspection &&
+          transferObjectTask?.taskInterval == 'No') {
+        isValid = false;
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(
+              content: Text('Choose inspection interval!'),
+              backgroundColor: Colors.red,
+            ),
+          );
+      }
+
       if (isValid) {
         _formKey.currentState!.save();
         if (transferObjectTask!.duration != null) {
@@ -326,43 +340,44 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
 
           Provider.of<TaskProvider>(context, listen: false).addNextTask(tmp);
         }
-      }
-    }
+        if (task.type == TaskType.inspection) {
+          await Provider.of<InspectionProvider>(context, listen: false)
+              .addInspection(
+            item!,
+            inspection!,
+          )
+              .then((value) {
+            if (!value) {
+              ScaffoldMessenger.of(context)
+                ..hideCurrentSnackBar()
+                ..showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                        'Error occured while adding to Data Base. Please try again later.'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+            } else {
+              item!.inspectionStatus = inspection!.status;
+              item!.interval = task.taskInterval!;
 
-    if (task.type == TaskType.inspection) {
-      await Provider.of<InspectionProvider>(context, listen: false)
-          .addInspection(
-        item!,
-        inspection!,
-      )
-          .then((value) {
-        if (!value) {
-          ScaffoldMessenger.of(context)
-            ..hideCurrentSnackBar()
-            ..showSnackBar(
-              const SnackBar(
-                content: Text(
-                    'Error occured while adding to Data Base. Please try again later.'),
-                backgroundColor: Colors.red,
-              ),
-            );
-        } else {
-          item!.inspectionStatus = inspection!.status;
+              item!.nextInspection = task.nextDate!;
 
-          item!.nextInspection =
-              DateCalc.getNextDate(item!.lastInspection, item!.interval)!;
+              Provider.of<ItemProvider>(context, listen: false)
+                  .updateItem(item!);
 
-          Provider.of<ItemProvider>(context, listen: false).updateItem(item!);
-
-          Provider.of<ItemProvider>(context, listen: false)
-              .fetchInspectionsStatus();
-          Provider.of<InspectionProvider>(context, listen: false)
-              .fetchByItem(item!);
+              Provider.of<ItemProvider>(context, listen: false)
+                  .fetchInspectionsStatus();
+              Provider.of<InspectionProvider>(context, listen: false)
+                  .fetchByItem(item!);
+              // Provider.of<TaskProvider>(context, listen: false).fetchAndSetTasks();
+            }
+          });
         }
-      });
-    }
-    if (completed) {
-      Navigator.of(context).pop('completed');
+        if (completed) {
+          Navigator.of(context).pop('completed');
+        }
+      }
     }
   }
 

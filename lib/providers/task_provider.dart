@@ -302,6 +302,7 @@ class TaskProvider with ChangeNotifier {
     if (nextTask == null) {
       return null;
     }
+    _tasks.remove(task);
     notifyListeners();
     return await addTask(nextTask);
   }
