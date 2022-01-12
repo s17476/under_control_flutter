@@ -156,63 +156,44 @@ class ItemProvider with ChangeNotifier {
   Future<void> fetchAndSetItems() async {
     // print('fetch');
     List<Item> tmpItems = [];
+    Future<QuerySnapshot> querySnapshot;
     if (_showCategories) {
-      await FirebaseFirestore.instance
+      querySnapshot = FirebaseFirestore.instance
           .collection('companies')
           .doc(_user!.companyId)
           .collection('items')
           .orderBy('category', descending: _descending)
-          .get()
-          .then((QuerySnapshot querySnapshot) {
-        for (var doc in querySnapshot.docs) {
-          tmpItems.add(
-            Item(
-              itemId: doc.id,
-              internalId: doc['internalId'],
-              producer: doc['producer'],
-              model: doc['model'],
-              category: doc['category'],
-              location: doc['location'],
-              comments: doc['comments'],
-              lastInspection: DateTime.parse(doc['lastInspection']),
-              nextInspection: DateTime.parse(doc['nextInspection']),
-              interval: doc['interval'],
-              inspectionStatus: doc['inspectionStatus'],
-            ),
-          );
-        }
-        _items = tmpItems;
-        return _items;
-      });
+          .get();
     } else {
-      await FirebaseFirestore.instance
+      querySnapshot = FirebaseFirestore.instance
           .collection('companies')
           .doc(_user!.companyId)
           .collection('items')
           .orderBy('inspectionStatus', descending: _descending)
-          .get()
-          .then((QuerySnapshot querySnapshot) {
-        for (var doc in querySnapshot.docs) {
-          tmpItems.add(
-            Item(
-              itemId: doc.id,
-              internalId: doc['internalId'],
-              producer: doc['producer'],
-              model: doc['model'],
-              category: doc['category'],
-              location: doc['location'],
-              comments: doc['comments'],
-              lastInspection: DateTime.parse(doc['lastInspection']),
-              nextInspection: DateTime.parse(doc['nextInspection']),
-              interval: doc['interval'],
-              inspectionStatus: doc['inspectionStatus'],
-            ),
-          );
-        }
-        _items = tmpItems;
-        return _items;
-      });
+          .get();
     }
+
+    await querySnapshot.then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        tmpItems.add(
+          Item(
+            itemId: doc.id,
+            internalId: doc['internalId'],
+            producer: doc['producer'],
+            model: doc['model'],
+            category: doc['category'],
+            location: doc['location'],
+            comments: doc['comments'],
+            lastInspection: DateTime.parse(doc['lastInspection']),
+            nextInspection: DateTime.parse(doc['nextInspection']),
+            interval: doc['interval'],
+            inspectionStatus: doc['inspectionStatus'],
+          ),
+        );
+      }
+      _items = tmpItems;
+      return _items;
+    });
 
     // check if inspection has expired
     List<String> updatedItems = [];
