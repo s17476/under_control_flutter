@@ -206,7 +206,8 @@ class _TasksListState extends State<TasksList> {
 
                       listItems.add(
                         (Provider.of<TaskProvider>(context).isActive &&
-                                task.type != TaskType.inspection)
+                                task.type != TaskType.inspection &&
+                                task.executor != TaskExecutor.shared)
                             ?
                             // shows active tasks
                             Dismissible(

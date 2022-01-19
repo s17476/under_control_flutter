@@ -208,7 +208,7 @@ class TaskProvider with ChangeNotifier {
 
   Future<Task?> addTask(Task task) async {
     // print('add task executor id  ${task.executorId}');
-    Task tmpTask;
+    Task tmpTask = task;
     Task result;
     // get taskss referance
     final tasksRef = FirebaseFirestore.instance
@@ -245,8 +245,14 @@ class TaskProvider with ChangeNotifier {
       notifyListeners();
       return tmpTask;
     });
+    //share task
+    if (tmpTask.executor == TaskExecutor.shared) {
+      await shareTask(tmpTask);
+    }
     return result;
   }
+
+  Future<void> shareTask(Task task) async {}
 
   // update task
   Future<void> updateTask(Task task) async {

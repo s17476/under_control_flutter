@@ -4,6 +4,7 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
+import 'package:under_control_flutter/providers/user_provider.dart';
 
 class TaskListItem extends StatelessWidget {
   const TaskListItem({
@@ -71,13 +72,14 @@ class TaskListItem extends StatelessWidget {
                     Text(
                       task.title,
                       style: TextStyle(
-                          fontSize: SizeConfig.blockSizeHorizontal * 4,
-                          color: isExpired &&
-                                  Provider.of<TaskProvider>(context,
-                                          listen: false)
-                                      .isActive
-                              ? Colors.red
-                              : Colors.white),
+                        fontSize: SizeConfig.blockSizeHorizontal * 4,
+                        color: isExpired &&
+                                Provider.of<TaskProvider>(context,
+                                        listen: false)
+                                    .isActive
+                            ? Colors.red
+                            : Colors.white,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (task.location != null && task.location != '')
@@ -128,12 +130,33 @@ class TaskListItem extends StatelessWidget {
               const SizedBox(
                 width: 5,
               ),
+
+              //task is active
               Provider.of<TaskProvider>(context).isActive
-                  ? Icon(
-                      Icons.arrow_forward_ios,
-                      color: Theme.of(context).primaryColor,
-                      size: 35,
-                    )
+                  ? task.executor == TaskExecutor.shared
+                      ? task.executorId ==
+                              Provider.of<UserProvider>(context).user!.companyId
+                          //shared with me
+                          ? Icon(
+                              Icons.emoji_people,
+                              color:
+                                  Theme.of(context).appBarTheme.foregroundColor,
+                              size: 40,
+                            )
+                          //shared
+                          : Icon(
+                              Icons.share,
+                              color:
+                                  Theme.of(context).appBarTheme.foregroundColor,
+                              size: 45,
+                            )
+                      : Icon(
+                          Icons.arrow_forward_ios,
+                          color: Theme.of(context).primaryColor,
+                          size: 35,
+                        )
+
+                  // task is done
                   : Icon(
                       Icons.done,
                       color: Theme.of(context).primaryColor,

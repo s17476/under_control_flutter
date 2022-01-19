@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
@@ -109,7 +108,8 @@ class CalendarEventsList extends StatelessWidget {
                       item = null;
                     }
                     return Provider.of<TaskProvider>(context).isActive &&
-                            value[index].type != TaskType.inspection
+                            value[index].type != TaskType.inspection &&
+                            value[index].executor != TaskExecutor.shared
                         ? Dismissible(
                             key: Key(value[index].taskId!),
                             confirmDismiss: (direction) async {
@@ -159,7 +159,7 @@ class CalendarEventsList extends StatelessWidget {
                                       value[index].taskInterval!);
                                 }
 
-                                Task tmpTask = value[index];
+                                // Task tmpTask = value[index];
                                 await Provider.of<TaskProvider>(context,
                                         listen: false)
                                     .rapidComplete(context, value[index])
