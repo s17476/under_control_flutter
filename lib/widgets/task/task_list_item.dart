@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
+import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
+import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 
@@ -114,7 +116,7 @@ class TaskListItem extends StatelessWidget {
                                   size: 15,
                                 ),
                                 Text(
-                                  '${item!.producer} ${item!.model}',
+                                  task.itemName!,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     color: Theme.of(context).hintColor,
@@ -122,6 +124,69 @@ class TaskListItem extends StatelessWidget {
                                 ),
                               ],
                             ),
+
+                          // //sahred with company
+                          // if (task.executor == TaskExecutor.shared)
+                          //   Row(
+                          //     children: [
+                          //       Icon(
+                          //         Icons.share,
+                          //         color: Theme.of(context).hintColor,
+                          //         size: 15,
+                          //       ),
+                          //       task.executorId !=
+                          //               Provider.of<UserProvider>(context)
+                          //                   .user!
+                          //                   .companyId
+                          //           ? FutureBuilder(
+                          //               future: Provider.of<CompanyProvider>(
+                          //                       context)
+                          //                   .getCompanyById(task.executorId!),
+                          //               builder: (ctx, companyName) {
+                          //                 if (companyName.hasData) {
+                          //                   return Text(
+                          //                     companyName.data as String,
+                          //                     overflow: TextOverflow.ellipsis,
+                          //                     style: TextStyle(
+                          //                       color:
+                          //                           Theme.of(context).hintColor,
+                          //                     ),
+                          //                   );
+                          //                 }
+                          //                 return Text(
+                          //                   'Shared with',
+                          //                   style: TextStyle(
+                          //                     color:
+                          //                         Theme.of(context).hintColor,
+                          //                   ),
+                          //                 );
+                          //               })
+                          //           : FutureBuilder(
+                          //               future:
+                          //                   Provider.of<UserProvider>(context)
+                          //                       .getUserById(
+                          //                           context, task.userId),
+                          //               builder: (ctx, user) {
+                          //                 if (user.hasData) {
+                          //                   return Text(
+                          //                     (user.data as AppUser).company!,
+                          //                     overflow: TextOverflow.ellipsis,
+                          //                     style: TextStyle(
+                          //                       color:
+                          //                           Theme.of(context).hintColor,
+                          //                     ),
+                          //                   );
+                          //                 }
+                          //                 return Text(
+                          //                   'Shared by',
+                          //                   style: TextStyle(
+                          //                     color:
+                          //                         Theme.of(context).hintColor,
+                          //                   ),
+                          //                 );
+                          //               })
+                          //     ],
+                          //   ),
                         ],
                       ),
                   ],
@@ -148,7 +213,7 @@ class TaskListItem extends StatelessWidget {
                               Icons.share,
                               color:
                                   Theme.of(context).appBarTheme.foregroundColor,
-                              size: 45,
+                              size: 40,
                             )
                       : Icon(
                           Icons.arrow_forward_ios,

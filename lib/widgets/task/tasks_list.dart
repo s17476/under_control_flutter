@@ -252,13 +252,6 @@ class _TasksListState extends State<TasksList> {
                                         return false;
                                       }
                                     }
-                                    // set task date to today
-                                    task.date = DateTime.now();
-                                    if (task.taskInterval != null &&
-                                        task.taskInterval != 'No') {
-                                      task.nextDate = DateCalc.getNextDate(
-                                          task.date, task.taskInterval!);
-                                    }
 
                                     await Provider.of<TaskProvider>(context,
                                             listen: false)

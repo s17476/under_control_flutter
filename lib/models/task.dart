@@ -16,6 +16,7 @@ class Task {
   String? executorId;
   String userId;
   String? itemId;
+  String? itemName;
   String? location;
   String description;
   String comments;
@@ -35,6 +36,7 @@ class Task {
     this.executorId,
     required this.userId,
     this.itemId,
+    this.itemName,
     this.location,
     required this.description,
     required this.comments,
@@ -59,6 +61,7 @@ class Task {
     String? executorId,
     String? userId,
     String? itemId,
+    String? itemName,
     String? location,
     String? description,
     String? comments,
@@ -78,6 +81,7 @@ class Task {
       executorId: executorId ?? this.executorId,
       userId: userId ?? this.userId,
       itemId: itemId ?? this.itemId,
+      itemName: itemName ?? this.itemName,
       location: location ?? this.location,
       description: description ?? this.description,
       comments: comments ?? this.comments,

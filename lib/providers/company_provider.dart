@@ -24,8 +24,8 @@ class CompanyProvider with ChangeNotifier {
         .get();
   }
 
-  Future<String> getCompanyById(String companyId) {
-    return FirebaseFirestore.instance
+  Future<String> getCompanyById(String companyId) async {
+    return await FirebaseFirestore.instance
         .collection('companies')
         .doc(companyId)
         .get()

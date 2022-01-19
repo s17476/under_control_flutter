@@ -299,6 +299,8 @@ class _MainScreenState extends State<MainScreen> {
                                             status: TaskStatus.planned,
                                             type: TaskType.inspection,
                                             itemId: tmpItem.itemId,
+                                            itemName:
+                                                '${tmpItem.producer} ${tmpItem.model}',
                                             location: tmpItem.location,
                                             taskInterval: tmpItem.interval,
                                             nextDate: DateCalc.getNextDate(

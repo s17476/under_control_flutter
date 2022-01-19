@@ -58,9 +58,7 @@ class MainDrawer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      print('DO KONTAAAAAAAAAAAAAAAAAAAAA');
-                    },
+                    onTap: () {},
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -79,9 +77,10 @@ class MainDrawer extends StatelessWidget {
                           children: [
                             Text(
                               userProvider.user!.userName,
-                              style: TextStyle(
-                                fontSize: SizeConfig.blockSizeVertical * 3,
+                              style: const TextStyle(
+                                fontSize: 16,
                                 fontWeight: FontWeight.w700,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             SizedBox(

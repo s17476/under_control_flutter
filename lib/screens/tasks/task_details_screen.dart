@@ -166,9 +166,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
     await Provider.of<UserProvider>(context)
         .getUserById(context, task.userId)
         .then((value) {
-      setState(() {
-        _creatorName = value!.userName;
-      });
+      if (value != null) {
+        print('xxx');
+        setState(() {
+          _creatorName = value.userName;
+        });
+      }
     });
   }
 
@@ -387,9 +390,23 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
     oldTask = task.copyWith();
 
     if (task.type == TaskType.inspection) {
-      item = Provider.of<ItemProvider>(context, listen: false)
-          .items
-          .firstWhere((element) => element.itemId == task.itemId);
+      try {
+        item = Provider.of<ItemProvider>(context, listen: false)
+            .items
+            .firstWhere((element) => element.itemId == task.itemId);
+      } catch (e) {
+        item = Item(
+          internalId: '',
+          producer: 'Deleted',
+          model: 'asset',
+          category: '',
+          location: '',
+          lastInspection: DateTime.now(),
+          nextInspection: DateTime.now(),
+          interval: '',
+          inspectionStatus: 0,
+        );
+      }
     }
 
     if (task.type == TaskType.inspection && inspection == null) {

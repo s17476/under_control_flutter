@@ -34,7 +34,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
   String _statusString = 'OK';
   DateTime? _inspectionDate;
   String _checklistName = 'New checklist';
-  String _inspectionInterval = 'No';
+  String _inspectionInterval = '1 year';
 
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _nameTextController = TextEditingController();
@@ -681,14 +681,12 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                             onChanged: (String? newValue) {
                               FocusScope.of(context).requestFocus(FocusNode());
                               setState(() {
-                                print(newValue);
                                 _inspectionInterval = newValue!;
                               });
                             },
                             dropdownColor:
                                 Theme.of(context).appBarTheme.backgroundColor,
                             items: <String>[
-                              'No',
                               '2 years',
                               '1 year',
                               '6 months',

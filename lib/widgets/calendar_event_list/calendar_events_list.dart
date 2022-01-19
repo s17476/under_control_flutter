@@ -151,13 +151,13 @@ class CalendarEventsList extends StatelessWidget {
                                 }
 
                                 // set task date to today
-                                value[index].date = DateTime.now();
-                                if (value[index].taskInterval != null &&
-                                    value[index].taskInterval != 'No') {
-                                  value[index].nextDate = DateCalc.getNextDate(
-                                      value[index].date,
-                                      value[index].taskInterval!);
-                                }
+                                // value[index].date = DateTime.now();
+                                // if (value[index].taskInterval != null &&
+                                //     value[index].taskInterval != 'No') {
+                                //   value[index].nextDate = DateCalc.getNextDate(
+                                //       value[index].date,
+                                //       value[index].taskInterval!);
+                                // }
 
                                 // Task tmpTask = value[index];
                                 await Provider.of<TaskProvider>(context,

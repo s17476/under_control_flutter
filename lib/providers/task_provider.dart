@@ -26,6 +26,9 @@ class TaskProvider with ChangeNotifier {
 
   void clear() {
     _user = null;
+    _upcomingTasks = [];
+    _tasks = {};
+    _tasksArchive = {};
   }
 
   void updateUser(AppUser? user) {
@@ -128,6 +131,7 @@ class TaskProvider with ChangeNotifier {
           executorId: doc['executorId'],
           userId: doc['userId'],
           itemId: doc['itemId'],
+          itemName: doc['itemName'],
           location: doc['location'],
           description: doc['description'],
           comments: doc['comments'],
@@ -149,10 +153,76 @@ class TaskProvider with ChangeNotifier {
       } else {
         _tasksArchive = tmpTasks;
       }
-
-      _isLoading = false;
-      notifyListeners();
     });
+    await fetchAndSetSharedTasks();
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> fetchAndSetSharedTasks() async {
+    _isLoading = true;
+    Map<String, List<Task>> tmpTasks = {};
+    final taskRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(_user!.companyId)
+        .collection('sharedTasks')
+        .get();
+
+    await taskRef.then((QuerySnapshot querySnapshot) async {
+      for (var sharedDoc in querySnapshot.docs) {
+        final companyId = sharedDoc['companyId'];
+        final taskId = sharedDoc['taskId'];
+
+        await FirebaseFirestore.instance
+            .collection('companies')
+            .doc(companyId)
+            .collection('tasks')
+            .doc(taskId)
+            .get()
+            .then((DocumentSnapshot docSnap) {
+          if (docSnap.exists) {
+            final date = DateTime.parse(docSnap['date']);
+            final stringDate = DateFormat('dd/MM/yyyy').format(date);
+            final nextDate = docSnap['nextDate'] != null
+                ? DateTime.parse(docSnap['nextDate'])
+                : null;
+
+            final tmpTask = Task(
+              taskId: docSnap.id,
+              title: docSnap['title'],
+              date: date,
+              nextDate: nextDate,
+              taskInterval: docSnap['taskInterval'],
+              executor: TaskExecutor.values[docSnap['executor']],
+              executorId: docSnap['executorId'],
+              userId: docSnap['userId'],
+              itemId: docSnap['itemId'],
+              itemName: docSnap['itemName'],
+              location: docSnap['location'],
+              description: docSnap['description'],
+              comments: docSnap['comments'],
+              status: TaskStatus.values[docSnap['status']],
+              type: TaskType.values[docSnap['type']],
+              images: docSnap['images'],
+              cost: docSnap['cost'],
+              duration: docSnap['duration'],
+            );
+
+            if (tmpTasks.containsKey(stringDate)) {
+              tmpTasks[stringDate]!.add(tmpTask);
+            } else {
+              tmpTasks[stringDate] = [tmpTask];
+            }
+          }
+        });
+
+        // print('f\ne\nt\nc\nh\n ${tmpTask.cost}  ${tmpTask.duration}');
+
+      }
+    });
+
+    _tasks.addEntries(tmpTasks.entries);
   }
 
   Future<void> fetchAndSetCompletedTasks() async {
@@ -182,6 +252,7 @@ class TaskProvider with ChangeNotifier {
           executorId: doc['executorId'],
           userId: doc['userId'],
           itemId: doc['itemId'],
+          itemName: doc['itemName'],
           location: doc['location'],
           description: doc['description'],
           comments: doc['comments'],
@@ -225,6 +296,7 @@ class TaskProvider with ChangeNotifier {
       'executorId': task.executorId,
       'userId': task.userId,
       'itemId': task.itemId,
+      'itemName': task.itemName,
       'location': task.location,
       'description': task.description,
       'comments': task.comments,
@@ -255,8 +327,13 @@ class TaskProvider with ChangeNotifier {
   Future<void> shareTask(Task task) async {
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
-        .doc(_user!.companyId)
-        .collection('tasks');
+        .doc(task.executorId)
+        .collection('sharedTasks');
+
+    await tasksRef.add({
+      'companyId': _user!.companyId,
+      'taskId': task.taskId,
+    });
   }
 
   // update task
@@ -276,6 +353,7 @@ class TaskProvider with ChangeNotifier {
       'executorId': task.executorId,
       'userId': task.userId,
       'itemId': task.itemId,
+      'itemName': task.itemName,
       'location': task.location,
       'description': task.description,
       'comments': task.comments,
@@ -336,6 +414,7 @@ class TaskProvider with ChangeNotifier {
       'executorId': _user!.userId,
       'userId': task.userId,
       'itemId': task.itemId,
+      'itemName': task.itemName,
       'location': task.location,
       'description': task.description,
       'comments': task.comments,
@@ -385,7 +464,7 @@ class TaskProvider with ChangeNotifier {
       // print(error);
     });
 
-    fetchAndSetCompletedTasks();
+    // fetchAndSetCompletedTasks();
     return response;
   }
 
@@ -420,6 +499,12 @@ class TaskProvider with ChangeNotifier {
     _undoTask = task;
     task.status = TaskStatus.completed;
     task.comments = 'Rapid Complete';
+
+    // set task date to today
+    task = task.copyWith(date: DateTime.now());
+    if (task.taskInterval != null && task.taskInterval != 'No') {
+      task.nextDate = DateCalc.getNextDate(task.date, task.taskInterval!);
+    }
 
     var response = false;
     await addToArchive(task).then((_) => deleteTask(task).then((value) {
