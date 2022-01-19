@@ -252,7 +252,12 @@ class TaskProvider with ChangeNotifier {
     return result;
   }
 
-  Future<void> shareTask(Task task) async {}
+  Future<void> shareTask(Task task) async {
+    final tasksRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(_user!.companyId)
+        .collection('tasks');
+  }
 
   // update task
   Future<void> updateTask(Task task) async {
