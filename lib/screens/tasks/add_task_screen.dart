@@ -178,8 +178,10 @@ class _AddTaskScreenState extends State<AddTaskScreen>
         }
 
         final itemProvider = Provider.of<ItemProvider>(context, listen: false);
-        final item = itemProvider.items
-            .firstWhere((element) => element.itemId == selectedItemId);
+        if (selectedItemId != null) {
+          item = itemProvider.items
+              .firstWhere((element) => element.itemId == selectedItemId);
+        }
         Task task = Task(
           title: _taskTitle,
           date: _taskDate!,
@@ -190,7 +192,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
           userId:
               Provider.of<UserProvider>(context, listen: false).user!.userId,
           itemId: selectedItemId,
-          itemName: '${item.producer} ${item.model}',
+          itemName: '${item?.producer ?? ''} ${item?.model ?? ''}',
           location: selectedLocation,
           description: _taskDescription,
           comments: '',

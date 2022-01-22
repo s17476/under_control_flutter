@@ -112,7 +112,7 @@ class UserProvider with ChangeNotifier {
     BuildContext context,
     String userId,
   ) async {
-    _user = await FirebaseFirestore.instance
+    return await FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
         .get()
@@ -139,7 +139,7 @@ class UserProvider with ChangeNotifier {
       }
       return tmpUser;
     });
-    return _user;
+    // return _user;
   }
 
   // set company to the current user

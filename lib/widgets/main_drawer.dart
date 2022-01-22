@@ -69,9 +69,6 @@ class MainDrawer extends StatelessWidget {
                               NetworkImage(userProvider.user!.userImage),
                           maxRadius: SizeConfig.blockSizeHorizontal * 8,
                         ),
-                        SizedBox(
-                          width: SizeConfig.blockSizeHorizontal * 5,
-                        ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -91,12 +88,6 @@ class MainDrawer extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(
-                          width: SizeConfig.blockSizeHorizontal * 10,
-                        ),
-                        // SizedBox(
-                        //   width: SizeConfig.blockSizeHorizontal * 10,
-                        // ),
                         Icon(
                           Icons.navigate_next,
                           size: SizeConfig.blockSizeVertical * 4,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/models/app_user.dart';
+import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 
 class TaskProvider with ChangeNotifier {
@@ -38,6 +39,10 @@ class TaskProvider with ChangeNotifier {
   set executor(TaskExecutor taskExecutor) {
     calendarExecutor = taskExecutor;
     notifyListeners();
+  }
+
+  void setDoneTasks() {
+    _isActive = false;
   }
 
   void toggleIsActive() {
@@ -158,6 +163,59 @@ class TaskProvider with ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+  }
+
+  // get shared done tasks
+  Future<Map<String, List<Task>>> getSharedDoneTasks(
+      Item item, String companyId) async {
+    _isLoading = true;
+    Map<String, List<Task>> tmpTasks = {};
+    final taskRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(companyId)
+        .collection('archive')
+        .orderBy('date', descending: true)
+        .get();
+
+    await taskRef.then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        final date = DateTime.parse(doc['date']);
+        final stringDate = DateFormat('dd/MM/yyyy').format(date);
+        final nextDate =
+            doc['nextDate'] != null ? DateTime.parse(doc['nextDate']) : null;
+
+        final tmpTask = Task(
+          taskId: doc.id,
+          title: doc['title'],
+          date: date,
+          nextDate: nextDate,
+          taskInterval: doc['taskInterval'],
+          executor: TaskExecutor.values[doc['executor']],
+          executorId: doc['executorId'],
+          userId: doc['userId'],
+          itemId: doc['itemId'],
+          itemName: doc['itemName'],
+          location: doc['location'],
+          description: doc['description'],
+          comments: doc['comments'],
+          status: TaskStatus.values[doc['status']],
+          type: TaskType.values[doc['type']],
+          images: doc['images'],
+          cost: doc['cost'],
+          duration: doc['duration'],
+        );
+        // print('f\ne\nt\nc\nh\n ${tmpTask.cost}  ${tmpTask.duration}');
+        if (tmpTasks.containsKey(stringDate)) {
+          tmpTasks[stringDate]!.add(tmpTask);
+        } else {
+          tmpTasks[stringDate] = [tmpTask];
+        }
+      }
+    });
+
+    _isLoading = false;
+    notifyListeners();
+    return tmpTasks;
   }
 
   Future<void> fetchAndSetSharedTasks() async {
@@ -453,6 +511,10 @@ class TaskProvider with ChangeNotifier {
             .collection('tasks')
             .doc(task.taskId);
 
+    if (task.executor == TaskExecutor.shared) {
+      await deleteSharedTask(task);
+    }
+
     await taskRef.delete().then((_) {
       final key = DateFormat('dd/MM/yyyy').format(task.date);
       _tasks[key]!.removeWhere((element) => element.taskId == task.taskId);
@@ -466,6 +528,29 @@ class TaskProvider with ChangeNotifier {
 
     // fetchAndSetCompletedTasks();
     return response;
+  }
+
+  // delete shared task
+  Future<void> deleteSharedTask(Task task) async {
+    String taskToDelete = '';
+    await FirebaseFirestore.instance
+        .collection('companies')
+        .doc(task.executorId)
+        .collection('sharedTasks')
+        .where('taskId', isEqualTo: task.taskId)
+        .get()
+        .then((QuerySnapshot querySnap) {
+      if (querySnap.docs.isNotEmpty) {
+        taskToDelete = querySnap.docs[0]['taskId'];
+      }
+    });
+
+    await FirebaseFirestore.instance
+        .collection('companies')
+        .doc(task.executorId)
+        .collection('sharedTasks')
+        .doc(taskToDelete)
+        .delete();
   }
 
   Future<bool> deleteFromTaskArchive(BuildContext context, Task task) async {

@@ -40,6 +40,7 @@ class TaskListItem extends StatelessWidget {
       DateTime.now().month,
       DateTime.now().day,
     ).isAfter(task.date);
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         vertical: 3.0,
@@ -57,7 +58,9 @@ class TaskListItem extends StatelessWidget {
                 child: Container(
                   color: darkTheme[task.type.index]!,
                   width: SizeConfig.blockSizeHorizontal * 16,
-                  height: SizeConfig.blockSizeHorizontal * 18,
+                  height: task.executor == TaskExecutor.shared
+                      ? SizeConfig.blockSizeHorizontal * 22
+                      : SizeConfig.blockSizeHorizontal * 18,
                   child: Icon(
                     eventIcons[task.type.index],
                     color: Colors.white,
@@ -107,7 +110,7 @@ class TaskListItem extends StatelessWidget {
                               ),
                             ],
                           ),
-                          if (item != null)
+                          if (task.itemName != '')
                             Row(
                               children: [
                                 Icon(
@@ -125,68 +128,70 @@ class TaskListItem extends StatelessWidget {
                               ],
                             ),
 
-                          // //sahred with company
-                          // if (task.executor == TaskExecutor.shared)
-                          //   Row(
-                          //     children: [
-                          //       Icon(
-                          //         Icons.share,
-                          //         color: Theme.of(context).hintColor,
-                          //         size: 15,
-                          //       ),
-                          //       task.executorId !=
-                          //               Provider.of<UserProvider>(context)
-                          //                   .user!
-                          //                   .companyId
-                          //           ? FutureBuilder(
-                          //               future: Provider.of<CompanyProvider>(
-                          //                       context)
-                          //                   .getCompanyById(task.executorId!),
-                          //               builder: (ctx, companyName) {
-                          //                 if (companyName.hasData) {
-                          //                   return Text(
-                          //                     companyName.data as String,
-                          //                     overflow: TextOverflow.ellipsis,
-                          //                     style: TextStyle(
-                          //                       color:
-                          //                           Theme.of(context).hintColor,
-                          //                     ),
-                          //                   );
-                          //                 }
-                          //                 return Text(
-                          //                   'Shared with',
-                          //                   style: TextStyle(
-                          //                     color:
-                          //                         Theme.of(context).hintColor,
-                          //                   ),
-                          //                 );
-                          //               })
-                          //           : FutureBuilder(
-                          //               future:
-                          //                   Provider.of<UserProvider>(context)
-                          //                       .getUserById(
-                          //                           context, task.userId),
-                          //               builder: (ctx, user) {
-                          //                 if (user.hasData) {
-                          //                   return Text(
-                          //                     (user.data as AppUser).company!,
-                          //                     overflow: TextOverflow.ellipsis,
-                          //                     style: TextStyle(
-                          //                       color:
-                          //                           Theme.of(context).hintColor,
-                          //                     ),
-                          //                   );
-                          //                 }
-                          //                 return Text(
-                          //                   'Shared by',
-                          //                   style: TextStyle(
-                          //                     color:
-                          //                         Theme.of(context).hintColor,
-                          //                   ),
-                          //                 );
-                          //               })
-                          //     ],
-                          //   ),
+                          //sahred with company
+                          if (task.executor == TaskExecutor.shared)
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.share,
+                                  color: Theme.of(context).hintColor,
+                                  size: 15,
+                                ),
+                                task.executorId !=
+                                        Provider.of<UserProvider>(context)
+                                            .user!
+                                            .companyId
+                                    ? FutureBuilder(
+                                        future: Provider.of<CompanyProvider>(
+                                                context)
+                                            .getCompanyById(task.executorId!),
+                                        builder: (ctx, companyName) {
+                                          if (companyName.hasData) {
+                                            return Text(
+                                              companyName.data as String,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color:
+                                                    Theme.of(context).hintColor,
+                                              ),
+                                            );
+                                          }
+                                          return SizedBox(
+                                            width: 10,
+                                            height: 10,
+                                            child: CircularProgressIndicator(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                            ),
+                                          );
+                                        })
+                                    : FutureBuilder(
+                                        future:
+                                            Provider.of<UserProvider>(context)
+                                                .getUserById(
+                                                    context, task.userId),
+                                        builder: (ctx, user) {
+                                          if (user.hasData) {
+                                            return Text(
+                                              (user.data as AppUser).company!,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                color:
+                                                    Theme.of(context).hintColor,
+                                              ),
+                                            );
+                                          }
+                                          return SizedBox(
+                                            width: 10,
+                                            height: 10,
+                                            child: CircularProgressIndicator(
+                                              color: Theme.of(context)
+                                                  .primaryColor,
+                                            ),
+                                          );
+                                        })
+                              ],
+                            ),
                         ],
                       ),
                   ],

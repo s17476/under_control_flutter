@@ -23,6 +23,7 @@ import 'package:under_control_flutter/screens/main_screen.dart';
 import 'package:under_control_flutter/screens/start/loading_screen.dart';
 import 'package:under_control_flutter/screens/tasks/add_task_screen.dart';
 import 'package:under_control_flutter/screens/tasks/choose_shared_company_screen.dart';
+import 'package:under_control_flutter/screens/tasks/shared_task_detail_screen.dart';
 import 'package:under_control_flutter/screens/tasks/task_details_screen.dart';
 
 void main() {
@@ -190,6 +191,8 @@ class _AppState extends State<App> {
               const EquipmentDetailsScreen(),
           AddTaskScreen.routeName: (ctx) => const AddTaskScreen(),
           TaskDetailsScreen.routeName: (ctx) => const TaskDetailsScreen(),
+          SharedTaskDetailsScreen.routeName: (ctx) =>
+              const SharedTaskDetailsScreen(),
           AddInspectionScreen.routeName: (ctx) => const AddInspectionScreen(),
         },
       ),

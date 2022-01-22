@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/checklist.dart';
 import 'package:under_control_flutter/models/inspection.dart';
 import 'package:under_control_flutter/models/item.dart';
+import 'package:under_control_flutter/models/task.dart';
 
 class InspectionProvider with ChangeNotifier {
   InspectionProvider();
@@ -32,6 +34,52 @@ class InspectionProvider with ChangeNotifier {
         .doc(_user!.companyId)
         .collection('items')
         .doc(item.itemId)
+        .collection('inspections')
+        .orderBy('date', descending: true)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      // fetch inspections
+      for (var doc in querySnapshot.docs) {
+        Checklist tmpChecklist = Checklist(name: '', fields: {});
+        tmpInspections.add(Inspection(
+          inspectionId: doc.id,
+          user: doc['user'],
+          date: DateTime.parse(doc['date']),
+          comments: doc['comments'],
+          status: doc['status'],
+          taskId: doc['taskId'],
+          checklist: tmpChecklist,
+        ));
+
+        // fetch checklist
+        Map checkpointsMap = doc.data() as Map;
+        for (var checkpoint in checkpointsMap.keys) {
+          if (checkpoint == 'checklistName') {
+            tmpChecklist.name = checkpoint;
+          } else if (checkpoint != 'user' &&
+              checkpoint != 'date' &&
+              checkpoint != 'comments' &&
+              checkpoint != 'status' &&
+              checkpoint != 'taskId') {
+            tmpChecklist.fields[checkpoint] = doc[checkpoint];
+            // print('checkpoint    ${doc[checkpoint]}');
+          }
+        }
+      }
+
+      _inspections = tmpInspections;
+      notifyListeners();
+    });
+  }
+
+  // getch inspections by shared task
+  Future<void> fetchBySharedTask(Task task, String companyId) async {
+    List<Inspection> tmpInspections = [];
+    await FirebaseFirestore.instance
+        .collection('companies')
+        .doc(companyId)
+        .collection('items')
+        .doc(task.itemId)
         .collection('inspections')
         .orderBy('date', descending: true)
         .get()

@@ -9,6 +9,7 @@ import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
+import 'package:under_control_flutter/screens/tasks/shared_task_detail_screen.dart';
 import 'package:under_control_flutter/screens/tasks/task_details_screen.dart';
 import 'package:under_control_flutter/widgets/task/task_list_item.dart';
 
@@ -355,31 +356,42 @@ class _TasksListState extends State<TasksList> {
                                 ),
                               )
                             : GestureDetector(
-                                onTap: () => Navigator.of(context)
-                                    .pushNamed(TaskDetailsScreen.routeName,
-                                        arguments: task)
-                                    .then((value) {
-                                  if (value != null) {
-                                    String msg = '';
-                                    Color color = Theme.of(context)
-                                        .appBarTheme
-                                        .backgroundColor!;
-                                    if (value == 'deleted') {
-                                      msg = 'Task has been deleted!';
-                                    } else if (value == 'completed') {
-                                      msg = 'Task completed. Well done!';
-                                      color = Theme.of(context).primaryColor;
-                                    }
-                                    ScaffoldMessenger.of(context)
-                                      ..removeCurrentSnackBar()
-                                      ..showSnackBar(
-                                        SnackBar(
-                                          content: Text(msg),
-                                          backgroundColor: color,
-                                        ),
-                                      );
-                                  }
-                                }),
+                                onTap: (task.executor == TaskExecutor.shared &&
+                                        task.executorId == user!.companyId)
+                                    ? () {
+                                        print('shared');
+                                        Navigator.of(context).pushNamed(
+                                            SharedTaskDetailsScreen.routeName,
+                                            arguments: task);
+                                      }
+                                    : () => Navigator.of(context)
+                                            .pushNamed(
+                                                TaskDetailsScreen.routeName,
+                                                arguments: task)
+                                            .then((value) {
+                                          if (value != null) {
+                                            String msg = '';
+                                            Color color = Theme.of(context)
+                                                .appBarTheme
+                                                .backgroundColor!;
+                                            if (value == 'deleted') {
+                                              msg = 'Task has been deleted!';
+                                            } else if (value == 'completed') {
+                                              msg =
+                                                  'Task completed. Well done!';
+                                              color = Theme.of(context)
+                                                  .primaryColor;
+                                            }
+                                            ScaffoldMessenger.of(context)
+                                              ..removeCurrentSnackBar()
+                                              ..showSnackBar(
+                                                SnackBar(
+                                                  content: Text(msg),
+                                                  backgroundColor: color,
+                                                ),
+                                              );
+                                          }
+                                        }),
                                 child: TaskListItem(
                                   task: task,
                                   item: item,
