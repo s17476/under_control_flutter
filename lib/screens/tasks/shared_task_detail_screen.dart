@@ -502,7 +502,7 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
             IconButton(
               onPressed: () async {
                 FocusScope.of(context).unfocus();
-                bool exit = false;
+                // bool exit = false;
                 _showCompleteDialog(context, task).then((value) async {
                   if (value == true) {
                     // if task is inspection
@@ -620,8 +620,12 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
                 ],
               ),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                  top: 8,
+                  bottom: 1,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -947,8 +951,12 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
               // action buttons bar
               if (task.status != TaskStatus.completed)
                 AnimatedContainer(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: 4,
+                    top: 1,
+                  ),
                   duration: const Duration(milliseconds: 500),
                   color: _isInEditMode
                       ? Theme.of(context).appBarTheme.backgroundColor

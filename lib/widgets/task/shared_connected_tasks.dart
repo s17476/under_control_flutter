@@ -92,7 +92,8 @@ class _SharedConnectedTasksState extends State<SharedConnectedTasks> {
                 child: Text(
                   'Done tasks',
                   style: TextStyle(
-                      color: Theme.of(context).appBarTheme.foregroundColor),
+                    color: Theme.of(context).appBarTheme.foregroundColor,
+                  ),
                 ),
               ),
           ],
@@ -102,16 +103,11 @@ class _SharedConnectedTasksState extends State<SharedConnectedTasks> {
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           height: showTasks ? null : 0,
-
-          // color: Colors.white12,
           child: Column(children: [
             const Divider(),
             SharedTasksList.item(item: item, task: widget.task),
           ]),
         ),
-        // Divider(
-        //   color: Theme.of(context).appBarTheme.backgroundColor,
-        // ),
       ],
     );
   }
