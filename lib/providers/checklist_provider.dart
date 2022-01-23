@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/checklist.dart';
 
+// this class provides checklists data and DB operations methods
 class ChecklistProvider with ChangeNotifier {
   ChecklistProvider();
 
@@ -21,7 +22,7 @@ class ChecklistProvider with ChangeNotifier {
   List<Checklist> get checklists =>
       [Checklist(name: 'New checklist', fields: {}), ..._checklists];
 
-  // add new checklist
+  // add new checklist to DB
   Future<Checklist> addChecklist(Checklist checklist) async {
     Checklist result;
 

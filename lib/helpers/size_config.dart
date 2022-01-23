@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-//this class helps to adjust elements to different screen sizes
+//this class helps to adjust elements size to different screen sizes
 class SizeConfig {
   static MediaQueryData? _mediaQueryData;
   static double? _screenWidth;

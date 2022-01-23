@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:flutter/foundation.dart';
 import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/checklist.dart';
@@ -7,10 +6,9 @@ import 'package:under_control_flutter/models/inspection.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 
+// this class provides inspections data and DB operations methods
 class InspectionProvider with ChangeNotifier {
   InspectionProvider();
-
-  // InspectionProvider.user({this.user});
 
   List<Inspection> _inspections = [];
   AppUser? _user;
@@ -62,7 +60,6 @@ class InspectionProvider with ChangeNotifier {
               checkpoint != 'status' &&
               checkpoint != 'taskId') {
             tmpChecklist.fields[checkpoint] = doc[checkpoint];
-            // print('checkpoint    ${doc[checkpoint]}');
           }
         }
       }
@@ -108,7 +105,6 @@ class InspectionProvider with ChangeNotifier {
               checkpoint != 'status' &&
               checkpoint != 'taskId') {
             tmpChecklist.fields[checkpoint] = doc[checkpoint];
-            // print('checkpoint    ${doc[checkpoint]}');
           }
         }
       }

@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:under_control_flutter/models/app_user.dart';
 
+// this class provides data to the charts in overview screen
 class ChartDataProvider with ChangeNotifier {
   Map<String, double> _chartValues = {};
   AppUser? _user;
@@ -98,7 +99,6 @@ class ChartDataProvider with ChangeNotifier {
           result[stringDate] = result[stringDate]! + doc['cost'];
         }
       }
-
       _chartValues = result;
       notifyListeners();
       _isLoading = false;
@@ -157,9 +157,6 @@ class ChartDataProvider with ChangeNotifier {
       _assetsCost = tmpAssetsCosts;
       _assetsTime = tmpAssetsTime;
       notifyListeners();
-
-      // print(tmpAssetsTime);
-      // print(tmpAssetsCosts);
     });
   }
 }

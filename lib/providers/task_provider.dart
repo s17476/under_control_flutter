@@ -19,7 +19,6 @@ class TaskProvider with ChangeNotifier {
   bool _isLoading = false;
 
   List<Task> _upcomingTasks = [];
-  // List<Task> _completedTasks = [];
 
   TaskExecutor calendarExecutor = TaskExecutor.all;
 

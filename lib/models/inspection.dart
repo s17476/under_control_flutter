@@ -1,4 +1,3 @@
-import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/checklist.dart';
 
 class Inspection {
