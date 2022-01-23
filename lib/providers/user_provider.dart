@@ -142,6 +142,33 @@ class UserProvider with ChangeNotifier {
     // return _user;
   }
 
+  // get shared user by Id
+  Future<AppUser?> getSharedUserById(
+    String userId,
+  ) async {
+    return await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      AppUser? tmpUser;
+      if (documentSnapshot.exists) {
+        final userSnapshot = documentSnapshot.data() as Map<String, dynamic>;
+
+        tmpUser = AppUser.company(
+          userId: documentSnapshot.id,
+          email: userSnapshot['email'],
+          userName: userSnapshot['userName'],
+          userImage: userSnapshot['imgUrl'],
+          company: userSnapshot['company'],
+          companyId: userSnapshot['companyId'],
+        );
+      }
+      return tmpUser;
+    });
+    // return _user;
+  }
+
   // set company to the current user
   Future<void> setCompany(BuildContext context, Company company) async {
     _user = AppUser.company(

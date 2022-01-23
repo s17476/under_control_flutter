@@ -152,6 +152,29 @@ class ItemProvider with ChangeNotifier {
     );
   }
 
+  // updateItemInDb
+  Future<void> updateSharedItem(Item item, String companyId) async {
+    await FirebaseFirestore.instance
+        .collection('companies')
+        .doc(companyId)
+        .collection('items')
+        .doc(item.itemId)
+        .update({
+      'internalId': item.internalId,
+      'producer': item.producer,
+      'model': item.model,
+      'category': item.category.toUpperCase(),
+      'location': item.location,
+      'comments': item.comments,
+      'inspectionStatus': item.inspectionStatus,
+      'nextInspection': item.nextInspection.toIso8601String(),
+      'lastInspection': item.lastInspection.toIso8601String(),
+      'interval': item.interval,
+    }).catchError(
+      (e) => throw Exception('Connection error. Please try later...'),
+    );
+  }
+
   // fetch data from DB
   Future<void> fetchAndSetItems() async {
     // print('fetch');
@@ -222,6 +245,35 @@ class ItemProvider with ChangeNotifier {
       await _updateInspectionStatus(updatedItems, InspectionStatus.expired);
     }
     // notifyListeners();
+  }
+
+  // get shared item
+  Future<Item?> getSharedItem(String itemId, String companyId) async {
+    Item? tmpItem;
+    await FirebaseFirestore.instance
+        .collection('companies')
+        .doc(companyId)
+        .collection('items')
+        .doc(itemId)
+        .get()
+        .then((DocumentSnapshot doc) {
+      if (doc.exists) {
+        tmpItem = Item(
+          itemId: doc.id,
+          internalId: doc['internalId'],
+          producer: doc['producer'],
+          model: doc['model'],
+          category: doc['category'],
+          location: doc['location'],
+          comments: doc['comments'],
+          lastInspection: DateTime.parse(doc['lastInspection']),
+          nextInspection: DateTime.parse(doc['nextInspection']),
+          interval: doc['interval'],
+          inspectionStatus: doc['inspectionStatus'],
+        );
+      }
+    });
+    return tmpItem;
   }
 
   Future<void> _updateInspectionStatus(

@@ -159,4 +159,47 @@ class InspectionProvider with ChangeNotifier {
     });
     return response;
   }
+
+  // add shared inspection
+  Future<bool> addSharedInspection(
+      Item item, Inspection inspection, String companyId) async {
+    bool response;
+    final checklistName =
+        inspection.checklist == null ? '' : inspection.checklist!.name;
+
+    final inspectionRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(companyId)
+        .collection('items')
+        .doc(item.itemId)
+        .collection('inspections');
+
+    Map<String, dynamic> values = {
+      'user': inspection.user,
+      'date': inspection.date.toIso8601String(),
+      'comments': inspection.comments,
+      'status': inspection.status,
+      'checklistName': checklistName,
+      'taskId': inspection.taskId,
+    };
+
+    if (inspection.checklist != null) {
+      values.addAll(inspection.checklist!.fields);
+    }
+
+    // add to DB
+    response = await inspectionRef.add(values).then(
+      (value) {
+        inspection = inspection.copyWith(inspectionId: value.id);
+        // add to local list
+        _inspections.add(inspection);
+        notifyListeners();
+
+        return true;
+      },
+    ).catchError((_) {
+      return false;
+    });
+    return response;
+  }
 }

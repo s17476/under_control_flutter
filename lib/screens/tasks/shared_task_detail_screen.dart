@@ -12,7 +12,6 @@ import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/widgets/inspection/inspection_form.dart';
-import 'package:under_control_flutter/widgets/inspection/inspections_list.dart';
 import 'package:under_control_flutter/widgets/inspection/shared_inspection_list.dart';
 import 'package:under_control_flutter/widgets/task/shared_connected_tasks.dart';
 import 'package:under_control_flutter/widgets/task/task_complete.dart';
@@ -303,9 +302,10 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
         }
 
         // executor ID
-        task.executorId =
+        // task.executorId =
+        //     Provider.of<UserProvider>(context, listen: false).user!.userId;
+        inspection?.user =
             Provider.of<UserProvider>(context, listen: false).user!.userId;
-        inspection?.user = task.executorId!;
 
         // date
         task.date = transferObjectTask!.date;
@@ -330,12 +330,18 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
 
         // task is started, but not finished
         task.status = TaskStatus.started;
-        Provider.of<TaskProvider>(context, listen: false).updateTask(task);
+        final taskCreator =
+            await Provider.of<UserProvider>(context, listen: false)
+                .getUserById(context, task.userId);
+        Provider.of<TaskProvider>(context, listen: false)
+            .updateSharedTask(task, taskCreator!.companyId!);
+
         // task finished and moved to archive
         if (completed) {
           task.status = TaskStatus.completed;
+
           Provider.of<TaskProvider>(context, listen: false)
-              .completeTask(task, oldTask!);
+              .completeSharedTask(task, oldTask!, taskCreator.companyId!);
           var tmp = task.copyWith(
             comments: '',
             cost: 0,
@@ -343,14 +349,12 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
             status: TaskStatus.planned,
           );
 
-          Provider.of<TaskProvider>(context, listen: false).addNextTask(tmp);
+          Provider.of<TaskProvider>(context, listen: false)
+              .addNextSharedTask(tmp, taskCreator.companyId!);
         }
         if (task.type == TaskType.inspection) {
           await Provider.of<InspectionProvider>(context, listen: false)
-              .addInspection(
-            item!,
-            inspection!,
-          )
+              .addSharedInspection(item!, inspection!, taskCreator.companyId!)
               .then((value) {
             if (!value) {
               ScaffoldMessenger.of(context)
@@ -369,13 +373,7 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
               item!.nextInspection = task.nextDate!;
 
               Provider.of<ItemProvider>(context, listen: false)
-                  .updateItem(item!);
-
-              Provider.of<ItemProvider>(context, listen: false)
-                  .fetchInspectionsStatus();
-              Provider.of<InspectionProvider>(context, listen: false)
-                  .fetchByItem(item!);
-              // Provider.of<TaskProvider>(context, listen: false).fetchAndSetTasks();
+                  .updateSharedItem(item!, taskCreator.companyId!);
             }
           });
         }
@@ -391,25 +389,25 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
     task = ModalRoute.of(context)!.settings.arguments as Task;
     oldTask = task.copyWith();
 
-    if (task.type == TaskType.inspection) {
-      try {
-        item = Provider.of<ItemProvider>(context, listen: false)
-            .items
-            .firstWhere((element) => element.itemId == task.itemId);
-      } catch (e) {
-        item = Item(
-          internalId: '',
-          producer: 'Deleted',
-          model: 'asset',
-          category: '',
-          location: '',
-          lastInspection: DateTime.now(),
-          nextInspection: DateTime.now(),
-          interval: '',
-          inspectionStatus: 0,
-        );
-      }
-    }
+    // if (task.type == TaskType.inspection) {
+    //   try {
+    //     item = Provider.of<ItemProvider>(context, listen: false)
+    //         .items
+    //         .firstWhere((element) => element.itemId == task.itemId);
+    //   } catch (e) {
+    //     item = Item(
+    //       internalId: '',
+    //       producer: 'Deleted',
+    //       model: 'asset',
+    //       category: '',
+    //       location: '',
+    //       lastInspection: DateTime.now(),
+    //       nextInspection: DateTime.now(),
+    //       interval: '',
+    //       inspectionStatus: 0,
+    //     );
+    //   }
+    // }
 
     if (task.type == TaskType.inspection && inspection == null) {
       inspection = Inspection(
@@ -436,12 +434,23 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
     super.didChangeDependencies();
   }
 
+  Future<Item?> getItem() async {
+    try {
+      final taskCreator =
+          await Provider.of<UserProvider>(context, listen: false)
+              .getSharedUserById(task.userId);
+      item = await Provider.of<ItemProvider>(context, listen: false)
+          .getSharedItem(task.itemId!, taskCreator!.companyId!);
+    } catch (e) {}
+
+    return item;
+  }
+
   @override
   Widget build(BuildContext context) {
     // used to store task state before saving
     transferObjectTask ??= task.copyWith(date: DateTime.now());
 
-    final items = Provider.of<ItemProvider>(context, listen: false).items;
     final textStyle = Theme.of(context).textTheme.headline6!.copyWith(
         // fontSize: SizeConfig.blockSizeHorizontal * 4.5,
         );
@@ -451,14 +460,7 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
           fontSize: SizeConfig.blockSizeHorizontal * 3,
           color: Theme.of(context).hintColor,
         );
-
-    Item? asset;
-
-    // print(task.itemId);
-    final index = items.indexWhere((element) => element.itemId == task.itemId);
-    if (index >= 0) {
-      asset = items[index];
-    }
+    getItem();
 
     return Scaffold(
       appBar: AppBar(
@@ -642,7 +644,7 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
                       style: textStyle,
                     ),
                     // asset
-                    if (asset != null)
+                    if (item != null)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -657,7 +659,7 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
                             height: 1,
                           ),
                           Text(
-                            '${asset.producer} ${asset.model} ${asset.internalId}',
+                            '${item!.producer} ${item!.model} ${item!.internalId}',
                             style: textStyle,
                           ),
                           const SizedBox(
@@ -921,7 +923,7 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
                       ),
                     ),
 
-                    if (item != null)
+                    if (item != null && inspection != null)
                       AnimatedContainer(
                         duration: const Duration(milliseconds: 500),
                         height:
@@ -1053,7 +1055,7 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
 
                             _showCompleteDialog(context, task)
                                 .then((value) async {
-                              if (value == true) {
+                              if (value) {
                                 _completeTask(true);
                               }
                             });

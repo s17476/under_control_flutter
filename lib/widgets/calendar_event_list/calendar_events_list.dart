@@ -6,7 +6,9 @@ import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
+import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
+import 'package:under_control_flutter/screens/tasks/shared_task_detail_screen.dart';
 import 'package:under_control_flutter/screens/tasks/task_details_screen.dart';
 import 'package:under_control_flutter/widgets/task/task_list_item.dart';
 
@@ -245,18 +247,29 @@ class CalendarEventsList extends StatelessWidget {
                             ),
                           )
                         : GestureDetector(
-                            onTap: () => Navigator.of(context)
-                                .pushNamed(TaskDetailsScreen.routeName,
+                            onTap: value[index].executor ==
+                                        TaskExecutor.shared &&
+                                    value[index].executorId ==
+                                        Provider.of<UserProvider>(context,
+                                                listen: false)
+                                            .user!
+                                            .companyId
+                                ? () => Navigator.of(context).pushNamed(
+                                    SharedTaskDetailsScreen.routeName,
                                     arguments: value[index])
-                                .then((value) {
-                              if (value != null) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Item deleted'),
-                                  ),
-                                );
-                              }
-                            }),
+                                : () => Navigator.of(context)
+                                        .pushNamed(TaskDetailsScreen.routeName,
+                                            arguments: value[index])
+                                        .then((value) {
+                                      if (value != null) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Item deleted'),
+                                          ),
+                                        );
+                                      }
+                                    }),
                             child: TaskListItem(task: value[index], item: item),
                           );
                   },

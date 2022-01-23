@@ -301,8 +301,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
         }
 
         // executor ID
-        task.executorId =
-            Provider.of<UserProvider>(context, listen: false).user!.userId;
+        if (task.executor != TaskExecutor.shared) {
+          task.executorId =
+              Provider.of<UserProvider>(context, listen: false).user!.userId;
+        }
         inspection?.user = task.executorId!;
 
         // date

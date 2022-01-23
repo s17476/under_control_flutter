@@ -220,7 +220,7 @@ class TaskProvider with ChangeNotifier {
 
   Future<void> fetchAndSetSharedTasks() async {
     _isLoading = true;
-    Map<String, List<Task>> tmpTasks = {};
+
     final taskRef = FirebaseFirestore.instance
         .collection('companies')
         .doc(_user!.companyId)
@@ -267,10 +267,10 @@ class TaskProvider with ChangeNotifier {
               duration: docSnap['duration'],
             );
 
-            if (tmpTasks.containsKey(stringDate)) {
-              tmpTasks[stringDate]!.add(tmpTask);
+            if (_tasks.containsKey(stringDate)) {
+              _tasks[stringDate]!.add(tmpTask);
             } else {
-              tmpTasks[stringDate] = [tmpTask];
+              _tasks[stringDate] = [tmpTask];
             }
           }
         });
@@ -279,8 +279,6 @@ class TaskProvider with ChangeNotifier {
 
       }
     });
-
-    _tasks.addEntries(tmpTasks.entries);
   }
 
   Future<void> fetchAndSetCompletedTasks() async {
@@ -382,6 +380,54 @@ class TaskProvider with ChangeNotifier {
     return result;
   }
 
+  // add shared task
+  Future<Task?> addSharedTask(Task task, String companyId) async {
+    print('add task executor id  ${task.executorId}');
+    Task tmpTask = task;
+    Task result;
+    // get tasks referance
+    final tasksRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(companyId)
+        .collection('tasks');
+
+    result = await tasksRef.add({
+      'title': task.title,
+      'date': task.date.toIso8601String(),
+      'nextDate': task.nextDate?.toIso8601String(),
+      'taskInterval': task.taskInterval,
+      'executor': task.executor.index,
+      'executorId': task.executorId,
+      'userId': task.userId,
+      'itemId': task.itemId,
+      'itemName': task.itemName,
+      'location': task.location,
+      'description': task.description,
+      'comments': task.comments,
+      'status': task.status.index,
+      'type': task.type.index,
+      'images': task.images,
+      'cost': task.cost,
+      'duration': task.duration,
+    }).then((autoreneratedId) {
+      tmpTask = task.copyWith(taskId: autoreneratedId.id);
+      final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
+      if (_tasks.containsKey(date)) {
+        _tasks[date]!.add(tmpTask);
+      } else {
+        _tasks[date] = [tmpTask];
+      }
+
+      notifyListeners();
+      return tmpTask;
+    });
+    //share task
+    if (tmpTask.executor == TaskExecutor.shared) {
+      await shareTaskByShared(tmpTask, companyId);
+    }
+    return result;
+  }
+
   Future<void> shareTask(Task task) async {
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
@@ -392,6 +438,20 @@ class TaskProvider with ChangeNotifier {
       'companyId': _user!.companyId,
       'taskId': task.taskId,
     });
+    print('task shared');
+  }
+
+  Future<void> shareTaskByShared(Task task, String companyId) async {
+    final tasksRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(task.executorId)
+        .collection('sharedTasks');
+
+    await tasksRef.add({
+      'companyId': companyId,
+      'taskId': task.taskId,
+    });
+    print('task shared');
   }
 
   // update task
@@ -422,12 +482,52 @@ class TaskProvider with ChangeNotifier {
       'duration': task.duration,
     });
 
-    fetchAndSetTasks();
-    // notifyListeners();
+    // fetchAndSetTasks();
+    notifyListeners();
   }
 
+  // update shared task
+  Future<void> updateSharedTask(Task task, String companyId) async {
+    final tasksRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(companyId)
+        .collection('tasks')
+        .doc(task.taskId);
+
+    await tasksRef.set({
+      'title': task.title,
+      'date': task.date.toIso8601String(),
+      'nextDate': task.nextDate?.toIso8601String(),
+      'taskInterval': task.taskInterval,
+      'executor': task.executor.index,
+      'executorId': task.executorId,
+      'userId': task.userId,
+      'itemId': task.itemId,
+      'itemName': task.itemName,
+      'location': task.location,
+      'description': task.description,
+      'comments': task.comments,
+      'status': task.status.index,
+      'type': task.type.index,
+      'images': task.images,
+      'cost': task.cost,
+      'duration': task.duration,
+    });
+
+    // fetchAndSetTasks();
+    notifyListeners();
+  }
+
+  // complete task
   Future<void> completeTask(Task task, Task oldTask) async {
     await addToArchive(task).then((_) => deleteTask(oldTask));
+  }
+
+  // complete shared task
+  Future<void> completeSharedTask(
+      Task task, Task oldTask, String companyId) async {
+    await addSharedToArchive(task, companyId)
+        .then((_) => deleteSharedTask(oldTask, companyId));
   }
 
   // add next task to the list
@@ -446,6 +546,8 @@ class TaskProvider with ChangeNotifier {
         status: TaskStatus.planned,
       );
     }
+    print(task.executorId);
+    print('exe');
     if (nextTask == null) {
       return null;
     }
@@ -454,6 +556,31 @@ class TaskProvider with ChangeNotifier {
     return await addTask(nextTask);
   }
 
+  // add next shared task to the list
+  Future<Task?> addNextSharedTask(Task task, String companyId) async {
+    Task? nextTask;
+
+    // update next task date
+    if (task.taskInterval != 'No') {
+      DateTime nextDate = DateTime.now();
+
+      nextDate = DateCalc.getNextDate(task.nextDate!, task.taskInterval!)!;
+      nextTask = task.copyWith(
+        date: task.nextDate,
+        nextDate: nextDate,
+        comments: '',
+        status: TaskStatus.planned,
+      );
+    }
+    if (nextTask == null) {
+      return null;
+    }
+    // _tasks.remove(task);
+    // notifyListeners();
+    return await addSharedTask(nextTask, companyId);
+  }
+
+  // add task to archive
   Future<void> addToArchive(Task task) async {
     Task tmpTask;
 
@@ -497,6 +624,50 @@ class TaskProvider with ChangeNotifier {
     });
   }
 
+  // add shared task to archive
+  Future<void> addSharedToArchive(Task task, String companyId) async {
+    Task tmpTask;
+
+    // get tasks referance
+    final tasksRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(companyId)
+        .collection('archive');
+
+    await tasksRef.add({
+      'title': task.title,
+      'date': task.date.toIso8601String(),
+      'nextDate': task.nextDate?.toIso8601String(),
+      'taskInterval': task.taskInterval,
+      'executor': task.executor.index,
+      'executorId': task.executorId,
+      'userId': task.userId,
+      'itemId': task.itemId,
+      'itemName': task.itemName,
+      'location': task.location,
+      'description': task.description,
+      'comments': task.comments,
+      'status': task.status.index,
+      'type': task.type.index,
+      'images': task.images,
+      'cost': task.cost,
+      'duration': task.duration,
+    }).then((autoreneratedId) {
+      _undoTask = _undoTask?.copyWith(
+        taskId: autoreneratedId.id,
+      );
+      tmpTask = task.copyWith();
+
+      final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
+      if (_tasksArchive.containsKey(date)) {
+        _tasksArchive[date]!.add(tmpTask);
+      } else {
+        _tasksArchive[date] = [tmpTask];
+      }
+      notifyListeners();
+    });
+  }
+
   Future<bool> deleteTask(Task task) async {
     var response = true;
     final taskRef = !isActive
@@ -512,7 +683,7 @@ class TaskProvider with ChangeNotifier {
             .doc(task.taskId);
 
     if (task.executor == TaskExecutor.shared) {
-      await deleteSharedTask(task);
+      await deleteSharedWithTask(task);
     }
 
     await taskRef.delete().then((_) {
@@ -521,17 +692,42 @@ class TaskProvider with ChangeNotifier {
       if (_tasks[key] != null && _tasks[key]!.isEmpty) {
         _tasks.remove(key);
       }
-      notifyListeners();
     }).catchError((error) {
       // print(error);
     });
-
+    notifyListeners();
     // fetchAndSetCompletedTasks();
     return response;
   }
 
   // delete shared task
-  Future<void> deleteSharedTask(Task task) async {
+  Future<bool> deleteSharedTask(Task task, String companyId) async {
+    print('task id  ${task.taskId}');
+    var response = true;
+    final taskRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(companyId)
+        .collection('tasks')
+        .doc(task.taskId);
+
+    await deleteSharedWithTask(task);
+
+    await taskRef.delete().then((_) {
+      final key = DateFormat('dd/MM/yyyy').format(task.date);
+      _tasks[key]!.removeWhere((element) => element.taskId == task.taskId);
+      if (_tasks[key] != null && _tasks[key]!.isEmpty) {
+        _tasks.remove(key);
+      }
+    }).catchError((error) {
+      // print(error);
+    });
+    notifyListeners();
+    // fetchAndSetCompletedTasks();
+    return response;
+  }
+
+  // delete task shared with others
+  Future<void> deleteSharedWithTask(Task task) async {
     String taskToDelete = '';
     await FirebaseFirestore.instance
         .collection('companies')
@@ -541,9 +737,10 @@ class TaskProvider with ChangeNotifier {
         .get()
         .then((QuerySnapshot querySnap) {
       if (querySnap.docs.isNotEmpty) {
-        taskToDelete = querySnap.docs[0]['taskId'];
+        taskToDelete = querySnap.docs[0].id;
       }
     });
+    print('task to delete  $taskToDelete');
 
     await FirebaseFirestore.instance
         .collection('companies')
