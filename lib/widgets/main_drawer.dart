@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
@@ -30,7 +29,6 @@ class MainDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final userProvider = Provider.of<UserProvider>(context);
-    final companyProvider = Provider.of<CompanyProvider>(context);
     return Drawer(
       child: Column(
         children: [
@@ -46,15 +44,12 @@ class MainDrawer extends StatelessWidget {
           Expanded(
             child: Container(
               color: Theme.of(context).popupMenuTheme.color,
-              // height: double.infinity,
-              // width: double.infinity,
               padding: EdgeInsets.only(
                 top: SizeConfig.blockSizeVertical * 3,
                 left: SizeConfig.blockSizeHorizontal * 5,
                 right: SizeConfig.blockSizeHorizontal * 5,
               ),
               child: Column(
-                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   GestureDetector(
@@ -98,13 +93,11 @@ class MainDrawer extends StatelessWidget {
                   ),
                   Divider(
                     thickness: SizeConfig.blockSizeVertical * 0.2,
-                    // endIndent: SizeConfig.blockSizeHorizontal * 5,
                   ),
                   Expanded(
                     child: Container(
                       alignment: Alignment.bottomLeft,
                       padding: EdgeInsets.symmetric(
-                        // horizontal: SizeConfig.blockSizeVertical * 2,
                         vertical: SizeConfig.blockSizeHorizontal * 2,
                       ),
                       child: TextButton.icon(

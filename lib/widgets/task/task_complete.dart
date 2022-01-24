@@ -166,8 +166,6 @@ class _TaskCompleteState extends State<TaskComplete> {
             ],
           ),
         ),
-        // inspection interval
-
         Padding(
           padding: EdgeInsets.symmetric(
             horizontal: SizeConfig.blockSizeHorizontal * 8,
@@ -182,10 +180,7 @@ class _TaskCompleteState extends State<TaskComplete> {
                   color: Theme.of(context).textTheme.headline6!.color,
                 ),
               ),
-              // date picker
-
               // task interval
-
               DropdownButton<String>(
                 borderRadius: BorderRadius.circular(10),
                 value: _taskInterval,
@@ -226,12 +221,10 @@ class _TaskCompleteState extends State<TaskComplete> {
             ],
           ),
         ),
-
         Padding(
           padding: EdgeInsets.only(
             left: SizeConfig.blockSizeHorizontal * 8,
             right: SizeConfig.blockSizeHorizontal * 8,
-            // bottom: SizeConfig.blockSizeHorizontal * 8,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -293,7 +286,6 @@ class _TaskCompleteState extends State<TaskComplete> {
                       fontSize: SizeConfig.blockSizeHorizontal * 4,
                     ),
                     onConfirm: (Picker picker, List<int> value) {
-                      // You get your duration here
                       duration = (picker.getSelectedValues()[0] * 60) +
                           picker.getSelectedValues()[1];
                       setState(() {

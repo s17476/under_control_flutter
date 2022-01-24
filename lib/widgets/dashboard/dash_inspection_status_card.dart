@@ -20,7 +20,6 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
           fontSize: SizeConfig.blockSizeHorizontal * 4,
           color: Theme.of(context).appBarTheme.foregroundColor,
         );
-    // UserProvider userProvider = Provider.of<UserProvider>(context);
     ItemProvider itemProvider = Provider.of<ItemProvider>(context);
     Map<InspectionStatus, int> inspectionsStatus =
         itemProvider.inspectionsStatus;

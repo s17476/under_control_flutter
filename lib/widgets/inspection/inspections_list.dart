@@ -29,10 +29,6 @@ class _InspectionsListState extends State<InspectionsList> {
     super.initState();
   }
 
-  // String getUserData(Future<AppUser> user)async{
-  //   return await use
-  // }
-
   @override
   Widget build(BuildContext context) {
     final buttonStyle = Theme.of(widget.context).textTheme.headline6!.copyWith(
@@ -46,9 +42,6 @@ class _InspectionsListState extends State<InspectionsList> {
         children: [
           Container(
             alignment: Alignment.topLeft,
-            // padding: EdgeInsets.symmetric(
-            // vertical: SizeConfig.blockSizeHorizontal * 4,
-            // ),
             child: showInspections
                 ? TextButton.icon(
                     icon: const Icon(
@@ -85,13 +78,9 @@ class _InspectionsListState extends State<InspectionsList> {
                     ),
                   ),
           ),
-
-          // if (showInspections)
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             height: showInspections ? null : 0,
-
-            // color: Colors.white12,
             child: Column(children: [
               const Divider(),
               ...Provider.of<InspectionProvider>(context)
@@ -149,7 +138,8 @@ class _InspectionsListState extends State<InspectionsList> {
                                               )
                                             : const Padding(
                                                 padding: EdgeInsets.symmetric(
-                                                    vertical: 2),
+                                                  vertical: 2,
+                                                ),
                                                 child: CircleAvatar(
                                                   radius: 15,
                                                   backgroundColor: Colors.red,
@@ -228,22 +218,9 @@ class _InspectionsListState extends State<InspectionsList> {
                     const Divider(),
                   ],
                 );
-
-                //   subtitle: Column(
-                //     children: [
-                //
-                //
-
-                //       // TODO
-                //     ],
-                //   ),
-                // );
               }),
             ]),
           ),
-          // Divider(
-          //   color: Theme.of(context).appBarTheme.backgroundColor,
-          // ),
         ],
       ),
     );

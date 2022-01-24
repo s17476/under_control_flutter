@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
-import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
-import 'package:under_control_flutter/providers/company_provider.dart';
-import 'package:under_control_flutter/providers/task_provider.dart';
-import 'package:under_control_flutter/providers/user_provider.dart';
 
 class SharedTaskListItem extends StatelessWidget {
   const SharedTaskListItem({
@@ -35,12 +30,6 @@ class SharedTaskListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isExpired = DateTime(
-      DateTime.now().year,
-      DateTime.now().month,
-      DateTime.now().day,
-    ).isAfter(task.date);
-
     return Padding(
       padding: const EdgeInsets.symmetric(
         vertical: 3.0,

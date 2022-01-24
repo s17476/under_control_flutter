@@ -122,11 +122,6 @@ class _DashCompletedTasksState extends State<DashCompletedTasks> {
                       );
                     },
                   ),
-                  // Container(
-                  //   padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 3),
-                  //   alignment: Alignment.centerRight,
-                  //   child: const Text('data'),
-                  // ),
                 ],
               ),
             ),

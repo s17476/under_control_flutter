@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
-import 'package:under_control_flutter/providers/item_provider.dart';
-import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/widgets/task/shared_tasks_list.dart';
-import 'package:under_control_flutter/widgets/task/tasks_list.dart';
 
 class SharedConnectedTasks extends StatefulWidget {
   const SharedConnectedTasks(
@@ -98,8 +94,6 @@ class _SharedConnectedTasksState extends State<SharedConnectedTasks> {
               ),
           ],
         ),
-
-        // if (showTasks)
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           height: showTasks ? null : 0,

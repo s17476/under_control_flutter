@@ -29,12 +29,10 @@ class _InspectionFormState extends State<InspectionForm>
   final List<Animation<double>> _animations = [];
 
   String _statusString = 'OK';
-  // DateTime? _inspectionDate;
   String _checklistName = 'New checklist';
 
   final TextEditingController _textController = TextEditingController();
   final TextEditingController _nameTextController = TextEditingController();
-  // final TextEditingController _commentsTextController = TextEditingController();
 
   late Checklist _selectedChecklist;
 
@@ -43,7 +41,6 @@ class _InspectionFormState extends State<InspectionForm>
   @override
   void initState() {
     super.initState();
-    // _inspectionDate = DateTime.now();
     Provider.of<ChecklistProvider>(context, listen: false)
         .fetchAndSetChecklists();
     checklists =
@@ -167,7 +164,6 @@ class _InspectionFormState extends State<InspectionForm>
                     ],
                   ),
                 ),
-                // if (_checklistName == 'New checklist')
                 SizedBox(
                   child: Column(
                     children: [
@@ -327,7 +323,6 @@ class _InspectionFormState extends State<InspectionForm>
                                       ),
                                     );
                                 }
-                                // TODO
                                 _updateAnimationControllers();
                               },
                               icon: Icon(

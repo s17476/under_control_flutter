@@ -49,7 +49,6 @@ class TaskListItem extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(15),
         child: Container(
-          // height: 50,
           color: Theme.of(context).splashColor,
           child: Row(
             children: <Widget>[
@@ -127,7 +126,6 @@ class TaskListItem extends StatelessWidget {
                                 ),
                               ],
                             ),
-
                           //sahred with company
                           if (task.executor == TaskExecutor.shared)
                             Row(

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
@@ -41,6 +40,7 @@ class CalendarEventsList extends StatelessWidget {
   // events to show
   final ValueNotifier<List<Task>> selectedEvents;
 
+  // delete dialog widget
   Future<bool> _showDeleteDialog(
     BuildContext context,
     Task task,
@@ -152,16 +152,6 @@ class CalendarEventsList extends StatelessWidget {
                                   }
                                 }
 
-                                // set task date to today
-                                // value[index].date = DateTime.now();
-                                // if (value[index].taskInterval != null &&
-                                //     value[index].taskInterval != 'No') {
-                                //   value[index].nextDate = DateCalc.getNextDate(
-                                //       value[index].date,
-                                //       value[index].taskInterval!);
-                                // }
-
-                                // Task tmpTask = value[index];
                                 await Provider.of<TaskProvider>(context,
                                         listen: false)
                                     .rapidComplete(context, value[index])

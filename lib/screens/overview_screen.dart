@@ -35,8 +35,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
   String? selectedAsset;
 
   double maxBarWidth = (SizeConfig.blockSizeHorizontal * 100) - 16;
-  // double costsWidthBlock = 0;
-  // double timeWidthBlock = 0;
 
   RangeValues _currentRangeValues = const RangeValues(0, 0);
 
@@ -61,18 +59,11 @@ class _OverviewScreenState extends State<OverviewScreen> {
         assetsCosts = chartDataProvider.assetsCosts;
         assetsTime = chartDataProvider.assetsTime;
 
-        // if (assetsCosts.isNotEmpty) {
-        //   costsWidthBlock =
-        //       maxBarWidth / assetsCosts[assetsCosts.keys.toList()[0]]!;
-        // }
-        // print(assetsCosts);
-
         // make range slider labels
         while (tmpDate.isBefore(_toDate)) {
           labels.add(DateFormat('MMM yyyy').format(tmpDate));
           tmpDate = DateTime(tmpDate.year, tmpDate.month + 1, 1);
         }
-        // print('labels $labels');
         _currentRangeValues = RangeValues(0, labels.length.toDouble() - 1);
       });
 
@@ -153,8 +144,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
             return DateFormat('MMM').format(
               DateTime(_fromDate!.year, _fromDate!.month + value.toInt()),
             );
-            // }
-            // return '';
           },
           margin: 8,
         ),
@@ -202,7 +191,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
   Widget build(BuildContext context) {
     var chartDataProvider = Provider.of<ChartDataProvider>(context);
     chartData = chartDataProvider.chartValues;
-    // print('oldest date $_fromDate');
     final taskProvider = Provider.of<ChartDataProvider>(context);
     _totalCost = taskProvider.totalCost;
     _totalTime = taskProvider.totalTime;
@@ -213,8 +201,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
       chartData[chartData.keys.toList()[0].split(' ')[0]] =
           chartData[chartData.keys.toList()[0]]!;
     }
-
-    print(chartData.length);
 
     return _fromDate == null
         ? const Center(
@@ -283,12 +269,13 @@ class _OverviewScreenState extends State<OverviewScreen> {
                                         Text(
                                           'No data found',
                                           style: TextStyle(
-                                              fontSize: SizeConfig
-                                                      .blockSizeHorizontal *
-                                                  8,
-                                              color:
-                                                  Colors.black.withOpacity(0.5),
-                                              fontWeight: FontWeight.bold),
+                                            fontSize:
+                                                SizeConfig.blockSizeHorizontal *
+                                                    8,
+                                            color:
+                                                Colors.black.withOpacity(0.5),
+                                            fontWeight: FontWeight.bold,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -316,7 +303,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
                     child: Center(
                       child: RangeSlider(
                         values: _currentRangeValues,
-                        // min: 0,
                         max: labels.length.toDouble() - 1,
                         divisions: 200,
                         labels: RangeLabels(
@@ -333,16 +319,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
                                 .parse(labels[_currentRangeValues.end.round()]);
                           });
                         },
-                        // onChangeEnd: (_) {
-                        //   chartDataProvider.getAssetExpenses(
-                        //     itemId: selectedAsset,
-                        //     fromDate: sliderFromDate,
-                        //     toDate: sliderToDate,
-                        //   );
-                        //   if (sliderFromDate != null) {
-                        //     _fromDate = sliderFromDate;
-                        //   }
-                        // },
                         activeColor: Colors.green,
                         inactiveColor: Colors.green.shade900,
                       ),
@@ -355,7 +331,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
                       child: Padding(
                         padding: const EdgeInsets.only(
                           left: 16.0,
-                          // right: 16.0,
                           top: 16,
                           bottom: 8.0,
                         ),
@@ -464,7 +439,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
                       const Divider(
                         height: 1,
                       ),
-                      ////////////////////////////////////////
                       const Divider(
                         height: 1,
                       ),
@@ -478,7 +452,6 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           ],
                         ),
                       ),
-
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(

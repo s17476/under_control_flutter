@@ -91,21 +91,14 @@ class _ConnectedTasksState extends State<ConnectedTasks> {
                 ),
             ],
           ),
-
-          // if (showTasks)
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             height: showTasks ? null : 0,
-
-            // color: Colors.white12,
             child: Column(children: [
               const Divider(),
               TasksList.item(item: widget.item),
             ]),
           ),
-          // Divider(
-          //   color: Theme.of(context).appBarTheme.backgroundColor,
-          // ),
         ],
       ),
     );

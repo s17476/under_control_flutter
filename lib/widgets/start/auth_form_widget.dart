@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/pickers/user_image_picker.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
-import 'package:under_control_flutter/screens/start/choose_company_screen.dart';
 import 'package:under_control_flutter/widgets/start/logo_widget.dart';
 
 class AuthFormWidget extends StatefulWidget {
@@ -127,7 +126,6 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
   @override
   Widget build(BuildContext context) {
     var isLoading = Provider.of<UserProvider>(context).isLoading;
-    print(isLoading);
     SizeConfig.init(context);
     return SingleChildScrollView(
       child: AnimatedPadding(
@@ -358,10 +356,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                     });
                     if (!_isInLoginMode) {
                       _animationController!.forward();
-                      // _fieldHeight = SizeConfig.blockSizeVertical * 8;
                     } else {
                       _animationController!.reverse();
-                      // _fieldHeight = 0;
                     }
                   },
                   child: isLoading

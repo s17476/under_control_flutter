@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/screens/calendar/calendar_screen.dart';
 import 'package:under_control_flutter/screens/dash_screen.dart';
 import 'package:under_control_flutter/screens/equipment/equipment_screen.dart';

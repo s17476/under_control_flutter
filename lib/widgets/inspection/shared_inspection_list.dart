@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/app_user.dart';
-import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
@@ -39,10 +38,6 @@ class _SharedInspectionsListState extends State<SharedInspectionsList> {
         .fetchBySharedTask(widget.task, taskCreator!.companyId!);
   }
 
-  // String getUserData(Future<AppUser> user)async{
-  //   return await use
-  // }
-
   @override
   Widget build(BuildContext context) {
     final buttonStyle = Theme.of(widget.context).textTheme.headline6!.copyWith(
@@ -54,9 +49,6 @@ class _SharedInspectionsListState extends State<SharedInspectionsList> {
       children: [
         Container(
           alignment: Alignment.topLeft,
-          // padding: EdgeInsets.symmetric(
-          // vertical: SizeConfig.blockSizeHorizontal * 4,
-          // ),
           child: showInspections
               ? TextButton.icon(
                   icon: Icon(
@@ -95,13 +87,9 @@ class _SharedInspectionsListState extends State<SharedInspectionsList> {
                   ),
                 ),
         ),
-
-        // if (showInspections)
         AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           height: showInspections ? null : 0,
-
-          // color: Colors.white12,
           child: Column(children: [
             const Divider(),
             ...Provider.of<InspectionProvider>(context).inspections.map((insp) {
@@ -145,7 +133,8 @@ class _SharedInspectionsListState extends State<SharedInspectionsList> {
                                       insp.checklist!.fields[item] == true
                                           ? const Padding(
                                               padding: EdgeInsets.symmetric(
-                                                  vertical: 2),
+                                                vertical: 2,
+                                              ),
                                               child: CircleAvatar(
                                                 radius: 15,
                                                 backgroundColor: Colors.green,
@@ -157,7 +146,8 @@ class _SharedInspectionsListState extends State<SharedInspectionsList> {
                                             )
                                           : const Padding(
                                               padding: EdgeInsets.symmetric(
-                                                  vertical: 2),
+                                                vertical: 2,
+                                              ),
                                               child: CircleAvatar(
                                                 radius: 15,
                                                 backgroundColor: Colors.red,
@@ -236,22 +226,9 @@ class _SharedInspectionsListState extends State<SharedInspectionsList> {
                   const Divider(),
                 ],
               );
-
-              //   subtitle: Column(
-              //     children: [
-              //
-              //
-
-              //       // TODO
-              //     ],
-              //   ),
-              // );
             }),
           ]),
         ),
-        // Divider(
-        //   color: Theme.of(context).appBarTheme.backgroundColor,
-        // ),
       ],
     );
   }

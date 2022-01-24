@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
@@ -13,6 +12,7 @@ import 'package:under_control_flutter/screens/tasks/shared_task_detail_screen.da
 import 'package:under_control_flutter/screens/tasks/task_details_screen.dart';
 import 'package:under_control_flutter/widgets/task/task_list_item.dart';
 
+// ignore: must_be_immutable
 class TasksList extends StatefulWidget {
   TasksList({Key? key}) : super(key: key);
 
@@ -222,7 +222,6 @@ class _TasksListState extends State<TasksList> {
                                   if (direction ==
                                       DismissDirection.startToEnd) {
                                     // if task is inspection
-
                                     if (task.type == TaskType.inspection) {
                                       await Navigator.of(context).pushNamed(
                                           AddInspectionScreen.routeName,
@@ -359,7 +358,6 @@ class _TasksListState extends State<TasksList> {
                                 onTap: (task.executor == TaskExecutor.shared &&
                                         task.executorId == user!.companyId)
                                     ? () {
-                                        print('shared');
                                         Navigator.of(context).pushNamed(
                                             SharedTaskDetailsScreen.routeName,
                                             arguments: task);

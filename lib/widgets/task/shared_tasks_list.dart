@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:under_control_flutter/helpers/date_calc.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
-import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
 import 'package:under_control_flutter/screens/tasks/shared_task_detail_screen.dart';
-import 'package:under_control_flutter/screens/tasks/task_details_screen.dart';
 import 'package:under_control_flutter/widgets/task/shared_task_list_item.dart';
-import 'package:under_control_flutter/widgets/task/task_list_item.dart';
 
+// ignore: must_be_immutable
 class SharedTasksList extends StatefulWidget {
   SharedTasksList({Key? key}) : super(key: key);
 
@@ -50,7 +47,6 @@ class _SharedTasksListState extends State<SharedTasksList> {
   void initState() {
     getItems();
     super.initState();
-    // _tasks = Provider.of<TaskProvider>(context, listen: false).getAllTasks;
   }
 
   Future<void> getItems() async {
@@ -61,57 +57,10 @@ class _SharedTasksListState extends State<SharedTasksList> {
         .getSharedDoneTasks(widget.item!, companyId);
   }
 
-  Future<bool> _showDeleteDialog(
-    BuildContext context,
-    Task task,
-  ) async {
-    return await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete task?'),
-          content: SingleChildScrollView(
-            child: Text(
-              'Are you sure You want to delete \n${task.title} from the task list?',
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: Text(
-                'No',
-                style: TextStyle(
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: Text(
-                'Yes',
-                style: TextStyle(
-                  color: Theme.of(context).errorColor,
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
-                ),
-              ),
-            ),
-          ],
-          actionsAlignment: MainAxisAlignment.spaceEvenly,
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     TaskProvider taskProvider = Provider.of<TaskProvider>(context);
     executor = taskProvider.executor;
-    // _tasks = taskProvider.getSharedDoneTasks(item);
 
     Map<String, List<Task>> filteredTasks = {};
 
@@ -197,13 +146,8 @@ class _SharedTasksListState extends State<SharedTasksList> {
                 itemBuilder: (ctx, index) {
                   List<Widget> listItems = [];
                   final dateFormat = DateFormat('dd/MM/yyyy');
-                  // if (taskProvider.isActive) {
                   keys.sort((a, b) =>
                       dateFormat.parse(a).compareTo(dateFormat.parse(b)));
-                  // } else {
-                  //   keys.sort((a, b) =>
-                  //       dateFormat.parse(b).compareTo(dateFormat.parse(a)));
-                  // }
 
                   if (filteredTasks[keys[index]] != null) {
                     for (var task in filteredTasks[keys[index]]!) {
