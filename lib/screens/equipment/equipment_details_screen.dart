@@ -6,7 +6,6 @@ import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/screens/equipment/edit_equipment_screen.dart';
-import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
 import 'package:under_control_flutter/screens/tasks/add_task_screen.dart';
 import 'package:under_control_flutter/widgets/inspection/inspections_list.dart';
 import 'package:under_control_flutter/widgets/start/status_icon.dart';
@@ -24,6 +23,7 @@ class EquipmentDetailsScreen extends StatefulWidget {
 class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
   late Item item;
 
+  // delete dialog
   Future<dynamic> _showDeleteDialog(
     BuildContext context,
     Item item,
@@ -83,10 +83,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme.headline6!.copyWith(
-        // fontSize: SizeConfig.blockSizeHorizontal * 4.5,
-        // color: Theme.of(context).primaryColor,
-        );
+    final textStyle = Theme.of(context).textTheme.headline6!.copyWith();
     final expiredTextStyle = textStyle.copyWith(
       color: Theme.of(context).errorColor,
     );
@@ -94,13 +91,13 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
         .textTheme
         .headline6!
         .copyWith(fontSize: SizeConfig.blockSizeHorizontal * 3);
-    // Item item = ModalRoute.of(context)!.settings.arguments as Item;
-    // var showTasks = false;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Details'),
         iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
         actions: [
+          // edit button
           IconButton(
             onPressed: () => Navigator.of(context)
                 .pushNamed(EditEquipmentScreen.routeName, arguments: item)
@@ -127,10 +124,8 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
             onPressed: () {
               _showDeleteDialog(context, item).then((value) {
                 if (value != null) {
-                  // delete item
                   Provider.of<ItemProvider>(context, listen: false)
                       .deleteItem(context, item.itemId);
-                  // delete all
                   var tasks = Provider.of<TaskProvider>(context, listen: false)
                       .getAllTasks;
                   for (var key in tasks.keys) {
@@ -172,7 +167,6 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
         ),
         child: SingleChildScrollView(
           child: Column(
-            // mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Padding(
                 padding:
@@ -185,6 +179,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                       children: [
                         SizedBox(
                           width: SizeConfig.blockSizeHorizontal * 50,
+                          // left column
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -268,6 +263,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                             ],
                           ),
                         ),
+                        // right column
                         Column(
                           children: [
                             Padding(
@@ -336,7 +332,6 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                         width: double.infinity,
                         child: Text(
                           item.comments.isEmpty ? '------' : item.comments,
-                          // overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             color: Theme.of(context).textTheme.headline6!.color,
                             fontSize: SizeConfig.blockSizeHorizontal * 4.5,
@@ -347,49 +342,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                   ],
                 ),
               ),
-              // add new inspection button
-              // Container(
-              //   alignment: Alignment.centerLeft,
-              //   padding: const EdgeInsets.only(
-              //     top: 8,
-              //     left: 8,
-              //   ),
-              //   child: TextButton.icon(
-              //     label: Text(
-              //       "Add new inspection",
-              //       style: TextStyle(
-              //         fontSize: SizeConfig.blockSizeHorizontal * 4.5,
-              //       ),
-              //     ),
-              //     onPressed: () {
-              //       Navigator.of(context).pushNamed(
-              //           AddInspectionScreen.routeName,
-              //           arguments: [item, null]);
-              //     },
-              //     icon: Container(
-              //       // width: SizeConfig.blockSizeHorizontal * 14.5,
-              //       alignment: Alignment.topRight,
-              //       child: Stack(
-              //         children: [
-              //           Padding(
-              //             padding: EdgeInsets.only(
-              //               left: SizeConfig.blockSizeHorizontal * 4,
-              //             ),
-              //             child: Icon(
-              //               Icons.add,
-              //               size: SizeConfig.blockSizeHorizontal * 4.5,
-              //             ),
-              //           ),
-              //           Icon(
-              //             Icons.search,
-              //             size: SizeConfig.blockSizeHorizontal * 7,
-              //           )
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              // ),
-              // add new task
+              // add new task button
               Container(
                 alignment: Alignment.centerLeft,
                 padding: const EdgeInsets.only(
@@ -411,7 +364,6 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                       left: SizeConfig.blockSizeHorizontal * 1,
                       right: SizeConfig.blockSizeHorizontal * 1.5,
                     ),
-                    // width: SizeConfig.blockSizeHorizontal * 14.5,
                     alignment: Alignment.topRight,
                     child: Icon(
                       Icons.add_task,
@@ -420,7 +372,9 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                   ),
                 ),
               ),
+              // inspections list
               InspectionsList(context: context, item: item),
+              // list of connected with asset tasks
               ConnectedTasks(context: context, item: item),
             ],
           ),

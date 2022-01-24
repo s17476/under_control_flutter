@@ -54,25 +54,6 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
         // set inspections interval
         _nextInspection =
             DateCalc.getNextDate(_lastInspection!, _inspectionInterval);
-        // List<String> duration = _inspectionInterval.split(' ');
-        // if (duration[1] == 'week' || duration[1] == 'weeks') {
-        //   _nextInspection = DateTime(
-        //     _lastInspection!.year,
-        //     _lastInspection!.month,
-        //     _lastInspection!.day + (int.parse(duration[0]) * 7),
-        //   );
-        // } else if (duration[1] == 'month' || duration[1] == 'months') {
-        //   _nextInspection = DateTime(
-        //       _lastInspection!.year,
-        //       _lastInspection!.month + int.parse(duration[0]),
-        //       _lastInspection!.day);
-        // } else if (duration[1] == 'year' || duration[1] == 'years') {
-        //   _nextInspection = DateTime(
-        //     _lastInspection!.year + int.parse(duration[0]),
-        //     _lastInspection!.month,
-        //     _lastInspection!.day,
-        //   );
-        // }
 
         // create new asset
         Item item = Item(
@@ -117,48 +98,15 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
     }
   }
 
-  void _presentDayPicker() {
-    showDatePicker(
-      builder: (BuildContext context, Widget? child) {
-        return Theme(
-          data: ThemeData(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.green,
-              surface: Colors.black,
-              onSurface: Colors.white70,
-            ),
-            dialogBackgroundColor: Colors.grey.shade900,
-          ),
-          child: child ?? const Text(''),
-        );
-      },
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2019),
-      lastDate: DateTime.now(),
-    ).then((value) {
-      if (value == null) {
-        return;
-      }
-      setState(() {
-        _lastInspection = value;
-      });
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    String choosenDate;
-
     _lastInspection ??= DateTime.now();
-
-    choosenDate = 'Inspection date: ' +
-        DateFormat('dd/MMM/yyyy').format(_lastInspection!);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add asset'),
         iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
+        // app bar buttons
         actions: [
           IconButton(
               onPressed: _addNewEquipment,
@@ -171,6 +119,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
           ),
         ],
       ),
+      // background
       body: Container(
         width: SizeConfig.blockSizeHorizontal * 100,
         height: SizeConfig.blockSizeVertical * 110,
@@ -396,132 +345,6 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                     ],
                   ),
                 ),
-                // last inspection - date picker
-                // Row(
-                //   children: [
-                //     Expanded(
-                //       child: Text(
-                //         choosenDate,
-                //         textAlign: TextAlign.center,
-                //         style: TextStyle(
-                //           fontSize: SizeConfig.blockSizeHorizontal * 4,
-                //           color: Theme.of(context).textTheme.headline6!.color,
-                //         ),
-                //       ),
-                //     ),
-                //     SizedBox(width: SizeConfig.blockSizeHorizontal * 3),
-                //     TextButton(
-                //       onPressed: _presentDayPicker,
-                //       child: Text(
-                //         'Pick',
-                //         style: TextStyle(
-                //           fontSize: SizeConfig.blockSizeHorizontal * 4,
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
-                // SizedBox(
-                //   height: SizeConfig.blockSizeVertical * 1,
-                // ),
-
-                // status
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                //   children: [
-                //     Text(
-                //       'Inspection status:',
-                //       style: TextStyle(
-                //         fontSize: SizeConfig.blockSizeHorizontal * 4,
-                //         color: Theme.of(context).textTheme.headline6!.color,
-                //       ),
-                //     ),
-                //     DropdownButton<String>(
-                //       value: _statusString,
-                //       icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                //       iconSize: SizeConfig.blockSizeHorizontal * 4,
-                //       alignment: Alignment.center,
-                //       elevation: 16,
-                //       style: TextStyle(
-                //         color: _statusString == 'OK'
-                //             ? Colors.green
-                //             : _statusString == 'Needs attention'
-                //                 ? Colors.amber
-                //                 : Colors.red,
-                //         fontSize: SizeConfig.blockSizeHorizontal * 4,
-                //       ),
-                //       underline: Container(height: 0),
-                //       onChanged: (String? newValue) {
-                //         setState(() {
-                //           _statusString = newValue!;
-                //         });
-                //       },
-                //       dropdownColor:
-                //           Theme.of(context).appBarTheme.backgroundColor,
-                //       items: <String>[
-                //         'OK',
-                //         'Needs attention',
-                //         'Failed',
-                //       ].map<DropdownMenuItem<String>>((String value) {
-                //         return DropdownMenuItem<String>(
-                //           value: value,
-                //           child: Text(value),
-                //         );
-                //       }).toList(),
-                //     ),
-                //   ],
-                // ),
-                // SizedBox(
-                //   height: SizeConfig.blockSizeVertical * 3,
-                // ),
-
-                // inspection interval
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                //   children: [
-                //     Text(
-                //       'Inspections interval:',
-                //       style: TextStyle(
-                //         fontSize: SizeConfig.blockSizeHorizontal * 4,
-                //         color: Theme.of(context).textTheme.headline6!.color,
-                //       ),
-                //     ),
-                //     DropdownButton<String>(
-                //       borderRadius: BorderRadius.circular(10),
-                //       value: _inspectionInterval,
-                //       icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                //       iconSize: SizeConfig.blockSizeHorizontal * 4,
-                //       alignment: Alignment.center,
-                //       elevation: 16,
-                //       style: TextStyle(
-                //         color: Colors.green,
-                //         fontSize: SizeConfig.blockSizeHorizontal * 4,
-                //       ),
-                //       underline: Container(height: 0),
-                //       onChanged: (String? newValue) {
-                //         setState(() {
-                //           _inspectionInterval = newValue!;
-                //         });
-                //       },
-                //       dropdownColor:
-                //           Theme.of(context).appBarTheme.backgroundColor,
-                //       items: <String>[
-                //         '2 years',
-                //         '1 year',
-                //         '6 months',
-                //         '3 months',
-                //         '1 month',
-                //         '2 weeks',
-                //         '1 week',
-                //       ].map<DropdownMenuItem<String>>((String value) {
-                //         return DropdownMenuItem<String>(
-                //           value: value,
-                //           child: Text(value),
-                //         );
-                //       }).toList(),
-                //     ),
-                //   ],
-                // ),
                 SizedBox(
                   height: SizeConfig.blockSizeVertical * 0.5,
                 ),

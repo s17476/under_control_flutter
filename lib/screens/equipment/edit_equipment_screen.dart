@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
-import 'package:intl/intl.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 
@@ -17,7 +16,7 @@ class EditEquipmentScreen extends StatefulWidget {
 class _EditEquipmentScreenState extends State<EditEquipmentScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  late Item _item; ////////////////
+  late Item _item;
 
   String _internalId = '';
   String _producer = '';
@@ -28,6 +27,7 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
 
   @override
   void didChangeDependencies() {
+    // get passed to this screen Item object
     _item = ModalRoute.of(context)!.settings.arguments as Item;
     super.didChangeDependencies();
   }
@@ -76,7 +76,12 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
         title: const Text('Edit asset'),
         iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
         actions: [
-          IconButton(onPressed: _editEquipment, icon: const Icon(Icons.save)),
+          IconButton(
+              onPressed: _editEquipment,
+              icon: const Icon(
+                Icons.save,
+                size: 32,
+              )),
           SizedBox(
             width: SizeConfig.blockSizeHorizontal * 3,
           ),
@@ -140,10 +145,7 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                           labelStyle: const TextStyle(
                             color: Colors.white,
                           ),
-                          // focusColor: Colors.green,
-                          // hoverColor: Colors.green,
                         ),
-                        // cursorColor: Theme.of(context).primaryColor,
                         validator: (val) {
                           if (val!.length < 4) {
                             return 'Min. 4 characters';
@@ -300,11 +302,9 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                       // comments
                       TextFormField(
                         maxLines: null,
-                        // expands: true,
                         initialValue: _item.comments,
                         key: const ValueKey('comments'),
                         keyboardType: TextInputType.multiline,
-                        // textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                           labelStyle: const TextStyle(
                             color: Colors.white,
@@ -334,29 +334,9 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                     ],
                   ),
                 ),
-
                 SizedBox(
                   height: SizeConfig.blockSizeVertical * 2,
                 ),
-                // save button
-                // ElevatedButton(
-                //   onPressed: _editEquipment,
-                //   child: Text(
-                //     'Save changes',
-                //     style: TextStyle(
-                //       fontSize: SizeConfig.blockSizeHorizontal * 5.5,
-                //     ),
-                //   ),
-                //   style: ElevatedButton.styleFrom(
-                //     primary: Theme.of(context).primaryColor,
-                //     shape: RoundedRectangleBorder(
-                //       borderRadius: BorderRadius.circular(30.0),
-                //     ),
-                //   ),
-                // ),
-                // SizedBox(
-                //   height: SizeConfig.blockSizeVertical * 3,
-                // ),
               ],
             ),
           ),

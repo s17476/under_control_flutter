@@ -6,7 +6,6 @@ import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/checklist_provider.dart';
-import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
@@ -33,6 +32,8 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedPageIndex = 2;
 
   String dropdownValue = "All";
+
+  // task executors filter options
   List<String> dropdownItems = [
     'Shared',
     'Company',
@@ -87,8 +88,6 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     SizeConfig.init(context);
     UserProvider userProvider = Provider.of<UserProvider>(context);
-    // CompanyProvider companyProvider = Provider.of<CompanyProvider>(context);
-    // print(companyProvider.company);
 
     return WillPopScope(
       // double click to exit the app
@@ -210,7 +209,6 @@ class _MainScreenState extends State<MainScreen> {
                       Padding(
                         padding: EdgeInsets.only(
                           top: SizeConfig.safeBlockHorizontal * 1.5,
-                          // right: SizeConfig.blockSizeHorizontal * 3,
                         ),
                         child: DropdownButton<String>(
                           alignment: AlignmentDirectional.center,
@@ -220,14 +218,12 @@ class _MainScreenState extends State<MainScreen> {
                             color: Theme.of(context).primaryIconTheme.color,
                           ),
                           value: dropdownValue,
-                          // style: TextStyle(color: Colors.white),
                           items: dropdownItems.map((String value) {
                             return DropdownMenuItem<String>(
                               value: value,
                               child: Center(
                                 child: Text(
                                   value,
-                                  // textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize:
                                         SizeConfig.blockSizeHorizontal * 4.5,
@@ -262,7 +258,6 @@ class _MainScreenState extends State<MainScreen> {
                                         .push(_createRute(
                                             () => const AddEquipmentScreen()))
                                         .then((resultItem) {
-                                      // print('new item:   $resultItem');
                                       if (resultItem != null) {
                                         ScaffoldMessenger.of(context)
                                           ..removeCurrentSnackBar()

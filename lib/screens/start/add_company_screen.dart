@@ -44,7 +44,6 @@ class _AddCompanyScreenState extends State<AddCompanyScreen>
   @override
   Widget build(BuildContext context) {
     CompanyProvider companyProvider = Provider.of<CompanyProvider>(context);
-    // print(WidgetsBinding.instance!.window.viewInsets.bottom);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add new company'),

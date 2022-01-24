@@ -176,53 +176,6 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
     });
   }
 
-  // show delete confirmation dialog
-  Future<bool> _showDeleteDialog(
-    BuildContext context,
-    Task task,
-  ) async {
-    return await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete task?'),
-          content: SingleChildScrollView(
-            child: Text(
-              'Are you sure You want to delete \n${task.title} from the task list?',
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: Text(
-                'No',
-                style: TextStyle(
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: Text(
-                'Yes',
-                style: TextStyle(
-                  color: Theme.of(context).errorColor,
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
-                ),
-              ),
-            ),
-          ],
-          actionsAlignment: MainAxisAlignment.spaceEvenly,
-        );
-      },
-    );
-  }
-
   // show complete confirmation dialog
   Future<bool> _showCompleteDialog(
     BuildContext context,
@@ -301,9 +254,6 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
           task.duration = transferObjectTask!.duration;
         }
 
-        // executor ID
-        // task.executorId =
-        //     Provider.of<UserProvider>(context, listen: false).user!.userId;
         inspection?.user =
             Provider.of<UserProvider>(context, listen: false).user!.userId;
 
@@ -389,26 +339,6 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
     task = ModalRoute.of(context)!.settings.arguments as Task;
     oldTask = task.copyWith();
 
-    // if (task.type == TaskType.inspection) {
-    //   try {
-    //     item = Provider.of<ItemProvider>(context, listen: false)
-    //         .items
-    //         .firstWhere((element) => element.itemId == task.itemId);
-    //   } catch (e) {
-    //     item = Item(
-    //       internalId: '',
-    //       producer: 'Deleted',
-    //       model: 'asset',
-    //       category: '',
-    //       location: '',
-    //       lastInspection: DateTime.now(),
-    //       nextInspection: DateTime.now(),
-    //       interval: '',
-    //       inspectionStatus: 0,
-    //     );
-    //   }
-    // }
-
     if (task.type == TaskType.inspection && inspection == null) {
       inspection = Inspection(
         user: Provider.of<UserProvider>(context, listen: false).user!.userId,
@@ -451,10 +381,7 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
     // used to store task state before saving
     transferObjectTask ??= task.copyWith(date: DateTime.now());
 
-    final textStyle = Theme.of(context).textTheme.headline6!.copyWith(
-        // fontSize: SizeConfig.blockSizeHorizontal * 4.5,
-        );
-    //
+    final textStyle = Theme.of(context).textTheme.headline6!.copyWith();
 
     final labelTextStyle = Theme.of(context).textTheme.headline6!.copyWith(
           fontSize: SizeConfig.blockSizeHorizontal * 3,
@@ -497,23 +424,15 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
                 color: Theme.of(context).primaryColor,
               ),
             ),
-          // SizedBox(
-          //   width: SizeConfig.blockSizeHorizontal * 3,
-          // ),
           if (_isInEditMode && task.status != TaskStatus.completed)
             IconButton(
               onPressed: () async {
                 FocusScope.of(context).unfocus();
-                // bool exit = false;
                 _showCompleteDialog(context, task).then((value) async {
                   if (value == true) {
-                    // if task is inspection
-
                     _completeTask(true);
                   }
                 });
-                // Provider.of<TaskProvider>(context, listen: false)
-                //     .fetchAndSetTasks();
               },
               icon: Icon(
                 Icons.done,
@@ -1059,8 +978,6 @@ class _SharedTaskDetailsScreenState extends State<SharedTaskDetailsScreen>
                                 _completeTask(true);
                               }
                             });
-                            // Provider.of<TaskProvider>(context, listen: false)
-                            //     .fetchAndSetTasks();
                           },
                           icon: Icon(
                             Icons.done,

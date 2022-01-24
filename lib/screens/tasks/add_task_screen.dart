@@ -10,7 +10,6 @@ import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
-import 'package:under_control_flutter/screens/start/choose_company_screen.dart';
 import 'package:under_control_flutter/screens/tasks/choose_shared_company_screen.dart';
 
 class AddTaskScreen extends StatefulWidget {
@@ -43,6 +42,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
     Icons.handyman_outlined,
   ];
 
+  // task types
   final List<String> dropdownItems = const [
     'Maintenance',
     'Event',
@@ -50,6 +50,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
     'Reparation',
   ];
 
+  // executor types
   final List<String> executorTypeItems = const [
     'Company',
     'Specific user',
@@ -108,7 +109,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
       String? executorId;
       DateTime? nextDate;
       TaskExecutor taskExecutor;
-      // String? userId;
       String? selectedItemId;
       String? selectedLocation;
 
@@ -150,16 +150,12 @@ class _AddTaskScreenState extends State<AddTaskScreen>
       }
 
       if (isValid) {
-        // if (executorDropdown == 'Specific user') {
-        //   executorId = selectedUser!.userId;
-        // }
         _formKey.currentState!.save();
 
+        // set inspections interval
         if (_taskInterval != 'No') {
-          // set inspections interval
           nextDate = DateCalc.getNextDate(_taskDate!, _taskInterval);
         }
-
         if (executorDropdown == 'Company') {
           taskExecutor = TaskExecutor.company;
         } else if (executorDropdown == 'Shared') {
@@ -217,6 +213,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
     }
   }
 
+  // date picker
   void _presentDayPicker(Color color) {
     showDatePicker(
       builder: (BuildContext context, Widget? child) {
@@ -369,13 +366,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           FocusScope.of(context).requestFocus(FocusNode());
                           setState(() {
                             dropdownValue = newValue!;
-                            // if (selectedAsset?.producer != null &&
-                            //     selectedAsset?.producer != '') {
-                            //   titleController!.text =
-                            //       '${selectedAsset?.producer} ${selectedAsset?.model} ${selectedAsset?.internalId}';
-                            // } else {
-                            //   titleController!.text = dropdownValue;
-                            // }
                           });
                         },
                         items: dropdownItems.map((String value) {
@@ -445,9 +435,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                                   } else {
                                     titleController!.text = '';
                                   }
-                                  // else {
-                                  //   titleController!.text = dropdownValue;
-                                  // }
                                 });
                               },
                         items: allAssets.map((Item item) {
@@ -462,7 +449,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: SizeConfig.blockSizeHorizontal * 4,
-                                  // overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ),
@@ -476,8 +462,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                       // title
                       TextFormField(
                         controller: titleController,
-
-                        // initialValue: dropdownValue,
                         key: const ValueKey('title'),
                         keyboardType: TextInputType.name,
                         textInputAction: TextInputAction.next,
@@ -499,7 +483,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           ),
                           filled: true,
                           fillColor: Theme.of(context).splashColor,
-                          // hintText: 'Task title',
                         ),
                         validator: (val) {
                           if (val!.length < 4) {
@@ -517,13 +500,10 @@ class _AddTaskScreenState extends State<AddTaskScreen>
 
                       // task descryption
                       TextFormField(
-                        // controller: titleController,
-                        // initialValue: dropdownValue,
                         key: const ValueKey('description'),
                         keyboardType: TextInputType.multiline,
                         maxLines: null,
                         textInputAction: TextInputAction.newline,
-
                         decoration: InputDecoration(
                           errorStyle: const TextStyle(color: Colors.black),
                           labelText: 'Task description',
@@ -542,7 +522,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           ),
                           filled: true,
                           fillColor: Theme.of(context).splashColor,
-                          // hintText: 'Task description',
                         ),
                         validator: (val) {
                           return null;
@@ -603,7 +582,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: SizeConfig.blockSizeHorizontal * 4,
-                                  // overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ),
@@ -658,8 +636,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                               selectedUser = allUsers.firstWhere(
                                   (element) => element!.userId == newValue);
                             });
-                            // print('user ${selectedUser!.userId}');
-                            // print('user ${selectedUser!.userName}');
                           },
                           items: allUsers.map((AppUser? user) {
                             return DropdownMenuItem<String>(
@@ -674,7 +650,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                                   style: TextStyle(
                                     fontSize:
                                         SizeConfig.blockSizeHorizontal * 4,
-                                    // overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
@@ -684,7 +659,6 @@ class _AddTaskScreenState extends State<AddTaskScreen>
 
                       // Task executor dropdown - shared option
                       if (executorDropdown == 'Shared')
-                        /////////////////////////////////////////////////////////////////////////////////////////////
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [

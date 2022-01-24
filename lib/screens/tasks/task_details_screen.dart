@@ -11,7 +11,6 @@ import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
-import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
 import 'package:under_control_flutter/widgets/inspection/inspection_form.dart';
 import 'package:under_control_flutter/widgets/task/task_complete.dart';
 
@@ -167,7 +166,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
         .getUserById(context, task.userId)
         .then((value) {
       if (value != null) {
-        print('xxx');
         setState(() {
           _creatorName = value.userName;
         });
@@ -375,7 +373,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                   .fetchInspectionsStatus();
               Provider.of<InspectionProvider>(context, listen: false)
                   .fetchByItem(item!);
-              // Provider.of<TaskProvider>(context, listen: false).fetchAndSetTasks();
             }
           });
         }
@@ -442,10 +439,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
     transferObjectTask ??= task.copyWith(date: DateTime.now());
 
     final items = Provider.of<ItemProvider>(context, listen: false).items;
-    final textStyle = Theme.of(context).textTheme.headline6!.copyWith(
-        // fontSize: SizeConfig.blockSizeHorizontal * 4.5,
-        );
-    //
+    final textStyle = Theme.of(context).textTheme.headline6!.copyWith();
 
     final labelTextStyle = Theme.of(context).textTheme.headline6!.copyWith(
           fontSize: SizeConfig.blockSizeHorizontal * 3,
@@ -454,7 +448,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
 
     Item? asset;
 
-    // print(task.itemId);
     final index = items.indexWhere((element) => element.itemId == task.itemId);
     if (index >= 0) {
       asset = items[index];
@@ -511,9 +504,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                 color: Theme.of(context).primaryColor,
               ),
             ),
-          // SizedBox(
-          //   width: SizeConfig.blockSizeHorizontal * 3,
-          // ),
           if (_isInEditMode && task.status != TaskStatus.completed)
             IconButton(
               onPressed: () async {
@@ -526,8 +516,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                     _completeTask(true);
                   }
                 });
-                // Provider.of<TaskProvider>(context, listen: false)
-                //     .fetchAndSetTasks();
               },
               icon: Icon(
                 Icons.done,
@@ -794,7 +782,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                         ],
                       ),
                     // interval
-
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -836,7 +823,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                         ],
                       ),
                     // created by
-
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1054,8 +1040,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                                 _completeTask(true);
                               }
                             });
-                            // Provider.of<TaskProvider>(context, listen: false)
-                            //     .fetchAndSetTasks();
                           },
                           icon: Icon(
                             Icons.done,

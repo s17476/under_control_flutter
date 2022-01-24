@@ -1,13 +1,12 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-
 import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/company.dart';
 
+// this class provides user data and DB operations methods
 class UserProvider with ChangeNotifier {
   AppUser? _user;
   List<AppUser?> _allUsersInCompany = [];
@@ -37,7 +36,7 @@ class UserProvider with ChangeNotifier {
 
   List<AppUser?> get allUsersInCompany => [..._allUsersInCompany];
 
-  // initialize users in company
+  // initializes users in company
   Future<void> initializeCompanyUsers() async {
     List<AppUser?> tmpUsers = [];
     await FirebaseFirestore.instance
@@ -60,20 +59,18 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // initialize user
+  // initializes user data
   Future<AppUser?> initializeUser(
     BuildContext context,
     String userId,
   ) async {
     _isLoading = true;
-    // UserCredential userCredential = FirebaseAuth.instance.;
     _user = await FirebaseFirestore.instance
         .collection('users')
         .doc(userId)
         .get()
         .then((DocumentSnapshot documentSnapshot) {
       AppUser? tmpUser;
-      // if (documentSnapshot.exists) {
       final userSnapshot = documentSnapshot.data() as Map<String, dynamic>;
       if (userSnapshot['company'] == null) {
         tmpUser = AppUser(
@@ -91,14 +88,6 @@ class UserProvider with ChangeNotifier {
           companyId: userSnapshot['companyId'],
         );
       }
-      // } else {
-      //   ScaffoldMessenger.of(context)
-      //     ..removeCurrentSnackBar()
-      //     ..showSnackBar(SnackBar(
-      //       content: const Text('Unable get user data. Try again later...'),
-      //       backgroundColor: Theme.of(context).errorColor,
-      //     ));
-      // }
       _isLoading = false;
       _hasData = true;
       return tmpUser;
@@ -107,7 +96,7 @@ class UserProvider with ChangeNotifier {
     return _user;
   }
 
-  // get user by Id
+  // gets user by id
   Future<AppUser?> getUserById(
     BuildContext context,
     String userId,
@@ -139,10 +128,9 @@ class UserProvider with ChangeNotifier {
       }
       return tmpUser;
     });
-    // return _user;
   }
 
-  // get shared user by Id
+  // gets shared user by id
   Future<AppUser?> getSharedUserById(
     String userId,
   ) async {
@@ -166,10 +154,9 @@ class UserProvider with ChangeNotifier {
       }
       return tmpUser;
     });
-    // return _user;
   }
 
-  // set company to the current user
+  // sets company to the current user
   Future<void> setCompany(BuildContext context, Company company) async {
     _user = AppUser.company(
       userId: _user!.userId,
@@ -182,6 +169,7 @@ class UserProvider with ChangeNotifier {
     await updateUser(context);
   }
 
+  // updates user data in DB
   Future<void> updateUser(BuildContext context) async {
     await FirebaseFirestore.instance
         .collection('users')
@@ -225,7 +213,7 @@ class UserProvider with ChangeNotifier {
           password: password,
         );
 
-        // add user image to cloud storage
+        // adds user image to cloud storage
         final imgRef = FirebaseStorage.instance
             .ref()
             .child('user_images')
@@ -234,7 +222,7 @@ class UserProvider with ChangeNotifier {
 
         final imgUrl = await imgRef.getDownloadURL();
 
-        // add user data to DB
+        // adds user data to DB
         await FirebaseFirestore.instance
             .collection('users')
             .doc(userCredential.user!.uid)
@@ -284,6 +272,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // signout method
   void signout() {
     FirebaseAuth.instance.signOut();
     _user = null;
@@ -292,6 +281,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // listens to user authentification status
   Stream<User?> authStateChanges() {
     return FirebaseAuth.instance.authStateChanges();
   }

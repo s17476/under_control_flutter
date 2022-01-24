@@ -6,6 +6,7 @@ import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
 
+// this class provides tasks data and DB operations methods
 class TaskProvider with ChangeNotifier {
   AppUser? _user;
 
@@ -44,6 +45,7 @@ class TaskProvider with ChangeNotifier {
     _isActive = false;
   }
 
+  // switches between active and done tasks
   void toggleIsActive() {
     _isActive = !isActive;
     fetchAndSetTasks();
@@ -60,6 +62,7 @@ class TaskProvider with ChangeNotifier {
 
   Map<String, List<Task>> get getAllTasks => isActive ? _tasks : _tasksArchive;
 
+  // provides five upcoming tasks
   Future<List<Task>> fetchAndGetUpcomingTasks() async {
     var keys = _tasks.keys.toList();
     DateFormat format = DateFormat("dd/MM/yyyy");
@@ -80,6 +83,7 @@ class TaskProvider with ChangeNotifier {
     return _upcomingTasks;
   }
 
+  // provides five recently finished tasks
   Future<List<Task>> fetchAndGetCompletedTasks() async {
     var keys = _tasksArchive.keys.toList();
     DateFormat format = DateFormat("dd/MM/yyyy");
@@ -101,6 +105,7 @@ class TaskProvider with ChangeNotifier {
     return _upcomingTasks;
   }
 
+  // gets tasks data from DB
   Future<void> fetchAndSetTasks() async {
     _isLoading = true;
     Map<String, List<Task>> tmpTasks = {};
@@ -145,7 +150,6 @@ class TaskProvider with ChangeNotifier {
           cost: doc['cost'],
           duration: doc['duration'],
         );
-        // print('f\ne\nt\nc\nh\n ${tmpTask.cost}  ${tmpTask.duration}');
         if (tmpTasks.containsKey(stringDate)) {
           tmpTasks[stringDate]!.add(tmpTask);
         } else {
@@ -159,12 +163,11 @@ class TaskProvider with ChangeNotifier {
       }
     });
     await fetchAndSetSharedTasks();
-
     _isLoading = false;
     notifyListeners();
   }
 
-  // get shared done tasks
+  // gets shared done tasks
   Future<Map<String, List<Task>>> getSharedDoneTasks(
       Item item, String companyId) async {
     _isLoading = true;
@@ -203,7 +206,6 @@ class TaskProvider with ChangeNotifier {
           cost: doc['cost'],
           duration: doc['duration'],
         );
-        // print('f\ne\nt\nc\nh\n ${tmpTask.cost}  ${tmpTask.duration}');
         if (tmpTasks.containsKey(stringDate)) {
           tmpTasks[stringDate]!.add(tmpTask);
         } else {
@@ -211,12 +213,12 @@ class TaskProvider with ChangeNotifier {
         }
       }
     });
-
     _isLoading = false;
     notifyListeners();
     return tmpTasks;
   }
 
+  // gets shared tasks from DB
   Future<void> fetchAndSetSharedTasks() async {
     _isLoading = true;
 
@@ -273,13 +275,11 @@ class TaskProvider with ChangeNotifier {
             }
           }
         });
-
-        // print('f\ne\nt\nc\nh\n ${tmpTask.cost}  ${tmpTask.duration}');
-
       }
     });
   }
 
+  // gets completed tasks from DB
   Future<void> fetchAndSetCompletedTasks() async {
     _isLoading = true;
     Map<String, List<Task>> tmpTasks = {};
@@ -317,26 +317,23 @@ class TaskProvider with ChangeNotifier {
           cost: doc['cost'],
           duration: doc['duration'],
         );
-        // print('f\ne\nt\nc\nh\n ${tmpTask.cost}  ${tmpTask.duration}');
         if (tmpTasks.containsKey(stringDate)) {
           tmpTasks[stringDate]!.add(tmpTask);
         } else {
           tmpTasks[stringDate] = [tmpTask];
         }
       }
-
       _tasksArchive = tmpTasks;
-
       _isLoading = false;
       notifyListeners();
     });
   }
 
+  // adds new task to DB
   Future<Task?> addTask(Task task) async {
-    // print('add task executor id  ${task.executorId}');
     Task tmpTask = task;
     Task result;
-    // get taskss referance
+
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
         .doc(_user!.companyId)
@@ -372,19 +369,17 @@ class TaskProvider with ChangeNotifier {
       notifyListeners();
       return tmpTask;
     });
-    //share task
     if (tmpTask.executor == TaskExecutor.shared) {
       await shareTask(tmpTask);
     }
     return result;
   }
 
-  // add shared task
+  // add shared task to DB
   Future<Task?> addSharedTask(Task task, String companyId) async {
-    print('add task executor id  ${task.executorId}');
     Task tmpTask = task;
     Task result;
-    // get tasks referance
+
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
         .doc(companyId)
@@ -420,13 +415,13 @@ class TaskProvider with ChangeNotifier {
       notifyListeners();
       return tmpTask;
     });
-    //share task
     if (tmpTask.executor == TaskExecutor.shared) {
       await shareTaskByShared(tmpTask, companyId);
     }
     return result;
   }
 
+  // shares task with choosen company
   Future<void> shareTask(Task task) async {
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
@@ -437,9 +432,9 @@ class TaskProvider with ChangeNotifier {
       'companyId': _user!.companyId,
       'taskId': task.taskId,
     });
-    print('task shared');
   }
 
+  // shares cyclic task completed by choosen company
   Future<void> shareTaskByShared(Task task, String companyId) async {
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
@@ -450,10 +445,9 @@ class TaskProvider with ChangeNotifier {
       'companyId': companyId,
       'taskId': task.taskId,
     });
-    print('task shared');
   }
 
-  // update task
+  // updates task
   Future<void> updateTask(Task task) async {
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
@@ -480,12 +474,10 @@ class TaskProvider with ChangeNotifier {
       'cost': task.cost,
       'duration': task.duration,
     });
-
-    // fetchAndSetTasks();
     notifyListeners();
   }
 
-  // update shared task
+  // updates shared task
   Future<void> updateSharedTask(Task task, String companyId) async {
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
@@ -512,24 +504,22 @@ class TaskProvider with ChangeNotifier {
       'cost': task.cost,
       'duration': task.duration,
     });
-
-    // fetchAndSetTasks();
     notifyListeners();
   }
 
-  // complete task
+  // completes task
   Future<void> completeTask(Task task, Task oldTask) async {
     await addToArchive(task).then((_) => deleteTask(oldTask));
   }
 
-  // complete shared task
+  // completes shared task
   Future<void> completeSharedTask(
       Task task, Task oldTask, String companyId) async {
     await addSharedToArchive(task, companyId)
         .then((_) => deleteSharedTask(oldTask, companyId));
   }
 
-  // add next task to the list
+  // adds next cyclic task to the list
   Future<Task?> addNextTask(Task task) async {
     Task? nextTask;
 
@@ -545,8 +535,6 @@ class TaskProvider with ChangeNotifier {
         status: TaskStatus.planned,
       );
     }
-    print(task.executorId);
-    print('exe');
     if (nextTask == null) {
       return null;
     }
@@ -555,11 +543,11 @@ class TaskProvider with ChangeNotifier {
     return await addTask(nextTask);
   }
 
-  // add next shared task to the list
+  // adds next shared task to the list
   Future<Task?> addNextSharedTask(Task task, String companyId) async {
     Task? nextTask;
 
-    // update next task date
+    // updates next task date
     if (task.taskInterval != 'No') {
       DateTime nextDate = DateTime.now();
 
@@ -574,16 +562,13 @@ class TaskProvider with ChangeNotifier {
     if (nextTask == null) {
       return null;
     }
-    // _tasks.remove(task);
-    // notifyListeners();
     return await addSharedTask(nextTask, companyId);
   }
 
-  // add task to archive
+  // adds task to archive
   Future<void> addToArchive(Task task) async {
     Task tmpTask;
 
-    // get taskss referance
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
         .doc(_user!.companyId)
@@ -623,11 +608,10 @@ class TaskProvider with ChangeNotifier {
     });
   }
 
-  // add shared task to archive
+  // adds shared task to archive
   Future<void> addSharedToArchive(Task task, String companyId) async {
     Task tmpTask;
 
-    // get tasks referance
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
         .doc(companyId)
@@ -691,17 +675,13 @@ class TaskProvider with ChangeNotifier {
       if (_tasks[key] != null && _tasks[key]!.isEmpty) {
         _tasks.remove(key);
       }
-    }).catchError((error) {
-      // print(error);
-    });
+    }).catchError((error) {});
     notifyListeners();
-    // fetchAndSetCompletedTasks();
     return response;
   }
 
-  // delete shared task
+  // deletes shared task
   Future<bool> deleteSharedTask(Task task, String companyId) async {
-    print('task id  ${task.taskId}');
     var response = true;
     final taskRef = FirebaseFirestore.instance
         .collection('companies')
@@ -717,15 +697,12 @@ class TaskProvider with ChangeNotifier {
       if (_tasks[key] != null && _tasks[key]!.isEmpty) {
         _tasks.remove(key);
       }
-    }).catchError((error) {
-      // print(error);
-    });
+    }).catchError((error) {});
     notifyListeners();
-    // fetchAndSetCompletedTasks();
     return response;
   }
 
-  // delete task shared with others
+  // deletes task shared with choosen company
   Future<void> deleteSharedWithTask(Task task) async {
     String taskToDelete = '';
     await FirebaseFirestore.instance
@@ -739,7 +716,6 @@ class TaskProvider with ChangeNotifier {
         taskToDelete = querySnap.docs[0].id;
       }
     });
-    print('task to delete  $taskToDelete');
 
     await FirebaseFirestore.instance
         .collection('companies')
@@ -749,6 +725,7 @@ class TaskProvider with ChangeNotifier {
         .delete();
   }
 
+  // deletes task from archive
   Future<bool> deleteFromTaskArchive(BuildContext context, Task task) async {
     var response = true;
     await FirebaseFirestore.instance
@@ -775,6 +752,7 @@ class TaskProvider with ChangeNotifier {
     return response;
   }
 
+  // rapid complete
   Future<bool> rapidComplete(BuildContext context, Task task) async {
     _undoContext = context;
     _undoTask = task;
@@ -790,38 +768,36 @@ class TaskProvider with ChangeNotifier {
     var response = false;
     await addToArchive(task).then((_) => deleteTask(task).then((value) {
           addNextTask(task).then(
-            (nextTask) => // undo rapid complete
-                ScaffoldMessenger.of(context)
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(
-                    SnackBar(
-                      backgroundColor:
-                          Theme.of(context).appBarTheme.backgroundColor,
-                      content: Text('${task.title} - Rapid Complete done!'),
-                      duration: const Duration(seconds: 4),
-                      action: SnackBarAction(
-                        textColor: Colors.amber,
-                        label: 'UNDO',
-                        onPressed: () async {
-                          await undoRapidComplete();
-                          if (nextTask != null) {
-                            await deleteTask(nextTask);
-                          }
-                        },
-                      ),
-                    ),
+            (nextTask) => ScaffoldMessenger.of(context)
+              ..removeCurrentSnackBar()
+              ..showSnackBar(
+                SnackBar(
+                  backgroundColor:
+                      Theme.of(context).appBarTheme.backgroundColor,
+                  content: Text('${task.title} - Rapid Complete done!'),
+                  duration: const Duration(seconds: 4),
+                  action: SnackBarAction(
+                    textColor: Colors.amber,
+                    label: 'UNDO',
+                    onPressed: () async {
+                      await undoRapidComplete();
+                      if (nextTask != null) {
+                        await deleteTask(nextTask);
+                      }
+                    },
                   ),
+                ),
+              ),
           );
           response = value;
         }));
-    // print('rapid      $_undoTask');
     return response;
   }
 
+  // undo rapid complete
   Future<bool> undoRapidComplete() async {
     _undoTask!.status = TaskStatus.started;
     _undoTask!.comments = '';
-    // print('undo      $_undoTask');
     var response = false;
     await addTask(_undoTask!).then((value) =>
         deleteFromTaskArchive(_undoContext!, _undoTask!)

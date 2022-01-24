@@ -12,6 +12,7 @@ import 'package:under_control_flutter/providers/inspection_provider.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 
+// add inspections screen used while adding new asset
 class AddInspectionScreen extends StatefulWidget {
   const AddInspectionScreen({Key? key}) : super(key: key);
 
@@ -23,8 +24,6 @@ class AddInspectionScreen extends StatefulWidget {
 
 class _AddInspectionScreenState extends State<AddInspectionScreen>
     with TickerProviderStateMixin {
-  final _formKey = GlobalKey<FormState>();
-
   late Item item;
   late Task? task;
 
@@ -36,9 +35,9 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
   String _checklistName = 'New checklist';
   String _inspectionInterval = '1 year';
 
-  final TextEditingController _textController = TextEditingController();
-  final TextEditingController _nameTextController = TextEditingController();
-  final TextEditingController _commentsTextController = TextEditingController();
+  final _textController = TextEditingController();
+  final _nameTextController = TextEditingController();
+  final _commentsTextController = TextEditingController();
 
   late Checklist _selectedChecklist;
 
@@ -64,8 +63,6 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
     checklists = Provider.of<ChecklistProvider>(context).checklists;
     _animationControllers.clear();
     _animations.clear();
-    // _inspectionInterval = item.interval;
-    // print('keys lenght ${_selectedChecklist.fields.keys.length}');
     _updateAnimationControllers();
     super.didChangeDependencies();
   }
@@ -78,6 +75,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
     super.dispose();
   }
 
+  // updates animations controllers in case of adding or deleting control point
   void _updateAnimationControllers() {
     for (int i = 0; i < _selectedChecklist.fields.keys.length; i++) {
       _animationControllers.insert(
@@ -86,7 +84,6 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
             vsync: this,
             duration: const Duration(milliseconds: 500),
           ));
-
       _animations.insert(
           i,
           CurvedAnimation(
@@ -94,6 +91,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
     }
   }
 
+  // date picker widget
   void _presentDayPicker() {
     FocusScope.of(context).requestFocus(FocusNode());
     showDatePicker(
@@ -124,6 +122,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
     });
   }
 
+  // save inspection
   void saveInspection() {
     int statusValue;
     if (_selectedChecklist.name == 'New checklist') {
@@ -145,6 +144,8 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
       status: statusValue,
       taskId: task?.taskId,
     );
+
+    // try to add inspection to DB
     Provider.of<InspectionProvider>(context, listen: false)
         .addInspection(
       item,
@@ -157,7 +158,8 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
           ..showSnackBar(
             const SnackBar(
               content: Text(
-                  'Error occured while adding to Data Base. Please try again later.'),
+                'Error occured while adding to Data Base. Please try again later.',
+              ),
               backgroundColor: Colors.red,
             ),
           );
@@ -169,11 +171,14 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
         item.nextInspection =
             DateCalc.getNextDate(item.lastInspection, item.interval)!;
 
+        // updates item inspection status
         Provider.of<ItemProvider>(context, listen: false)
             .updateItem(item)
             .then((_) => Navigator.of(context).pop(value));
+        // fetch inspections status - used on dashboard screen
         Provider.of<ItemProvider>(context, listen: false)
             .fetchInspectionsStatus();
+        // fetch asset inspections data
         Provider.of<InspectionProvider>(context, listen: false)
             .fetchByItem(item);
       }
@@ -286,7 +291,6 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                           ),
                         ],
                       ),
-                      // if (_checklistName == 'New checklist')
                       SizedBox(
                         child: Column(
                           children: [
@@ -453,7 +457,6 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                                             ),
                                           );
                                       }
-                                      // TODO
                                       _updateAnimationControllers();
                                     },
                                     icon: Icon(

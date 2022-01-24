@@ -24,6 +24,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   late final ValueNotifier<List<Task>> _selectedEvents;
 
+  // inits tasks and calendar parameters
   @override
   void initState() {
     super.initState();
@@ -38,28 +39,27 @@ class _CalendarScreenState extends State<CalendarScreen> {
     super.dispose();
   }
 
+  // gets all tasks for a date
   List<Task> _getEventsForDay(DateTime day) {
     final date = DateFormat('dd/MM/yyyy').format(day);
 
+    // filters tasks by executor
     List<Task> shownEvents;
     if (_eventList[date] != null) {
       if (executor == TaskExecutor.company) {
         shownEvents = _eventList[date]!.where((event) {
           return event.executor == executor;
         }).toList();
-        // print('to show ${shownEvents.length}');
       } else if (executor == TaskExecutor.shared) {
         shownEvents = _eventList[date]!.where((event) {
           return event.executor == executor;
         }).toList();
-        // print('to show ${shownEvents.length}');
       } else if (executor == TaskExecutor.user) {
         shownEvents = _eventList[date]!.where((event) {
           return (event.executor == executor &&
               event.executorId ==
                   Provider.of<UserProvider>(context).user!.userId);
         }).toList();
-        // print('to show ${shownEvents.length}');
       } else {
         shownEvents = _eventList[date]!;
       }
@@ -67,7 +67,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
       shownEvents = [];
     }
 
-    // print("getevents $date, ${_eventList[date]}");
     return shownEvents..sort((a, b) => a.type.index.compareTo(b.type.index));
   }
 
@@ -90,12 +89,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // get data from provider and set listeners
     TaskProvider taskProvider = Provider.of<TaskProvider>(context);
     _eventList = taskProvider.getAllTasks;
-    executor = Provider.of<TaskProvider>(context).executor;
+    executor = taskProvider.executor;
     _selectedEvents.value = _getEventsForDay(_selectedDay!);
     return Column(
       children: [
+        // calendar widget
         TableCalendar(
           firstDay: DateTime.utc(2010, 10, 16),
           lastDay: DateTime.utc(2030, 3, 14),
@@ -125,6 +126,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             _focusedDay = focusedDay;
           },
           calendarBuilders: CalendarBuilders(
+            // monday to friday style
             dowBuilder: (context, day) {
               if (day.weekday == DateTime.monday ||
                   day.weekday == DateTime.tuesday ||
@@ -142,6 +144,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 );
               }
             },
+            // today marker style
             todayBuilder: (context, day, focusedDay) {
               return Center(
                   child: CircleAvatar(
@@ -151,6 +154,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
               ));
             },
+            // selected day marker style
             selectedBuilder: (context, day, focusedDay) {
               return Center(
                   child: CircleAvatar(
@@ -169,6 +173,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             },
             markerBuilder: (context, day, events) {
               return events.isNotEmpty
+                  // badge with events count for date
                   ? Positioned(
                       right: 3,
                       top: 3,
@@ -195,6 +200,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
             },
           ),
         ),
+        // events list widget
         CalendarEventsList(selectedEvents: _selectedEvents),
       ],
     );

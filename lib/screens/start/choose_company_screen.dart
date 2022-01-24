@@ -6,14 +6,13 @@ import 'package:under_control_flutter/models/company.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/start/add_company_screen.dart';
-import 'package:under_control_flutter/screens/start/add_company_screen.dart';
 
 class ChooseCompanyScreen extends StatelessWidget {
   const ChooseCompanyScreen({Key? key}) : super(key: key);
 
   static const routeName = '/choose_company';
 
-  // confirm company choice
+  // confirm company choice dialog
   Future<dynamic> _showDialog(
     BuildContext context,
     Company company,
