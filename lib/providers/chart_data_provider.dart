@@ -65,8 +65,8 @@ class ChartDataProvider with ChangeNotifier {
 
     // set chart start - end date
     fromDate ??= await getBottomTimeBorder();
-    toDate ??= DateTime(nowDate.year, nowDate.month, 31);
-    toDate = DateTime(toDate.year, toDate.month, 31);
+    toDate ??= DateTime(nowDate.year, nowDate.month);
+    toDate = DateTime(toDate.year, toDate.month + 1, 1);
 
     if (fromDate == toDate) {
       fromDate = DateTime(fromDate.year, fromDate.month, 1);
@@ -85,7 +85,7 @@ class ChartDataProvider with ChangeNotifier {
         .doc(_user!.companyId)
         .collection('archive')
         .where('date', isGreaterThanOrEqualTo: fromDate.toIso8601String())
-        .where('date', isLessThanOrEqualTo: toDate.toIso8601String())
+        .where('date', isLessThan: toDate.toIso8601String())
         .where('itemId', isEqualTo: itemId)
         .get()
         .then((QuerySnapshot querySnapshot) {
@@ -99,6 +99,7 @@ class ChartDataProvider with ChangeNotifier {
           result[stringDate] = result[stringDate]! + doc['cost'];
         }
       }
+
       _chartValues = result;
       notifyListeners();
       _isLoading = false;
