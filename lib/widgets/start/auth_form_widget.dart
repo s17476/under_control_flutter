@@ -132,9 +132,13 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
         padding: EdgeInsets.only(
           left: SizeConfig.blockSizeHorizontal * 10,
           right: SizeConfig.blockSizeHorizontal * 10,
-          top: WidgetsBinding.instance!.window.viewInsets.bottom > 0
-              ? SizeConfig.blockSizeHorizontal * 20
-              : SizeConfig.blockSizeHorizontal * 40,
+          top: SizeConfig.isSmallScreen
+              ? WidgetsBinding.instance!.window.viewInsets.bottom > 0
+                  ? SizeConfig.blockSizeHorizontal * 20
+                  : SizeConfig.blockSizeHorizontal * 40
+              : WidgetsBinding.instance!.window.viewInsets.bottom > 0
+                  ? SizeConfig.blockSizeHorizontal * 10
+                  : SizeConfig.blockSizeHorizontal * 30,
         ),
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
@@ -170,121 +174,29 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
               ),
 
               //email field
-              Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                        right: SizeConfig.blockSizeHorizontal * 2),
-                    child: Icon(
-                      Icons.person,
-                      color: Colors.green,
-                      size: SizeConfig.blockSizeHorizontal * 10,
-                    ),
-                  ),
-                  Expanded(
-                    child: TextFormField(
-                      key: const ValueKey('email'),
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: SizeConfig.blockSizeHorizontal * 1,
-                          horizontal: SizeConfig.blockSizeHorizontal * 5,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Theme.of(context).splashColor,
-                        hintText: 'E-mail address',
-                      ),
-                      onSaved: (value) {
-                        _userEmail = value!;
-                      },
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(
-                height: SizeConfig.blockSizeHorizontal * 4,
-              ),
-
-              //name field
-              FadeTransition(
-                opacity: _opacityAnimation!,
-                child: SlideTransition(
-                  position: _userSlideAnimation!,
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                            right: SizeConfig.blockSizeHorizontal * 2),
-                        child: Icon(
-                          Icons.person_outline,
-                          color: Colors.green,
-                          size: SizeConfig.blockSizeHorizontal * 10,
-                        ),
-                      ),
-                      Expanded(
-                        child: TextFormField(
-                          key: const ValueKey('name'),
-                          enabled: _isInLoginMode ? false : true,
-                          textInputAction: TextInputAction.next,
-                          keyboardType: TextInputType.name,
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(
-                              vertical: SizeConfig.blockSizeHorizontal * 1,
-                              horizontal: SizeConfig.blockSizeHorizontal * 5,
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30),
-                              borderSide: BorderSide.none,
-                            ),
-                            filled: true,
-                            fillColor: Theme.of(context).splashColor,
-                            hintText: 'User name',
-                          ),
-                          onSaved: (value) {
-                            _userName = value!;
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: SizeConfig.blockSizeHorizontal *
+                      (SizeConfig.isSmallScreen ? 0 : 15),
                 ),
-              ),
-
-              SlideTransition(
-                position: _userSlideAnimation!,
-                child: SizedBox(
-                  height: SizeConfig.blockSizeHorizontal * 4,
-                ),
-              ),
-
-              //password
-              SlideTransition(
-                position: _slideAnimation!,
                 child: Row(
                   children: [
                     Padding(
                       padding: EdgeInsets.only(
-                          right: SizeConfig.blockSizeHorizontal * 2),
+                        right: SizeConfig.blockSizeHorizontal * 2,
+                      ),
                       child: Icon(
-                        Icons.lock,
+                        Icons.person,
                         color: Colors.green,
-                        size: SizeConfig.blockSizeHorizontal * 10,
+                        size: SizeConfig.blockSizeHorizontal *
+                            (SizeConfig.isSmallScreen ? 10 : 6),
                       ),
                     ),
                     Expanded(
                       child: TextFormField(
-                        onFieldSubmitted: (val) {
-                          _trySubmit();
-                        },
-                        key: const ValueKey('password'),
-                        keyboardType: TextInputType.visiblePassword,
-                        textInputAction: TextInputAction.done,
+                        key: const ValueKey('email'),
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(
                             vertical: SizeConfig.blockSizeHorizontal * 1,
@@ -296,15 +208,132 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                           ),
                           filled: true,
                           fillColor: Theme.of(context).splashColor,
-                          hintText: 'Password',
+                          hintText: 'E-mail address',
                         ),
-                        obscureText: true,
                         onSaved: (value) {
-                          _userPassword = value!;
+                          _userEmail = value!;
                         },
                       ),
                     ),
                   ],
+                ),
+              ),
+
+              SizedBox(
+                height: SizeConfig.blockSizeHorizontal *
+                    (SizeConfig.isSmallScreen ? 4 : 2.5),
+              ),
+
+              //name field
+              FadeTransition(
+                opacity: _opacityAnimation!,
+                child: SlideTransition(
+                  position: _userSlideAnimation!,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: SizeConfig.blockSizeHorizontal *
+                          (SizeConfig.isSmallScreen ? 0 : 15),
+                    ),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(
+                            right: SizeConfig.blockSizeHorizontal * 2,
+                          ),
+                          child: Icon(
+                            Icons.person_outline,
+                            color: Colors.green,
+                            size: SizeConfig.blockSizeHorizontal *
+                                (SizeConfig.isSmallScreen ? 10 : 6),
+                          ),
+                        ),
+                        Expanded(
+                          child: TextFormField(
+                            key: const ValueKey('name'),
+                            enabled: _isInLoginMode ? false : true,
+                            textInputAction: TextInputAction.next,
+                            keyboardType: TextInputType.name,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                vertical: SizeConfig.blockSizeHorizontal * 1,
+                                horizontal: SizeConfig.blockSizeHorizontal * 5,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: BorderSide.none,
+                              ),
+                              filled: true,
+                              fillColor: Theme.of(context).splashColor,
+                              hintText: 'User name',
+                            ),
+                            onSaved: (value) {
+                              _userName = value!;
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+              SlideTransition(
+                position: _userSlideAnimation!,
+                child: SizedBox(
+                  height: SizeConfig.blockSizeHorizontal *
+                      (SizeConfig.isSmallScreen ? 4 : 2.5),
+                ),
+              ),
+
+              //password
+              SlideTransition(
+                position: _slideAnimation!,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: SizeConfig.blockSizeHorizontal *
+                        (SizeConfig.isSmallScreen ? 0 : 15),
+                  ),
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(
+                            right: SizeConfig.blockSizeHorizontal * 2),
+                        child: Icon(
+                          Icons.lock,
+                          color: Colors.green,
+                          size: SizeConfig.blockSizeHorizontal *
+                              (SizeConfig.isSmallScreen ? 10 : 6),
+                        ),
+                      ),
+                      Expanded(
+                        child: TextFormField(
+                          onFieldSubmitted: (val) {
+                            _trySubmit();
+                          },
+                          key: const ValueKey('password'),
+                          keyboardType: TextInputType.visiblePassword,
+                          textInputAction: TextInputAction.done,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: SizeConfig.blockSizeHorizontal * 1,
+                              horizontal: SizeConfig.blockSizeHorizontal * 5,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true,
+                            fillColor: Theme.of(context).splashColor,
+                            hintText: 'Password',
+                          ),
+                          obscureText: true,
+                          onSaved: (value) {
+                            _userPassword = value!;
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -331,7 +360,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                       : Text(
                           _isInLoginMode ? 'Login' : 'Signup',
                           style: TextStyle(
-                            fontSize: SizeConfig.blockSizeHorizontal * 5.5,
+                            fontSize: SizeConfig.blockSizeHorizontal *
+                                (SizeConfig.isSmallScreen ? 5.5 : 3.5),
                           ),
                         ),
                   style: ElevatedButton.styleFrom(
@@ -373,7 +403,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                               ? 'Create new account'
                               : 'I aleready have an account',
                           style: TextStyle(
-                            fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                            fontSize: SizeConfig.blockSizeHorizontal *
+                                (SizeConfig.isSmallScreen ? 4.5 : 3),
                           ),
                         ),
                 ),

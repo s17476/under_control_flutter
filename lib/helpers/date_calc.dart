@@ -1,7 +1,7 @@
 class DateCalc {
   // this method calculates the date of next cyclic task execution
   // date is counted from task execution date according
-  // interwal parameter
+  // interval parameter
   static DateTime? getNextDate(DateTime date, String interval) {
     DateTime? resultDate;
     List<String> duration = interval.split(' ');

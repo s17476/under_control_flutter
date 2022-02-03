@@ -77,19 +77,22 @@ class _UserImagePickerState extends State<UserImagePicker> {
               },
               icon: Icon(
                 Icons.camera,
-                size: SizeConfig.blockSizeHorizontal * 8,
+                size: SizeConfig.blockSizeHorizontal *
+                    (SizeConfig.isSmallScreen ? 8 : 5),
               ),
               label: Text(
                 'Take foto',
                 style: TextStyle(
-                  fontSize: SizeConfig.blockSizeHorizontal * 4,
+                  fontSize: SizeConfig.blockSizeHorizontal *
+                      (SizeConfig.isSmallScreen ? 4 : 3),
                 ),
               ),
             ),
             Text(
               'or',
               style: TextStyle(
-                fontSize: SizeConfig.blockSizeHorizontal * 5,
+                fontSize: SizeConfig.blockSizeHorizontal *
+                    (SizeConfig.isSmallScreen ? 5 : 4),
               ),
             ),
             //choose avatar image from device
@@ -99,12 +102,14 @@ class _UserImagePickerState extends State<UserImagePicker> {
               },
               icon: Icon(
                 Icons.image,
-                size: SizeConfig.blockSizeHorizontal * 8,
+                size: SizeConfig.blockSizeHorizontal *
+                    (SizeConfig.isSmallScreen ? 8 : 5),
               ),
               label: Text(
                 'Add image',
                 style: TextStyle(
-                  fontSize: SizeConfig.blockSizeHorizontal * 4,
+                  fontSize: SizeConfig.blockSizeHorizontal *
+                      (SizeConfig.isSmallScreen ? 4 : 3),
                 ),
               ),
             ),

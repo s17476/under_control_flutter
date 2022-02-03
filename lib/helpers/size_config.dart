@@ -8,6 +8,13 @@ class SizeConfig {
   static double? _safeAreaHorizontal;
   static double? _safeAreaVertical;
 
+  static bool get isSmallScreen => _screenWidth! < 800;
+
+  static bool get isMediumScreen =>
+      _screenWidth! >= 800 && _screenWidth! < 1200;
+
+  static bool get isLagreScreen => _screenWidth! >= 1200;
+
   static double get blockSizeHorizontal {
     return _screenWidth! / 100;
   }

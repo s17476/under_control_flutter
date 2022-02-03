@@ -51,7 +51,7 @@ class ChecklistProvider with ChangeNotifier {
       // add to local list
       var index =
           _checklists.indexWhere((element) => element.name == checklist.name);
-      // replace if alerede exist
+      // replace if aleready exist
       if (index >= 0) {
         _checklists.removeAt(index);
       }
