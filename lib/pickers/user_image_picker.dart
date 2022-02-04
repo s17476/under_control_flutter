@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 
 //helper to pick images from camera and device storage
@@ -19,7 +20,7 @@ class UserImagePicker extends StatefulWidget {
   _UserImagePickerState createState() => _UserImagePickerState();
 }
 
-class _UserImagePickerState extends State<UserImagePicker> {
+class _UserImagePickerState extends State<UserImagePicker> with ResponsiveSize {
   @override
   void initState() {
     super.initState();
@@ -53,7 +54,7 @@ class _UserImagePickerState extends State<UserImagePicker> {
     return Column(
       children: [
         CircleAvatar(
-          radius: SizeConfig.blockSizeHorizontal * 12,
+          radius: responsiveSize(small: 12, large: 6),
           backgroundColor: Colors.grey,
           backgroundImage: _image != null ? FileImage(_image!) : null,
           child: _image == null
@@ -61,14 +62,16 @@ class _UserImagePickerState extends State<UserImagePicker> {
                   '?',
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: SizeConfig.blockSizeHorizontal * 15,
+                    fontSize: responsiveSize(small: 15, large: 7),
                     fontWeight: FontWeight.w700,
                   ),
                 )
               : null,
         ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: isLargeScreen()
+              ? MainAxisAlignment.center
+              : MainAxisAlignment.spaceAround,
           children: [
             //take foto
             TextButton.icon(
@@ -77,22 +80,19 @@ class _UserImagePickerState extends State<UserImagePicker> {
               },
               icon: Icon(
                 Icons.camera,
-                size: SizeConfig.blockSizeHorizontal *
-                    (SizeConfig.isSmallScreen ? 8 : 5),
+                size: responsiveSize(small: 8, medium: 5, large: 2),
               ),
               label: Text(
                 'Take foto',
                 style: TextStyle(
-                  fontSize: SizeConfig.blockSizeHorizontal *
-                      (SizeConfig.isSmallScreen ? 4 : 3),
+                  fontSize: responsiveSize(small: 4, medium: 3, large: 1),
                 ),
               ),
             ),
             Text(
               'or',
               style: TextStyle(
-                fontSize: SizeConfig.blockSizeHorizontal *
-                    (SizeConfig.isSmallScreen ? 5 : 4),
+                fontSize: responsiveSize(small: 5, medium: 4, large: 1),
               ),
             ),
             //choose avatar image from device
@@ -102,14 +102,12 @@ class _UserImagePickerState extends State<UserImagePicker> {
               },
               icon: Icon(
                 Icons.image,
-                size: SizeConfig.blockSizeHorizontal *
-                    (SizeConfig.isSmallScreen ? 8 : 5),
+                size: responsiveSize(small: 8, medium: 5, large: 2),
               ),
               label: Text(
                 'Add image',
                 style: TextStyle(
-                  fontSize: SizeConfig.blockSizeHorizontal *
-                      (SizeConfig.isSmallScreen ? 4 : 3),
+                  fontSize: responsiveSize(small: 4, medium: 3, large: 1),
                 ),
               ),
             ),

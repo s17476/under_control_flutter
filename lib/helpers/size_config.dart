@@ -7,13 +7,15 @@ class SizeConfig {
   static double? _screenHeight;
   static double? _safeAreaHorizontal;
   static double? _safeAreaVertical;
+  static bool _isSmallScreen = false;
+  static bool _isMediumScreen = false;
+  static bool _isLargeScreen = false;
 
-  static bool get isSmallScreen => _screenWidth! < 800;
+  static bool get isSmallScreen => _isSmallScreen;
 
-  static bool get isMediumScreen =>
-      _screenWidth! >= 800 && _screenWidth! < 1200;
+  static bool get isMediumScreen => _isMediumScreen;
 
-  static bool get isLagreScreen => _screenWidth! >= 1200;
+  static bool get isLagreScreen => _isLargeScreen;
 
   static double get blockSizeHorizontal {
     return _screenWidth! / 100;
@@ -40,6 +42,11 @@ class SizeConfig {
           _mediaQueryData!.padding.left + _mediaQueryData!.padding.right;
       _safeAreaVertical =
           _mediaQueryData!.padding.top + _mediaQueryData!.padding.bottom;
+      // init screen size
+      _isSmallScreen = _screenWidth! <= 500 ? true : false;
+      _isMediumScreen =
+          _screenWidth! > 500 && _screenWidth! <= 800 ? true : false;
+      _isLargeScreen = _screenWidth! > 800 ? true : false;
     }
   }
 }

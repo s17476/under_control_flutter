@@ -32,6 +32,7 @@ class Logo extends StatelessWidget {
               style: TextStyle(
                 fontSize: SizeConfig.blockSizeHorizontal * whitheLettersSize,
                 fontWeight: FontWeight.w500,
+                color: Colors.white,
               ),
             ),
             Text(
@@ -47,6 +48,7 @@ class Logo extends StatelessWidget {
               style: TextStyle(
                 fontSize: SizeConfig.blockSizeHorizontal * whitheLettersSize,
                 fontWeight: FontWeight.w500,
+                color: Colors.white,
               ),
             ),
           ],

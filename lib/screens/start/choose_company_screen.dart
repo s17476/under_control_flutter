@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/company.dart';
 import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 import 'package:under_control_flutter/screens/start/add_company_screen.dart';
 
-class ChooseCompanyScreen extends StatelessWidget {
+class ChooseCompanyScreen extends StatelessWidget with ResponsiveSize {
   const ChooseCompanyScreen({Key? key}) : super(key: key);
 
   static const routeName = '/choose_company';
@@ -37,7 +38,7 @@ class ChooseCompanyScreen extends StatelessWidget {
                 'No',
                 style: TextStyle(
                   color: Theme.of(context).errorColor,
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  fontSize: responsiveSize(small: 5, medium: 2.5),
                 ),
               ),
             ),
@@ -48,7 +49,7 @@ class ChooseCompanyScreen extends StatelessWidget {
               child: Text(
                 'Yes',
                 style: TextStyle(
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  fontSize: responsiveSize(small: 5, medium: 2.5),
                 ),
               ),
             ),
@@ -61,6 +62,7 @@ class ChooseCompanyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     CompanyProvider companyProwider = Provider.of<CompanyProvider>(context);
     return Scaffold(
       appBar: AppBar(
@@ -68,19 +70,19 @@ class ChooseCompanyScreen extends StatelessWidget {
         actions: [
           // logout button
           Padding(
-            padding: EdgeInsets.only(right: SizeConfig.blockSizeHorizontal * 3),
+            padding: EdgeInsets.only(right: responsiveSize(small: 1)),
             child: IconButton(
               onPressed: Provider.of<UserProvider>(context).signout,
               icon: Icon(
                 Icons.logout,
-                size: SizeConfig.blockSizeVertical * 4,
+                size: responsiveSize(small: 8, medium: 4),
                 color: Theme.of(context).errorColor,
               ),
             ),
           ),
           // add company button
           Padding(
-            padding: EdgeInsets.only(right: SizeConfig.blockSizeHorizontal * 3),
+            padding: EdgeInsets.only(right: responsiveSize(small: 3)),
             child: IconButton(
               onPressed: () {
                 Navigator.of(context)
@@ -96,7 +98,7 @@ class ChooseCompanyScreen extends StatelessWidget {
               },
               icon: Icon(
                 Icons.add,
-                size: SizeConfig.blockSizeVertical * 5,
+                size: responsiveSize(small: 10, medium: 5),
                 color: Theme.of(context).primaryColor,
               ),
             ),

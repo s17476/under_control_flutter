@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/pickers/user_image_picker.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
@@ -17,7 +18,7 @@ class AuthFormWidget extends StatefulWidget {
 }
 
 class _AuthFormWidgetState extends State<AuthFormWidget>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, ResponsiveSize {
   final _formKey = GlobalKey<FormState>();
 
   var _isInLoginMode = true;
@@ -37,6 +38,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
   void initState() {
     super.initState();
     //initialize animations controllers
+
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -125,82 +127,97 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
 
   @override
   Widget build(BuildContext context) {
-    var isLoading = Provider.of<UserProvider>(context).isLoading;
     SizeConfig.init(context);
-    return SingleChildScrollView(
-      child: AnimatedPadding(
-        padding: EdgeInsets.only(
-          left: SizeConfig.blockSizeHorizontal * 10,
-          right: SizeConfig.blockSizeHorizontal * 10,
-          top: SizeConfig.isSmallScreen
-              ? WidgetsBinding.instance!.window.viewInsets.bottom > 0
-                  ? SizeConfig.blockSizeHorizontal * 20
-                  : SizeConfig.blockSizeHorizontal * 40
-              : WidgetsBinding.instance!.window.viewInsets.bottom > 0
-                  ? SizeConfig.blockSizeHorizontal * 10
-                  : SizeConfig.blockSizeHorizontal * 30,
+    var isLoading = Provider.of<UserProvider>(context).isLoading;
+    if (isLargeScreen()) {
+      _slideAnimation = Tween<Offset>(
+        begin: const Offset(0, -2.4),
+        end: const Offset(0, 0),
+      ).animate(
+        CurvedAnimation(
+          parent: _animationController!,
+          curve: Curves.linear,
         ),
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOut,
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: responsiveSize(small: 10),
+          right: responsiveSize(small: 10),
+          top: responsiveSize(small: 40, medium: 30, large: 4),
+        ),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
               //logo and image picker
-              _isInLoginMode
-                  ? FadeTransition(
-                      opacity: _opacityAnimationBackward!,
-                      child: Padding(
-                        padding: EdgeInsets.only(
-                          top: SizeConfig.blockSizeVertical * 4.7,
-                        ),
-                        child: const Logo(
-                          greenLettersSize: 15,
-                          whitheLettersSize: 10,
-                        ),
-                      ),
-                    )
-                  : FadeTransition(
-                      opacity: _opacityAnimation!,
-                      child: UserImagePicker(
-                        imagePickFn: _pickImage,
-                        image: _userImageFile,
-                      ),
-                    ),
               SizedBox(
-                height: _isInLoginMode
-                    ? SizeConfig.blockSizeHorizontal * 13
-                    : SizeConfig.blockSizeHorizontal * 5,
+                height: responsiveSize(small: 40, large: 17),
+                child: _isInLoginMode
+                    ? FadeTransition(
+                        opacity: _opacityAnimationBackward!,
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            top: responsiveSize(small: 4.7, large: 3),
+                          ),
+                          child: SizedBox(
+                            width: responsiveSize(small: 70, large: 40),
+                            child: FittedBox(
+                              child: Logo(
+                                greenLettersSize: responsiveSize(
+                                    small: 3.5, medium: 2, large: 0.6),
+                                whitheLettersSize: responsiveSize(
+                                    small: 2.3, medium: 1.3, large: 0.4),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : FadeTransition(
+                        opacity: _opacityAnimation!,
+                        child: UserImagePicker(
+                          imagePickFn: _pickImage,
+                          image: _userImageFile,
+                        ),
+                      ),
               ),
+              // SizedBox(
+              //   height: _isInLoginMode
+              //       ? responsiveSize(small: 18)
+              //       : responsiveSize(small: 5),
+              // ),
 
               //email field
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: SizeConfig.blockSizeHorizontal *
-                      (SizeConfig.isSmallScreen ? 0 : 15),
+                  horizontal: responsiveSize(small: 0, medium: 15, large: 25),
                 ),
                 child: Row(
                   children: [
                     Padding(
                       padding: EdgeInsets.only(
-                        right: SizeConfig.blockSizeHorizontal * 2,
+                        right: responsiveSize(small: 2, medium: 1, large: 0.3),
                       ),
                       child: Icon(
                         Icons.person,
                         color: Colors.green,
-                        size: SizeConfig.blockSizeHorizontal *
-                            (SizeConfig.isSmallScreen ? 10 : 6),
+                        size: responsiveSize(small: 10, medium: 6, large: 3),
                       ),
                     ),
                     Expanded(
                       child: TextFormField(
+                        style: const TextStyle(color: Colors.white),
                         key: const ValueKey('email'),
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                            vertical:
+                                responsiveSize(small: 1, medium: 2, large: 0),
+                            horizontal:
+                                responsiveSize(small: 5, medium: 3, large: 2),
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -220,8 +237,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
               ),
 
               SizedBox(
-                height: SizeConfig.blockSizeHorizontal *
-                    (SizeConfig.isSmallScreen ? 4 : 2.5),
+                height: responsiveSize(small: 4, medium: 2.5, large: 1),
               ),
 
               //name field
@@ -231,32 +247,36 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                   position: _userSlideAnimation!,
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      horizontal: SizeConfig.blockSizeHorizontal *
-                          (SizeConfig.isSmallScreen ? 0 : 15),
+                      horizontal:
+                          responsiveSize(small: 0, medium: 15, large: 25),
                     ),
                     child: Row(
                       children: [
                         Padding(
                           padding: EdgeInsets.only(
-                            right: SizeConfig.blockSizeHorizontal * 2,
+                            right:
+                                responsiveSize(small: 2, medium: 1, large: 0.3),
                           ),
                           child: Icon(
                             Icons.person_outline,
                             color: Colors.green,
-                            size: SizeConfig.blockSizeHorizontal *
-                                (SizeConfig.isSmallScreen ? 10 : 6),
+                            size:
+                                responsiveSize(small: 10, medium: 6, large: 3),
                           ),
                         ),
                         Expanded(
                           child: TextFormField(
+                            style: const TextStyle(color: Colors.white),
                             key: const ValueKey('name'),
                             enabled: _isInLoginMode ? false : true,
                             textInputAction: TextInputAction.next,
                             keyboardType: TextInputType.name,
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
-                                vertical: SizeConfig.blockSizeHorizontal * 1,
-                                horizontal: SizeConfig.blockSizeHorizontal * 5,
+                                vertical: responsiveSize(
+                                    small: 1, medium: 2, large: 0),
+                                horizontal: responsiveSize(
+                                    small: 5, medium: 3, large: 2),
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30),
@@ -280,33 +300,33 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
               SlideTransition(
                 position: _userSlideAnimation!,
                 child: SizedBox(
-                  height: SizeConfig.blockSizeHorizontal *
-                      (SizeConfig.isSmallScreen ? 4 : 2.5),
+                  height: responsiveSize(small: 4, medium: 2.5, large: 1),
                 ),
               ),
 
               //password
               SlideTransition(
-                position: _slideAnimation!,
+                position: _userSlideAnimation!,
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: SizeConfig.blockSizeHorizontal *
-                        (SizeConfig.isSmallScreen ? 0 : 15),
+                    horizontal: responsiveSize(small: 0, medium: 15, large: 25),
                   ),
                   child: Row(
                     children: [
                       Padding(
                         padding: EdgeInsets.only(
-                            right: SizeConfig.blockSizeHorizontal * 2),
+                          right:
+                              responsiveSize(small: 2, medium: 1, large: 0.3),
+                        ),
                         child: Icon(
                           Icons.lock,
                           color: Colors.green,
-                          size: SizeConfig.blockSizeHorizontal *
-                              (SizeConfig.isSmallScreen ? 10 : 6),
+                          size: responsiveSize(small: 10, medium: 6, large: 3),
                         ),
                       ),
                       Expanded(
                         child: TextFormField(
+                          style: const TextStyle(color: Colors.white),
                           onFieldSubmitted: (val) {
                             _trySubmit();
                           },
@@ -315,8 +335,10 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                           textInputAction: TextInputAction.done,
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.symmetric(
-                              vertical: SizeConfig.blockSizeHorizontal * 1,
-                              horizontal: SizeConfig.blockSizeHorizontal * 5,
+                              vertical:
+                                  responsiveSize(small: 1, medium: 2, large: 0),
+                              horizontal:
+                                  responsiveSize(small: 5, medium: 3, large: 2),
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30),
@@ -338,7 +360,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
               ),
 
               SizedBox(
-                height: SizeConfig.blockSizeHorizontal * 6,
+                height: responsiveSize(small: 6, large: 2),
               ),
 
               // Login button
@@ -348,10 +370,11 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                   onPressed: _trySubmit,
                   child: isLoading
                       ? Padding(
-                          padding: EdgeInsets.all(SizeConfig.blockSizeVertical),
+                          padding:
+                              EdgeInsets.all(responsiveSizeVertical(small: 1)),
                           child: SizedBox(
-                            height: SizeConfig.blockSizeVertical * 2.5,
-                            width: SizeConfig.blockSizeVertical * 2.5,
+                            height: responsiveSizeVertical(small: 2.5),
+                            width: responsiveSizeVertical(small: 2.5),
                             child: const CircularProgressIndicator(
                               color: Colors.white,
                             ),
@@ -360,8 +383,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                       : Text(
                           _isInLoginMode ? 'Login' : 'Signup',
                           style: TextStyle(
-                            fontSize: SizeConfig.blockSizeHorizontal *
-                                (SizeConfig.isSmallScreen ? 5.5 : 3.5),
+                            fontSize:
+                                responsiveSize(small: 5.5, medium: 3, large: 1),
                           ),
                         ),
                   style: ElevatedButton.styleFrom(
@@ -373,7 +396,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                 ),
               ),
               SizedBox(
-                height: SizeConfig.blockSizeHorizontal * 5,
+                height: responsiveSize(small: 5, large: 1),
               ),
 
               // toggle button
@@ -395,16 +418,16 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                           child: const CircularProgressIndicator(
                             color: Colors.white,
                           ),
-                          height: SizeConfig.blockSizeHorizontal * 7,
-                          width: SizeConfig.blockSizeHorizontal * 7,
+                          height: responsiveSize(small: 7),
+                          width: responsiveSize(small: 7),
                         )
                       : Text(
                           _isInLoginMode
                               ? 'Create new account'
                               : 'I aleready have an account',
                           style: TextStyle(
-                            fontSize: SizeConfig.blockSizeHorizontal *
-                                (SizeConfig.isSmallScreen ? 4.5 : 3),
+                            fontSize:
+                                responsiveSize(small: 4.5, medium: 3, large: 1),
                           ),
                         ),
                 ),

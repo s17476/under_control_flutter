@@ -30,6 +30,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
   runApp(const App());
 }
 
@@ -68,8 +69,8 @@ class _AppState extends State<App> {
           primary: Colors.green,
         ),
       ),
-      scaffoldBackgroundColor: Colors.white12,
-      // scaffoldBackgroundColor: const Color(0xff232d37),
+      // scaffoldBackgroundColor: Colors.white12,
+      scaffoldBackgroundColor: const Color(0xff222222),
       primaryColor: Colors.green,
       backgroundColor: Colors.grey,
       cardColor: Colors.black26,
