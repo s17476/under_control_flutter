@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
@@ -12,7 +13,8 @@ class DashCompletedTasks extends StatefulWidget {
   _DashCompletedTasksState createState() => _DashCompletedTasksState();
 }
 
-class _DashCompletedTasksState extends State<DashCompletedTasks> {
+class _DashCompletedTasksState extends State<DashCompletedTasks>
+    with ResponsiveSize {
   final List<Color?> darkTheme = const [
     Colors.green,
     Colors.blue,
@@ -29,9 +31,11 @@ class _DashCompletedTasksState extends State<DashCompletedTasks> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     TextStyle cardTextStyle = Theme.of(context).textTheme.headline6!.copyWith(
-        fontSize: SizeConfig.blockSizeHorizontal * 4,
-        color: Theme.of(context).appBarTheme.foregroundColor);
+          fontSize: responsiveSize(small: 4, medium: 3),
+          color: Theme.of(context).appBarTheme.foregroundColor,
+        );
 
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
@@ -43,21 +47,21 @@ class _DashCompletedTasksState extends State<DashCompletedTasks> {
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             elevation: 10,
-            margin: EdgeInsets.only(
-              bottom: SizeConfig.blockSizeHorizontal * 4,
-              left: SizeConfig.blockSizeHorizontal * 4,
-              right: SizeConfig.blockSizeHorizontal * 4,
+            margin: const EdgeInsets.only(
+              bottom: 16,
+              left: 16,
+              right: 16,
             ),
             child: Container(
               width: double.infinity,
-              padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 2),
+              padding: EdgeInsets.all(responsiveSize(small: 2)),
               child: Column(
                 children: [
                   Text(
                     'Recently completed tasks',
                     textAlign: TextAlign.start,
                     style: Theme.of(context).textTheme.headline6?.copyWith(
-                        fontSize: SizeConfig.blockSizeHorizontal * 4,
+                        fontSize: responsiveSize(small: 4),
                         color: Theme.of(context).primaryColor),
                   ),
                   const Divider(),
@@ -80,7 +84,7 @@ class _DashCompletedTasksState extends State<DashCompletedTasks> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 SizedBox(
-                                  width: 200,
+                                  width: responsiveSize(small: 50),
                                   child: Text(
                                     task.title,
                                     overflow: TextOverflow.ellipsis,
@@ -95,16 +99,16 @@ class _DashCompletedTasksState extends State<DashCompletedTasks> {
                                       style: cardTextStyle,
                                     ),
                                     SizedBox(
-                                      width: SizeConfig.blockSizeHorizontal,
+                                      width: responsiveSize(small: 1),
                                     ),
                                     Icon(
                                       eventIcons[task.type.index],
                                       color: darkTheme[task.type.index],
-                                      size: SizeConfig.blockSizeHorizontal * 7,
+                                      size: responsiveSize(small: 7),
                                     ),
                                     Icon(
                                       Icons.done,
-                                      size: SizeConfig.blockSizeHorizontal * 7,
+                                      size: responsiveSize(small: 7),
                                       color: Colors.green,
                                     ),
                                   ],

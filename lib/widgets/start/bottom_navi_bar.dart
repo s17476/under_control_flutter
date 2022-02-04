@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
+import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/screens/calendar/calendar_screen.dart';
 import 'package:under_control_flutter/screens/dash_screen.dart';
 import 'package:under_control_flutter/screens/equipment/equipment_screen.dart';
 import 'package:under_control_flutter/screens/overview_screen.dart';
 import 'package:under_control_flutter/screens/tasks/tasks_screen.dart';
 
-class BottomNaviBar extends StatelessWidget {
+class BottomNaviBar extends StatelessWidget with ResponsiveSize {
   const BottomNaviBar(
       {Key? key,
       required this.selectPage,
@@ -53,12 +55,16 @@ class BottomNaviBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      height: isBottomNavBarVisible ? 55 : 0,
+      height: isBottomNavBarVisible ? (SizeConfig.isSmallScreen ? 55 : 90) : 0,
       child: Wrap(
         children: [
           BottomNavigationBar(
+            iconSize: SizeConfig.isSmallScreen ? 28 : 50,
+            selectedLabelStyle:
+                TextStyle(fontSize: SizeConfig.isSmallScreen ? 14 : 25),
             onTap: selectPage,
             items: tabs
                 .map(

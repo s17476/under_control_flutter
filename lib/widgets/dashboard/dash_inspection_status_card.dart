@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
@@ -13,11 +14,13 @@ class DashInspectionStatusCard extends StatefulWidget {
       _DashInspectionStatusCardState();
 }
 
-class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
+class _DashInspectionStatusCardState extends State<DashInspectionStatusCard>
+    with ResponsiveSize {
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     TextStyle cardTextStyle = Theme.of(context).textTheme.headline6!.copyWith(
-          fontSize: SizeConfig.blockSizeHorizontal * 4,
+          fontSize: responsiveSize(small: 4, medium: 3.5),
           color: Theme.of(context).appBarTheme.foregroundColor,
         );
     ItemProvider itemProvider = Provider.of<ItemProvider>(context);
@@ -35,14 +38,14 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
       ),
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 2),
+        padding: EdgeInsets.all(responsiveSize(small: 2)),
         child: Column(
           children: [
             Text(
               'Equipment status',
               textAlign: TextAlign.start,
               style: Theme.of(context).textTheme.headline6?.copyWith(
-                  fontSize: SizeConfig.blockSizeHorizontal * 4,
+                  fontSize: responsiveSize(small: 4),
                   color: Theme.of(context).primaryColor),
             ),
             const Divider(),
@@ -120,7 +123,7 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
               ),
             ),
             Container(
-              padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 3),
+              padding: EdgeInsets.all(responsiveSize(small: 3)),
               alignment: Alignment.centerRight,
               child: makeComment(inspectionsStatus),
             ),
@@ -157,7 +160,7 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard> {
     return Text(
       comment,
       style: Theme.of(context).textTheme.headline6?.copyWith(
-            fontSize: SizeConfig.blockSizeHorizontal * 4,
+            fontSize: responsiveSize(small: 4, medium: 3.5),
             color: commentColor,
           ),
     );

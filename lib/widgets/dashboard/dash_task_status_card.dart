@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/task.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
@@ -12,7 +13,8 @@ class DashTaskStatusCard extends StatefulWidget {
   _DashTaskStatusCardState createState() => _DashTaskStatusCardState();
 }
 
-class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
+class _DashTaskStatusCardState extends State<DashTaskStatusCard>
+    with ResponsiveSize {
   final List<Color?> darkTheme = const [
     Colors.green,
     Colors.blue,
@@ -29,8 +31,9 @@ class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     TextStyle cardTextStyle = Theme.of(context).textTheme.headline6!.copyWith(
-        fontSize: SizeConfig.blockSizeHorizontal * 4,
+        fontSize: responsiveSize(small: 4, medium: 3),
         color: Theme.of(context).appBarTheme.foregroundColor);
 
     return Card(
@@ -44,14 +47,14 @@ class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
       ),
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal * 2),
+        padding: EdgeInsets.all(responsiveSize(small: 2)),
         child: Column(
           children: [
             Text(
               'Upcoming tasks',
               textAlign: TextAlign.start,
               style: Theme.of(context).textTheme.headline6?.copyWith(
-                  fontSize: SizeConfig.blockSizeHorizontal * 4,
+                  fontSize: responsiveSize(small: 4),
                   color: Theme.of(context).primaryColor),
             ),
             const Divider(),
@@ -86,7 +89,7 @@ class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
-                            width: SizeConfig.blockSizeHorizontal * 60,
+                            width: responsiveSize(small: 60),
                             child: Text(
                               task.title,
                               overflow: TextOverflow.ellipsis,
@@ -102,12 +105,12 @@ class _DashTaskStatusCardState extends State<DashTaskStatusCard> {
                                     cardTextStyle.copyWith(color: statusColor),
                               ),
                               SizedBox(
-                                width: SizeConfig.blockSizeHorizontal,
+                                width: responsiveSize(small: 1),
                               ),
                               Icon(
                                 eventIcons[task.type.index],
                                 color: darkTheme[task.type.index],
-                                size: SizeConfig.blockSizeHorizontal * 7,
+                                size: responsiveSize(small: 7),
                               ),
                             ],
                           )

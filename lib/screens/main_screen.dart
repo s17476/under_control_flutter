@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/date_calc.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
@@ -23,7 +24,7 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with ResponsiveSize {
   late ScrollController _scrollController;
   late bool _isBottomNavBarVisible;
 
@@ -134,14 +135,18 @@ class _MainScreenState extends State<MainScreen> {
                         return TextButton(
                           onPressed: taskProvider.toggleIsActive,
                           child: taskProvider.isActive
-                              ? const Text(
+                              ? Text(
                                   'Active tasks',
-                                  style: TextStyle(fontSize: 18),
+                                  style: TextStyle(
+                                    fontSize:
+                                        responsiveSize(small: 4.5, medium: 2.7),
+                                  ),
                                 )
-                              : const Text(
+                              : Text(
                                   'Done tasks',
                                   style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize:
+                                        responsiveSize(small: 4.5, medium: 2.7),
                                     color: Colors.amber,
                                   ),
                                 ),
@@ -165,11 +170,8 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                       ),
                     SizedBox(
-                      width:
-                          SizeConfig.blockSizeHorizontal * _selectedPageIndex !=
-                                  1
-                              ? 4
-                              : 1,
+                      width: responsiveSize(
+                          small: _selectedPageIndex != 1 ? 4 : 1),
                     ),
                     // avatar in dashboard screen
                     if (_selectedPageIndex == 2)
@@ -178,7 +180,7 @@ class _MainScreenState extends State<MainScreen> {
                             Theme.of(context).appBarTheme.backgroundColor,
                         backgroundImage:
                             NetworkImage(userProvider.user!.userImage),
-                        maxRadius: SizeConfig.blockSizeHorizontal * 4,
+                        maxRadius: responsiveSize(small: 4, medium: 2.5),
                       ),
                     // sort by status - button in assets screen
                     if (_selectedPageIndex == 3)
@@ -197,18 +199,15 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                       ),
                     SizedBox(
-                      width:
-                          SizeConfig.blockSizeHorizontal * _selectedPageIndex !=
-                                  1
-                              ? 4
-                              : 1,
+                      width: responsiveSize(
+                          small: _selectedPageIndex != 1 ? 4 : 1),
                     ),
 
                     // show in calendar and tasks screen
                     if (_selectedPageIndex == 1 || _selectedPageIndex == 0)
                       Padding(
                         padding: EdgeInsets.only(
-                          top: SizeConfig.safeBlockHorizontal * 1.5,
+                          top: responsiveSize(small: 1.5),
                         ),
                         child: DropdownButton<String>(
                           alignment: AlignmentDirectional.center,
@@ -226,7 +225,7 @@ class _MainScreenState extends State<MainScreen> {
                                   value,
                                   style: TextStyle(
                                     fontSize:
-                                        SizeConfig.blockSizeHorizontal * 4.5,
+                                        responsiveSize(small: 4.5, medium: 3),
                                   ),
                                 ),
                               ),
@@ -334,7 +333,8 @@ class _MainScreenState extends State<MainScreen> {
                                               ..showSnackBar(
                                                 SnackBar(
                                                   content: const Text(
-                                                      'New task added'),
+                                                    'New task added',
+                                                  ),
                                                   backgroundColor:
                                                       Theme.of(context)
                                                           .appBarTheme
@@ -347,7 +347,7 @@ class _MainScreenState extends State<MainScreen> {
                                     : null,
                         icon: Icon(
                           Icons.add,
-                          size: SizeConfig.blockSizeVertical * 5,
+                          size: responsiveSize(small: 9, medium: 6),
                           color: Provider.of<TaskProvider>(context).isActive ||
                                   _selectedPageIndex == 3
                               ? Theme.of(context).primaryColor
@@ -355,7 +355,7 @@ class _MainScreenState extends State<MainScreen> {
                         ),
                       ),
                     SizedBox(
-                      width: SizeConfig.blockSizeHorizontal * 4,
+                      width: responsiveSize(small: 2),
                     ),
                   ],
                   pinned: false,
