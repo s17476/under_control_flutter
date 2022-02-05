@@ -53,9 +53,9 @@ class _AddCompanyScreenState extends State<AddCompanyScreen>
       body: SingleChildScrollView(
         child: Padding(
           padding: EdgeInsets.only(
-            left: responsiveSize(small: 10, medium: 18),
-            right: responsiveSize(small: 10, medium: 18),
-            top: responsiveSize(small: 20),
+            left: responsiveSizePct(small: 10, medium: 18),
+            right: responsiveSizePct(small: 10, medium: 18),
+            top: responsiveSizePct(small: 20),
           ),
           child: Form(
             key: _formKey,
@@ -64,11 +64,11 @@ class _AddCompanyScreenState extends State<AddCompanyScreen>
               children: [
                 Icon(
                   Icons.apartment,
-                  size: responsiveSize(small: 20),
+                  size: responsiveSizePct(small: 20),
                   color: Theme.of(context).primaryColor,
                 ),
                 SizedBox(
-                  height: responsiveSize(small: 5),
+                  height: responsiveSizePct(small: 5),
                 ),
                 TextFormField(
                   key: const ValueKey('name'),
@@ -76,8 +76,8 @@ class _AddCompanyScreenState extends State<AddCompanyScreen>
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.symmetric(
-                      vertical: responsiveSize(small: 1),
-                      horizontal: responsiveSize(small: 5),
+                      vertical: responsiveSizePct(small: 1),
+                      horizontal: responsiveSizePct(small: 5),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -98,7 +98,7 @@ class _AddCompanyScreenState extends State<AddCompanyScreen>
                   },
                 ),
                 SizedBox(
-                  height: responsiveSize(small: 5),
+                  height: responsiveSizePct(small: 5),
                 ),
                 TextFormField(
                   key: const ValueKey('address'),
@@ -106,8 +106,8 @@ class _AddCompanyScreenState extends State<AddCompanyScreen>
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.symmetric(
-                      vertical: responsiveSize(small: 1),
-                      horizontal: responsiveSize(small: 5),
+                      vertical: responsiveSizePct(small: 1),
+                      horizontal: responsiveSizePct(small: 5),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -128,7 +128,7 @@ class _AddCompanyScreenState extends State<AddCompanyScreen>
                   },
                 ),
                 SizedBox(
-                  height: responsiveSize(small: 5),
+                  height: responsiveSizePct(small: 5),
                 ),
                 TextFormField(
                   key: const ValueKey('postCode'),
@@ -136,8 +136,8 @@ class _AddCompanyScreenState extends State<AddCompanyScreen>
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.symmetric(
-                      vertical: responsiveSize(small: 1),
-                      horizontal: responsiveSize(small: 5),
+                      vertical: responsiveSizePct(small: 1),
+                      horizontal: responsiveSizePct(small: 5),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -158,7 +158,7 @@ class _AddCompanyScreenState extends State<AddCompanyScreen>
                   },
                 ),
                 SizedBox(
-                  height: responsiveSize(small: 5),
+                  height: responsiveSizePct(small: 5),
                 ),
                 TextFormField(
                   keyboardAppearance: Brightness.dark,
@@ -167,8 +167,8 @@ class _AddCompanyScreenState extends State<AddCompanyScreen>
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.symmetric(
-                      vertical: responsiveSize(small: 1),
-                      horizontal: responsiveSize(small: 5),
+                      vertical: responsiveSizePct(small: 1),
+                      horizontal: responsiveSizePct(small: 5),
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(30),
@@ -189,7 +189,7 @@ class _AddCompanyScreenState extends State<AddCompanyScreen>
                   },
                 ),
                 SizedBox(
-                  height: responsiveSize(small: 7),
+                  height: responsiveSizePct(small: 7),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -199,7 +199,7 @@ class _AddCompanyScreenState extends State<AddCompanyScreen>
                   child: Text(
                     'Add company',
                     style: TextStyle(
-                      fontSize: responsiveSize(small: 5.5, medium: 2),
+                      fontSize: responsiveSizePct(small: 5.5, medium: 2),
                     ),
                   ),
                   style: ElevatedButton.styleFrom(

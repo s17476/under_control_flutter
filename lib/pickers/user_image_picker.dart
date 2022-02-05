@@ -51,10 +51,11 @@ class _UserImagePickerState extends State<UserImagePicker> with ResponsiveSize {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     return Column(
       children: [
         CircleAvatar(
-          radius: responsiveSize(small: 12, large: 6),
+          radius: responsiveSizePx(small: 50, medium: 90),
           backgroundColor: Colors.grey,
           backgroundImage: _image != null ? FileImage(_image!) : null,
           child: _image == null
@@ -62,52 +63,50 @@ class _UserImagePickerState extends State<UserImagePicker> with ResponsiveSize {
                   '?',
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: responsiveSize(small: 15, large: 7),
+                    fontSize: responsiveSizePx(small: 50, medium: 100),
                     fontWeight: FontWeight.w700,
                   ),
                 )
               : null,
         ),
         Row(
-          mainAxisAlignment: isLargeScreen()
-              ? MainAxisAlignment.center
-              : MainAxisAlignment.spaceAround,
+          mainAxisAlignment: isSmallScreen()
+              ? MainAxisAlignment.spaceAround
+              : MainAxisAlignment.center,
           children: [
             //take foto
             TextButton.icon(
               onPressed: () {
                 _pickImage(ImageSource.camera);
               },
-              icon: Icon(
+              icon: const Icon(
                 Icons.camera,
-                size: responsiveSize(small: 8, medium: 5, large: 2),
+                size: 30,
               ),
-              label: Text(
+              label: const Text(
                 'Take foto',
                 style: TextStyle(
-                  fontSize: responsiveSize(small: 4, medium: 3, large: 1),
+                  fontSize: 18,
                 ),
               ),
             ),
-            Text(
+            const Text(
               'or',
-              style: TextStyle(
-                fontSize: responsiveSize(small: 5, medium: 4, large: 1),
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.white),
             ),
             //choose avatar image from device
             TextButton.icon(
               onPressed: () {
                 _pickImage(ImageSource.gallery);
               },
-              icon: Icon(
+              icon: const Icon(
                 Icons.image,
-                size: responsiveSize(small: 8, medium: 5, large: 2),
+                size: 30,
               ),
-              label: Text(
+              label: const Text(
                 'Add image',
                 style: TextStyle(
-                  fontSize: responsiveSize(small: 4, medium: 3, large: 1),
+                  fontSize: 18,
                 ),
               ),
             ),

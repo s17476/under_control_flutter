@@ -144,9 +144,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.only(
-          left: responsiveSize(small: 10),
-          right: responsiveSize(small: 10),
-          top: responsiveSize(small: 40, medium: 30, large: 4),
+          left: responsiveSizePct(small: 10),
+          right: responsiveSizePct(small: 10),
+          top: responsiveSizePct(small: 40, medium: 30, large: 4),
         ),
         child: Form(
           key: _formKey,
@@ -154,21 +154,21 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
             children: [
               //logo and image picker
               SizedBox(
-                height: responsiveSize(small: 40, large: 17),
+                height: responsiveSizePct(small: 40, large: 17),
                 child: _isInLoginMode
                     ? FadeTransition(
                         opacity: _opacityAnimationBackward!,
                         child: Padding(
                           padding: EdgeInsets.only(
-                            top: responsiveSize(small: 4.7, large: 3),
+                            top: responsiveSizePct(small: 4.7, large: 3),
                           ),
                           child: SizedBox(
-                            width: responsiveSize(small: 70, large: 40),
+                            width: responsiveSizePct(small: 70, large: 40),
                             child: FittedBox(
                               child: Logo(
-                                greenLettersSize: responsiveSize(
+                                greenLettersSize: responsiveSizePct(
                                     small: 3.5, medium: 2, large: 0.6),
-                                whitheLettersSize: responsiveSize(
+                                whitheLettersSize: responsiveSizePct(
                                     small: 2.3, medium: 1.3, large: 0.4),
                               ),
                             ),
@@ -192,18 +192,20 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
               //email field
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: responsiveSize(small: 0, medium: 15, large: 25),
+                  horizontal:
+                      responsiveSizePct(small: 0, medium: 15, large: 25),
                 ),
                 child: Row(
                   children: [
                     Padding(
                       padding: EdgeInsets.only(
-                        right: responsiveSize(small: 2, medium: 1, large: 0.3),
+                        right:
+                            responsiveSizePct(small: 2, medium: 1, large: 0.3),
                       ),
                       child: Icon(
                         Icons.person,
                         color: Colors.green,
-                        size: responsiveSize(small: 10, medium: 6, large: 3),
+                        size: responsiveSizePct(small: 10, medium: 6, large: 3),
                       ),
                     ),
                     Expanded(
@@ -214,10 +216,10 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(
-                            vertical:
-                                responsiveSize(small: 1, medium: 2, large: 0),
-                            horizontal:
-                                responsiveSize(small: 5, medium: 3, large: 2),
+                            vertical: responsiveSizePct(
+                                small: 1, medium: 2, large: 0),
+                            horizontal: responsiveSizePct(
+                                small: 5, medium: 3, large: 2),
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -237,7 +239,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
               ),
 
               SizedBox(
-                height: responsiveSize(small: 4, medium: 2.5, large: 1),
+                height: responsiveSizePct(small: 4, medium: 2.5, large: 1),
               ),
 
               //name field
@@ -248,20 +250,20 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal:
-                          responsiveSize(small: 0, medium: 15, large: 25),
+                          responsiveSizePct(small: 0, medium: 15, large: 25),
                     ),
                     child: Row(
                       children: [
                         Padding(
                           padding: EdgeInsets.only(
-                            right:
-                                responsiveSize(small: 2, medium: 1, large: 0.3),
+                            right: responsiveSizePct(
+                                small: 2, medium: 1, large: 0.3),
                           ),
                           child: Icon(
                             Icons.person_outline,
                             color: Colors.green,
-                            size:
-                                responsiveSize(small: 10, medium: 6, large: 3),
+                            size: responsiveSizePct(
+                                small: 10, medium: 6, large: 3),
                           ),
                         ),
                         Expanded(
@@ -273,9 +275,9 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                             keyboardType: TextInputType.name,
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.symmetric(
-                                vertical: responsiveSize(
+                                vertical: responsiveSizePct(
                                     small: 1, medium: 2, large: 0),
-                                horizontal: responsiveSize(
+                                horizontal: responsiveSizePct(
                                     small: 5, medium: 3, large: 2),
                               ),
                               border: OutlineInputBorder(
@@ -300,7 +302,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
               SlideTransition(
                 position: _userSlideAnimation!,
                 child: SizedBox(
-                  height: responsiveSize(small: 4, medium: 2.5, large: 1),
+                  height: responsiveSizePct(small: 4, medium: 2.5, large: 1),
                 ),
               ),
 
@@ -309,19 +311,21 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                 position: _userSlideAnimation!,
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: responsiveSize(small: 0, medium: 15, large: 25),
+                    horizontal:
+                        responsiveSizePct(small: 0, medium: 15, large: 25),
                   ),
                   child: Row(
                     children: [
                       Padding(
                         padding: EdgeInsets.only(
-                          right:
-                              responsiveSize(small: 2, medium: 1, large: 0.3),
+                          right: responsiveSizePct(
+                              small: 2, medium: 1, large: 0.3),
                         ),
                         child: Icon(
                           Icons.lock,
                           color: Colors.green,
-                          size: responsiveSize(small: 10, medium: 6, large: 3),
+                          size:
+                              responsiveSizePct(small: 10, medium: 6, large: 3),
                         ),
                       ),
                       Expanded(
@@ -335,10 +339,10 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                           textInputAction: TextInputAction.done,
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.symmetric(
-                              vertical:
-                                  responsiveSize(small: 1, medium: 2, large: 0),
-                              horizontal:
-                                  responsiveSize(small: 5, medium: 3, large: 2),
+                              vertical: responsiveSizePct(
+                                  small: 1, medium: 2, large: 0),
+                              horizontal: responsiveSizePct(
+                                  small: 5, medium: 3, large: 2),
                             ),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(30),
@@ -360,7 +364,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
               ),
 
               SizedBox(
-                height: responsiveSize(small: 6, large: 2),
+                height: responsiveSizePct(small: 6, large: 2),
               ),
 
               // Login button
@@ -370,11 +374,11 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                   onPressed: _trySubmit,
                   child: isLoading
                       ? Padding(
-                          padding:
-                              EdgeInsets.all(responsiveSizeVertical(small: 1)),
+                          padding: EdgeInsets.all(
+                              responsiveSizeVerticalPct(small: 1)),
                           child: SizedBox(
-                            height: responsiveSizeVertical(small: 2.5),
-                            width: responsiveSizeVertical(small: 2.5),
+                            height: responsiveSizeVerticalPct(small: 2.5),
+                            width: responsiveSizeVerticalPct(small: 2.5),
                             child: const CircularProgressIndicator(
                               color: Colors.white,
                             ),
@@ -383,8 +387,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                       : Text(
                           _isInLoginMode ? 'Login' : 'Signup',
                           style: TextStyle(
-                            fontSize:
-                                responsiveSize(small: 5.5, medium: 3, large: 1),
+                            fontSize: responsiveSizePct(
+                                small: 5.5, medium: 3, large: 1),
                           ),
                         ),
                   style: ElevatedButton.styleFrom(
@@ -396,7 +400,7 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                 ),
               ),
               SizedBox(
-                height: responsiveSize(small: 5, large: 1),
+                height: responsiveSizePct(small: 5, large: 1),
               ),
 
               // toggle button
@@ -418,16 +422,16 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
                           child: const CircularProgressIndicator(
                             color: Colors.white,
                           ),
-                          height: responsiveSize(small: 7),
-                          width: responsiveSize(small: 7),
+                          height: responsiveSizePct(small: 7),
+                          width: responsiveSizePct(small: 7),
                         )
                       : Text(
                           _isInLoginMode
                               ? 'Create new account'
                               : 'I aleready have an account',
                           style: TextStyle(
-                            fontSize:
-                                responsiveSize(small: 4.5, medium: 3, large: 1),
+                            fontSize: responsiveSizePct(
+                                small: 4.5, medium: 3, large: 1),
                           ),
                         ),
                 ),

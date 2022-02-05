@@ -1,7 +1,7 @@
 import 'package:under_control_flutter/helpers/size_config.dart';
 
 mixin ResponsiveSize {
-  double responsiveSize(
+  double responsiveSizePct(
       {required double small, double? medium, double? large}) {
     if (SizeConfig.isSmallScreen) {
       return SizeConfig.blockSizeHorizontal * small;
@@ -12,7 +12,7 @@ mixin ResponsiveSize {
     }
   }
 
-  double responsiveSizeVertical(
+  double responsiveSizeVerticalPct(
       {required double small, double? medium, double? large}) {
     if (SizeConfig.isSmallScreen) {
       return SizeConfig.blockSizeVertical * small;
@@ -21,6 +21,25 @@ mixin ResponsiveSize {
     } else {
       return SizeConfig.blockSizeVertical * (large ?? medium ?? small);
     }
+  }
+
+  double responsiveSizePx(
+      {required double small, double? medium, double? large}) {
+    if (SizeConfig.isSmallScreen) {
+      return small;
+    } else if (SizeConfig.isMediumScreen) {
+      return medium ?? small;
+    } else {
+      return large ?? medium ?? small;
+    }
+  }
+
+  bool isSmallScreen() {
+    return SizeConfig.isSmallScreen;
+  }
+
+  bool isMediumScreen() {
+    return SizeConfig.isMediumScreen;
   }
 
   bool isLargeScreen() {

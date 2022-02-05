@@ -20,7 +20,7 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard>
   Widget build(BuildContext context) {
     SizeConfig.init(context);
     TextStyle cardTextStyle = Theme.of(context).textTheme.headline6!.copyWith(
-          fontSize: responsiveSize(small: 4, medium: 3.5),
+          fontSize: responsiveSizePx(small: 16, medium: 22),
           color: Theme.of(context).appBarTheme.foregroundColor,
         );
     ItemProvider itemProvider = Provider.of<ItemProvider>(context);
@@ -38,14 +38,14 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard>
       ),
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.all(responsiveSize(small: 2)),
+        padding: const EdgeInsets.all(10),
         child: Column(
           children: [
             Text(
               'Equipment status',
               textAlign: TextAlign.start,
               style: Theme.of(context).textTheme.headline6?.copyWith(
-                  fontSize: responsiveSize(small: 4),
+                  fontSize: responsiveSizePx(small: 18, medium: 30),
                   color: Theme.of(context).primaryColor),
             ),
             const Divider(),
@@ -123,7 +123,7 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard>
               ),
             ),
             Container(
-              padding: EdgeInsets.all(responsiveSize(small: 3)),
+              padding: const EdgeInsets.all(10),
               alignment: Alignment.centerRight,
               child: makeComment(inspectionsStatus),
             ),
@@ -160,7 +160,7 @@ class _DashInspectionStatusCardState extends State<DashInspectionStatusCard>
     return Text(
       comment,
       style: Theme.of(context).textTheme.headline6?.copyWith(
-            fontSize: responsiveSize(small: 4, medium: 3.5),
+            fontSize: responsiveSizePct(small: 4, medium: 3.5),
             color: commentColor,
           ),
     );

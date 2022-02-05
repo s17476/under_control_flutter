@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:under_control_flutter/helpers/size_config.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/screens/equipment/equipment_details_screen.dart';
@@ -17,7 +17,7 @@ class EquipmentScreen extends StatefulWidget {
   State<EquipmentScreen> createState() => _EquipmentScreenState();
 }
 
-class _EquipmentScreenState extends State<EquipmentScreen> {
+class _EquipmentScreenState extends State<EquipmentScreen> with ResponsiveSize {
   var _isLoading = false;
   var _currentCategory = '';
   // colors used to mark categories in lise view
@@ -76,7 +76,7 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                     'No assets registered. \n\n Add some!',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: SizeConfig.blockSizeHorizontal * 6,
+                      fontSize: 18,
                       color: Theme.of(context).textTheme.headline6!.color,
                     ),
                   ),
@@ -84,7 +84,7 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
               // show list of items when loaded and has data
               : ListView(
                   padding: EdgeInsets.symmetric(
-                    horizontal: SizeConfig.blockSizeHorizontal * 2,
+                    horizontal: responsiveSizePx(small: 5, medium: 10),
                   ),
                   children: [
                     ...items.map(
@@ -110,8 +110,7 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                                   item.category,
                                   style: TextStyle(
                                     color: colors[colorPointer],
-                                    fontSize:
-                                        SizeConfig.blockSizeHorizontal * 6,
+                                    fontSize: 24,
                                   ),
                                 ),
                               ),
@@ -180,7 +179,7 @@ class _EquipmentScreenState extends State<EquipmentScreen> {
                                 trailing: StatusIcon(
                                   heroTag: item.itemId!,
                                   inspectionStatus: item.inspectionStatus,
-                                  size: 12,
+                                  size: 50,
                                   textSize: 0,
                                 ),
                               ),

@@ -33,7 +33,7 @@ class _DashCompletedTasksState extends State<DashCompletedTasks>
   Widget build(BuildContext context) {
     SizeConfig.init(context);
     TextStyle cardTextStyle = Theme.of(context).textTheme.headline6!.copyWith(
-          fontSize: responsiveSize(small: 4, medium: 3),
+          fontSize: responsiveSizePx(small: 16, medium: 22),
           color: Theme.of(context).appBarTheme.foregroundColor,
         );
 
@@ -54,14 +54,14 @@ class _DashCompletedTasksState extends State<DashCompletedTasks>
             ),
             child: Container(
               width: double.infinity,
-              padding: EdgeInsets.all(responsiveSize(small: 2)),
+              padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
                   Text(
                     'Recently completed tasks',
                     textAlign: TextAlign.start,
                     style: Theme.of(context).textTheme.headline6?.copyWith(
-                        fontSize: responsiveSize(small: 4),
+                        fontSize: responsiveSizePx(small: 18, medium: 30),
                         color: Theme.of(context).primaryColor),
                   ),
                   const Divider(),
@@ -84,7 +84,7 @@ class _DashCompletedTasksState extends State<DashCompletedTasks>
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 SizedBox(
-                                  width: responsiveSize(small: 50),
+                                  width: responsiveSizePct(small: 50),
                                   child: Text(
                                     task.title,
                                     overflow: TextOverflow.ellipsis,
@@ -98,17 +98,19 @@ class _DashCompletedTasksState extends State<DashCompletedTasks>
                                       overflow: TextOverflow.ellipsis,
                                       style: cardTextStyle,
                                     ),
-                                    SizedBox(
-                                      width: responsiveSize(small: 1),
+                                    const SizedBox(
+                                      width: 5,
                                     ),
                                     Icon(
                                       eventIcons[task.type.index],
                                       color: darkTheme[task.type.index],
-                                      size: responsiveSize(small: 7),
+                                      size: responsiveSizePx(
+                                          small: 30, medium: 55),
                                     ),
                                     Icon(
                                       Icons.done,
-                                      size: responsiveSize(small: 7),
+                                      size: responsiveSizePx(
+                                          small: 30, medium: 55),
                                       color: Colors.green,
                                     ),
                                   ],

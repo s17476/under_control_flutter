@@ -135,18 +135,16 @@ class _MainScreenState extends State<MainScreen> with ResponsiveSize {
                         return TextButton(
                           onPressed: taskProvider.toggleIsActive,
                           child: taskProvider.isActive
-                              ? Text(
+                              ? const Text(
                                   'Active tasks',
                                   style: TextStyle(
-                                    fontSize:
-                                        responsiveSize(small: 4.5, medium: 2.7),
+                                    fontSize: 18,
                                   ),
                                 )
-                              : Text(
+                              : const Text(
                                   'Done tasks',
                                   style: TextStyle(
-                                    fontSize:
-                                        responsiveSize(small: 4.5, medium: 2.7),
+                                    fontSize: 18,
                                     color: Colors.amber,
                                   ),
                                 ),
@@ -169,19 +167,8 @@ class _MainScreenState extends State<MainScreen> with ResponsiveSize {
                           color: Theme.of(context).appBarTheme.foregroundColor,
                         ),
                       ),
-                    SizedBox(
-                      width: responsiveSize(
-                          small: _selectedPageIndex != 1 ? 4 : 1),
-                    ),
-                    // avatar in dashboard screen
-                    if (_selectedPageIndex == 2)
-                      CircleAvatar(
-                        backgroundColor:
-                            Theme.of(context).appBarTheme.backgroundColor,
-                        backgroundImage:
-                            NetworkImage(userProvider.user!.userImage),
-                        maxRadius: responsiveSize(small: 4, medium: 2.5),
-                      ),
+                    if (_selectedPageIndex == 3) const SizedBox(width: 20),
+
                     // sort by status - button in assets screen
                     if (_selectedPageIndex == 3)
                       IconButton(
@@ -198,16 +185,23 @@ class _MainScreenState extends State<MainScreen> with ResponsiveSize {
                           color: Theme.of(context).appBarTheme.foregroundColor,
                         ),
                       ),
-                    SizedBox(
-                      width: responsiveSize(
-                          small: _selectedPageIndex != 1 ? 4 : 1),
-                    ),
+                    if (_selectedPageIndex == 3) const SizedBox(width: 20),
+
+                    // avatar in dashboard screen
+                    if (_selectedPageIndex == 2)
+                      CircleAvatar(
+                        backgroundColor:
+                            Theme.of(context).appBarTheme.backgroundColor,
+                        backgroundImage:
+                            NetworkImage(userProvider.user!.userImage),
+                        maxRadius: 20,
+                      ),
 
                     // show in calendar and tasks screen
                     if (_selectedPageIndex == 1 || _selectedPageIndex == 0)
                       Padding(
-                        padding: EdgeInsets.only(
-                          top: responsiveSize(small: 1.5),
+                        padding: const EdgeInsets.only(
+                          top: 5,
                         ),
                         child: DropdownButton<String>(
                           alignment: AlignmentDirectional.center,
@@ -223,10 +217,8 @@ class _MainScreenState extends State<MainScreen> with ResponsiveSize {
                               child: Center(
                                 child: Text(
                                   value,
-                                  style: TextStyle(
-                                    fontSize:
-                                        responsiveSize(small: 4.5, medium: 3),
-                                  ),
+                                  style: const TextStyle(
+                                      fontSize: 18, color: Colors.white),
                                 ),
                               ),
                             );
@@ -347,7 +339,7 @@ class _MainScreenState extends State<MainScreen> with ResponsiveSize {
                                     : null,
                         icon: Icon(
                           Icons.add,
-                          size: responsiveSize(small: 9, medium: 6),
+                          size: 40,
                           color: Provider.of<TaskProvider>(context).isActive ||
                                   _selectedPageIndex == 3
                               ? Theme.of(context).primaryColor
@@ -355,7 +347,7 @@ class _MainScreenState extends State<MainScreen> with ResponsiveSize {
                         ),
                       ),
                     SizedBox(
-                      width: responsiveSize(small: 2),
+                      width: responsiveSizePx(small: 10, large: 20),
                     ),
                   ],
                   pinned: false,

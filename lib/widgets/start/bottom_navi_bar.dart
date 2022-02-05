@@ -55,14 +55,14 @@ class BottomNaviBar extends StatelessWidget with ResponsiveSize {
 
   @override
   Widget build(BuildContext context) {
-    SizeConfig.init(context);
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
-      height: isBottomNavBarVisible ? (SizeConfig.isSmallScreen ? 55 : 90) : 0,
+      height:
+          isBottomNavBarVisible ? responsiveSizePx(small: 55, medium: 90) : 0,
       child: Wrap(
         children: [
           BottomNavigationBar(
-            iconSize: SizeConfig.isSmallScreen ? 28 : 50,
+            iconSize: responsiveSizePx(small: 28, medium: 50),
             selectedLabelStyle:
                 TextStyle(fontSize: SizeConfig.isSmallScreen ? 14 : 25),
             onTap: selectPage,

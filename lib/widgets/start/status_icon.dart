@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 
 class StatusIcon extends StatelessWidget {
@@ -13,7 +12,7 @@ class StatusIcon extends StatelessWidget {
 
   final String heroTag;
   final int inspectionStatus;
-  final int size;
+  final double size;
   final int textSize;
 
   @override
@@ -26,7 +25,7 @@ class StatusIcon extends StatelessWidget {
                 child: Icon(
                   Icons.check_circle_outline_rounded,
                   color: Colors.green,
-                  size: SizeConfig.blockSizeHorizontal * size,
+                  size: size,
                 ),
               ),
               if (textSize != 0)
@@ -46,7 +45,7 @@ class StatusIcon extends StatelessWidget {
                     child: Icon(
                       Icons.clear_rounded,
                       color: Colors.red,
-                      size: SizeConfig.blockSizeHorizontal * size,
+                      size: size,
                     ),
                   ),
                   if (textSize != 0)
@@ -66,7 +65,7 @@ class StatusIcon extends StatelessWidget {
                         child: Icon(
                           Icons.warning_amber_rounded,
                           color: Colors.amber,
-                          size: SizeConfig.blockSizeHorizontal * size,
+                          size: size,
                         ),
                       ),
                       if (textSize != 0)
@@ -85,7 +84,7 @@ class StatusIcon extends StatelessWidget {
                         child: Icon(
                           Icons.alarm_outlined,
                           color: Colors.red,
-                          size: SizeConfig.blockSizeHorizontal * size,
+                          size: size,
                         ),
                       ),
                       if (textSize != 0)
