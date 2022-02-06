@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 
-class CostsBarChart extends StatelessWidget {
+class CostsBarChart extends StatelessWidget with ResponsiveSize {
   const CostsBarChart({Key? key, required this.assetsCost}) : super(key: key);
 
   final Map<String, double> assetsCost;
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     Map<String, double> sortedMap = {};
 
     sortedMap.addEntries(assetsCost.entries.toList()
       ..sort((a, b) => (b.value).compareTo(a.value)));
 
-    final double chartWidthBlock = (SizeConfig.blockSizeHorizontal * 65) /
+    final double chartWidthBlock = responsiveSizePct(small: 60, medium: 80) /
         sortedMap[sortedMap.keys.toList()[0]]!;
 
     return Padding(
@@ -56,7 +58,8 @@ class CostsBarChart extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: 2, bottom: 8),
                     child: Text(
-                        '${item.producer} ${item.model} ${item.internalId}'),
+                      '${item.producer} ${item.model} ${item.internalId}',
+                    ),
                   ),
                 ],
               );

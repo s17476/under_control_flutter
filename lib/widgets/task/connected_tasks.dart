@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
@@ -16,13 +17,14 @@ class ConnectedTasks extends StatefulWidget {
   _ConnectedTasksState createState() => _ConnectedTasksState();
 }
 
-class _ConnectedTasksState extends State<ConnectedTasks> {
+class _ConnectedTasksState extends State<ConnectedTasks> with ResponsiveSize {
   var showTasks = false;
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     final buttonStyle = Theme.of(widget.context).textTheme.headline6!.copyWith(
-        fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+        fontSize: responsiveSizePx(small: 18, medium: 30),
         color: Theme.of(context).primaryColor);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -35,9 +37,10 @@ class _ConnectedTasksState extends State<ConnectedTasks> {
                 alignment: Alignment.topLeft,
                 child: showTasks
                     ? TextButton.icon(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.keyboard_arrow_up_rounded,
                           color: Colors.green,
+                          size: responsiveSizePx(small: 35, medium: 50),
                         ),
                         onPressed: () {
                           setState(() {
@@ -52,9 +55,10 @@ class _ConnectedTasksState extends State<ConnectedTasks> {
                         ),
                       )
                     : TextButton.icon(
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.keyboard_arrow_down_rounded,
                           color: Colors.green,
+                          size: responsiveSizePx(small: 35, medium: 50),
                         ),
                         onPressed: () {
                           setState(() {
@@ -77,13 +81,19 @@ class _ConnectedTasksState extends State<ConnectedTasks> {
                     return TextButton(
                       onPressed: taskProvider.toggleIsActive,
                       child: taskProvider.isActive
-                          ? const Text(
+                          ? Text(
                               'Active tasks',
+                              style: TextStyle(
+                                fontSize:
+                                    responsiveSizePx(small: 18, medium: 30),
+                              ),
                             )
-                          : const Text(
+                          : Text(
                               'Done tasks',
                               style: TextStyle(
                                 color: Colors.amber,
+                                fontSize:
+                                    responsiveSizePx(small: 18, medium: 30),
                               ),
                             ),
                     );

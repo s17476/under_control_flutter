@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/item.dart';
@@ -8,7 +9,7 @@ import 'package:under_control_flutter/providers/company_provider.dart';
 import 'package:under_control_flutter/providers/task_provider.dart';
 import 'package:under_control_flutter/providers/user_provider.dart';
 
-class TaskListItem extends StatelessWidget {
+class TaskListItem extends StatelessWidget with ResponsiveSize {
   const TaskListItem({
     Key? key,
     required this.task,
@@ -35,6 +36,7 @@ class TaskListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     bool isExpired = DateTime(
       DateTime.now().year,
       DateTime.now().month,
@@ -42,12 +44,13 @@ class TaskListItem extends StatelessWidget {
     ).isAfter(task.date);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 3.0,
+      padding: EdgeInsets.symmetric(
+        vertical: responsiveSizePx(small: 3, medium: 6),
         horizontal: 8.0,
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius:
+            BorderRadius.circular(responsiveSizePx(small: 15, medium: 30)),
         child: Container(
           color: Theme.of(context).splashColor,
           child: Row(
@@ -56,18 +59,18 @@ class TaskListItem extends StatelessWidget {
                 tag: task.taskId!,
                 child: Container(
                   color: darkTheme[task.type.index]!,
-                  width: SizeConfig.blockSizeHorizontal * 16,
+                  width: responsiveSizePx(small: 70, medium: 120),
                   height: task.executor == TaskExecutor.shared
-                      ? SizeConfig.blockSizeHorizontal * 22
-                      : SizeConfig.blockSizeHorizontal * 18,
+                      ? responsiveSizePx(small: 90, medium: 160)
+                      : responsiveSizePx(small: 70, medium: 130),
                   child: Icon(
                     eventIcons[task.type.index],
                     color: Colors.white,
-                    size: SizeConfig.blockSizeHorizontal * 12,
+                    size: responsiveSizePx(small: 50, medium: 90),
                   ),
                 ),
               ),
-              SizedBox(width: SizeConfig.blockSizeHorizontal * 3),
+              SizedBox(width: responsiveSizePx(small: 8, medium: 16)),
               Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -76,7 +79,7 @@ class TaskListItem extends StatelessWidget {
                     Text(
                       task.title,
                       style: TextStyle(
-                        fontSize: SizeConfig.blockSizeHorizontal * 4,
+                        fontSize: responsiveSizePx(small: 16, medium: 30),
                         color: isExpired &&
                                 Provider.of<TaskProvider>(context,
                                         listen: false)
@@ -88,7 +91,7 @@ class TaskListItem extends StatelessWidget {
                     ),
                     if (task.location != null && task.location != '')
                       SizedBox(
-                        height: SizeConfig.blockSizeHorizontal,
+                        height: responsiveSizePx(small: 4, medium: 8),
                       ),
                     if (task.location != null && task.location != '')
                       Column(
@@ -98,13 +101,15 @@ class TaskListItem extends StatelessWidget {
                               Icon(
                                 Icons.location_on,
                                 color: Theme.of(context).hintColor,
-                                size: 15,
+                                size: responsiveSizePx(small: 15, medium: 30),
                               ),
                               Text(
                                 task.location!,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   color: Theme.of(context).hintColor,
+                                  fontSize:
+                                      responsiveSizePx(small: 14, medium: 22),
                                 ),
                               ),
                             ],
@@ -115,13 +120,15 @@ class TaskListItem extends StatelessWidget {
                                 Icon(
                                   Icons.handyman,
                                   color: Theme.of(context).hintColor,
-                                  size: 15,
+                                  size: responsiveSizePx(small: 15, medium: 30),
                                 ),
                                 Text(
                                   task.itemName!,
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     color: Theme.of(context).hintColor,
+                                    fontSize:
+                                        responsiveSizePx(small: 14, medium: 22),
                                   ),
                                 ),
                               ],
@@ -133,7 +140,7 @@ class TaskListItem extends StatelessWidget {
                                 Icon(
                                   Icons.share,
                                   color: Theme.of(context).hintColor,
-                                  size: 15,
+                                  size: responsiveSizePx(small: 15, medium: 30),
                                 ),
                                 task.executorId !=
                                         Provider.of<UserProvider>(context)
@@ -151,6 +158,8 @@ class TaskListItem extends StatelessWidget {
                                               style: TextStyle(
                                                 color:
                                                     Theme.of(context).hintColor,
+                                                fontSize: responsiveSizePx(
+                                                    small: 14, medium: 22),
                                               ),
                                             );
                                           }
@@ -209,29 +218,29 @@ class TaskListItem extends StatelessWidget {
                               Icons.emoji_people,
                               color:
                                   Theme.of(context).appBarTheme.foregroundColor,
-                              size: 40,
+                              size: responsiveSizePx(small: 40, medium: 70),
                             )
                           //shared
                           : Icon(
                               Icons.share,
                               color:
                                   Theme.of(context).appBarTheme.foregroundColor,
-                              size: 40,
+                              size: responsiveSizePx(small: 40, medium: 70),
                             )
                       : Icon(
                           Icons.arrow_forward_ios,
                           color: Theme.of(context).primaryColor,
-                          size: 35,
+                          size: responsiveSizePx(small: 40, medium: 70),
                         )
 
                   // task is done
                   : Icon(
                       Icons.done,
                       color: Theme.of(context).primaryColor,
-                      size: 45,
+                      size: responsiveSizePx(small: 40, medium: 70),
                     ),
               const SizedBox(
-                width: 5,
+                width: 8,
               ),
             ],
           ),

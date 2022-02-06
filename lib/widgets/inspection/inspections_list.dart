@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/app_user.dart';
 import 'package:under_control_flutter/models/item.dart';
@@ -19,7 +20,7 @@ class InspectionsList extends StatefulWidget {
   _InspectionsListState createState() => _InspectionsListState();
 }
 
-class _InspectionsListState extends State<InspectionsList> {
+class _InspectionsListState extends State<InspectionsList> with ResponsiveSize {
   var showInspections = false;
 
   @override
@@ -31,8 +32,9 @@ class _InspectionsListState extends State<InspectionsList> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     final buttonStyle = Theme.of(widget.context).textTheme.headline6!.copyWith(
-        fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+        fontSize: responsiveSizePx(small: 18, medium: 30),
         color: Theme.of(context).primaryColor);
     final userProvider = Provider.of<UserProvider>(context);
 
@@ -44,9 +46,10 @@ class _InspectionsListState extends State<InspectionsList> {
             alignment: Alignment.topLeft,
             child: showInspections
                 ? TextButton.icon(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.keyboard_arrow_up_rounded,
                       color: Colors.green,
+                      size: responsiveSizePx(small: 35, medium: 50),
                     ),
                     onPressed: () {
                       setState(() {
@@ -61,9 +64,10 @@ class _InspectionsListState extends State<InspectionsList> {
                     ),
                   )
                 : TextButton.icon(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.keyboard_arrow_down_rounded,
                       color: Colors.green,
+                      size: responsiveSizePx(small: 35, medium: 50),
                     ),
                     onPressed: () {
                       setState(() {
@@ -164,7 +168,7 @@ class _InspectionsListState extends State<InspectionsList> {
                               StatusIcon(
                                 textSize: 0,
                                 heroTag: insp.date.toIso8601String(),
-                                size: 10,
+                                size: responsiveSizePx(small: 40, medium: 55),
                                 inspectionStatus: insp.status,
                               ),
                             ],

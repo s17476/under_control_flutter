@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:under_control_flutter/helpers/date_calc.dart';
-import 'package:under_control_flutter/helpers/size_config.dart';
-import 'package:intl/intl.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 import 'package:under_control_flutter/screens/inspection/add_inspection_screen.dart';
@@ -17,13 +15,11 @@ class AddEquipmentScreen extends StatefulWidget {
 }
 
 class _AddEquipmentScreenState extends State<AddEquipmentScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, ResponsiveSize {
   final _formKey = GlobalKey<FormState>();
 
   DateTime? _lastInspection;
   DateTime? _nextInspection;
-  String _statusString = 'OK';
-  String _inspectionInterval = '1 year';
   String _internalId = '';
   String _producer = '';
   String _model = '';
@@ -32,7 +28,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
   String _comments = '';
 
   // add new asset
-  Future<Item?> _addNewEquipment() async {
+  Future<void> _addNewEquipment() async {
     if (_formKey.currentState != null) {
       // validate user input
       final isValid = _formKey.currentState!.validate();
@@ -40,20 +36,10 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
 
       // if user is valid
       if (isValid) {
-        // set inspection status
-        int statusValue;
-        if (_statusString == 'OK') {
-          statusValue = InspectionStatus.ok.index;
-        } else if (_statusString == 'Needs attention') {
-          statusValue = InspectionStatus.needsAttention.index;
-        } else {
-          statusValue = InspectionStatus.failed.index;
-        }
         _formKey.currentState!.save();
 
         // set inspections interval
-        _nextInspection =
-            DateCalc.getNextDate(_lastInspection!, _inspectionInterval);
+        _nextInspection = _lastInspection!;
 
         // create new asset
         Item item = Item(
@@ -65,8 +51,8 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
           comments: _comments,
           lastInspection: _lastInspection!,
           nextInspection: _nextInspection!,
-          interval: _inspectionInterval,
-          inspectionStatus: statusValue,
+          interval: '',
+          inspectionStatus: 0,
         );
 
         // try to add data to DB and close current screen
@@ -110,19 +96,19 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
         actions: [
           IconButton(
               onPressed: _addNewEquipment,
-              icon: Icon(
+              icon: const Icon(
                 Icons.save,
-                size: SizeConfig.blockSizeHorizontal * 9,
+                size: 40,
               )),
-          SizedBox(
-            width: SizeConfig.blockSizeHorizontal * 3,
+          const SizedBox(
+            width: 10,
           ),
         ],
       ),
       // background
       body: Container(
-        width: SizeConfig.blockSizeHorizontal * 100,
-        height: SizeConfig.blockSizeVertical * 110,
+        width: responsiveSizePct(small: 100),
+        height: responsiveSizeVerticalPct(small: 110),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -136,9 +122,9 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
         child: SingleChildScrollView(
           child: AnimatedPadding(
             padding: EdgeInsets.only(
-              left: 24,
-              right: 24,
-              top: SizeConfig.blockSizeHorizontal * 5,
+              left: responsiveSizePx(small: 24, medium: 60),
+              right: responsiveSizePx(small: 24, medium: 60),
+              top: responsiveSizePx(small: 20, medium: 50),
             ),
             duration: const Duration(milliseconds: 400),
             curve: Curves.easeInOut,
@@ -151,11 +137,11 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                     children: [
                       Icon(
                         Icons.handyman,
-                        size: SizeConfig.blockSizeHorizontal * 20,
+                        size: responsiveSizePx(small: 100, medium: 150),
                         color: Theme.of(context).primaryColor,
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 30, medium: 50),
                       ),
                       // internal id
                       TextFormField(
@@ -163,9 +149,9 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         keyboardType: TextInputType.name,
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 24,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -186,7 +172,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         },
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 20, medium: 40),
                       ),
                       // producer
                       TextFormField(
@@ -194,9 +180,9 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         keyboardType: TextInputType.name,
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 24,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -217,7 +203,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         },
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 20, medium: 40),
                       ),
                       // model
                       TextFormField(
@@ -225,9 +211,9 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         keyboardType: TextInputType.name,
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 24,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -248,7 +234,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         },
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 20, medium: 40),
                       ),
                       //catergory
                       TextFormField(
@@ -256,9 +242,9 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         keyboardType: TextInputType.name,
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 24,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -279,7 +265,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         },
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 20, medium: 40),
                       ),
                       //location
                       TextFormField(
@@ -287,9 +273,9 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         keyboardType: TextInputType.name,
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 24,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -310,7 +296,7 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         },
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 20, medium: 40),
                       ),
                       // comments
                       TextFormField(
@@ -320,9 +306,9 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         keyboardType: TextInputType.multiline,
                         // textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 24,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -340,13 +326,13 @@ class _AddEquipmentScreenState extends State<AddEquipmentScreen>
                         },
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 1,
+                        height: responsiveSizePx(small: 20, medium: 40),
                       ),
                     ],
                   ),
                 ),
                 SizedBox(
-                  height: SizeConfig.blockSizeVertical * 0.5,
+                  height: responsiveSizePx(small: 20, medium: 40),
                 ),
               ],
             ),

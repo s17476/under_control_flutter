@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
@@ -27,7 +28,7 @@ class TasksList extends StatefulWidget {
   _TasksListState createState() => _TasksListState();
 }
 
-class _TasksListState extends State<TasksList> {
+class _TasksListState extends State<TasksList> with ResponsiveSize {
   Map<String, List<Task>> _tasks = {};
   var executor = TaskExecutor.all;
 
@@ -69,10 +70,10 @@ class _TasksListState extends State<TasksList> {
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text(
+              child: const Text(
                 'No',
                 style: TextStyle(
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -80,11 +81,11 @@ class _TasksListState extends State<TasksList> {
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: Text(
+              child: const Text(
                 'Yes',
                 style: TextStyle(
-                  color: Theme.of(context).errorColor,
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  color: Colors.red,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -97,6 +98,7 @@ class _TasksListState extends State<TasksList> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     TaskProvider taskProvider = Provider.of<TaskProvider>(context);
     executor = taskProvider.executor;
     _tasks = taskProvider.getAllTasks;
@@ -180,7 +182,7 @@ class _TasksListState extends State<TasksList> {
                     ? const NeverScrollableScrollPhysics()
                     : null,
                 shrinkWrap: true,
-                padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal),
+                padding: EdgeInsets.all(responsiveSizePx(small: 0, medium: 24)),
                 itemCount: keys.length,
                 itemBuilder: (ctx, index) {
                   List<Widget> listItems = [];
@@ -299,7 +301,8 @@ class _TasksListState extends State<TasksList> {
                                   child: Icon(
                                     Icons.delete,
                                     color: Colors.white,
-                                    size: SizeConfig.blockSizeHorizontal * 15,
+                                    size:
+                                        responsiveSizePx(small: 50, medium: 70),
                                   ),
                                 ),
                                 background: Container(
@@ -311,15 +314,14 @@ class _TasksListState extends State<TasksList> {
                                       Icon(
                                         Icons.done,
                                         color: Colors.white,
-                                        size:
-                                            SizeConfig.blockSizeHorizontal * 20,
+                                        size: responsiveSizePx(
+                                            small: 60, medium: 90),
                                       ),
                                       Text(
                                         'Rapid Complete',
                                         style: TextStyle(
-                                          fontSize:
-                                              SizeConfig.blockSizeHorizontal *
-                                                  5,
+                                          fontSize: responsiveSizePx(
+                                              small: 25, medium: 40),
                                         ),
                                       ),
                                     ],
@@ -405,8 +407,8 @@ class _TasksListState extends State<TasksList> {
                       if (listItems.isNotEmpty)
                         Padding(
                           padding: EdgeInsets.symmetric(
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
-                            vertical: SizeConfig.blockSizeHorizontal,
+                            horizontal: responsiveSizePx(small: 20, medium: 30),
+                            vertical: 4,
                           ),
                           child: Text(keys[index]),
                         ),

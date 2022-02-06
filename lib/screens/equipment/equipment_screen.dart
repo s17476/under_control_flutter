@@ -110,7 +110,8 @@ class _EquipmentScreenState extends State<EquipmentScreen> with ResponsiveSize {
                                   item.category,
                                   style: TextStyle(
                                     color: colors[colorPointer],
-                                    fontSize: 24,
+                                    fontSize:
+                                        responsiveSizePx(small: 24, medium: 30),
                                   ),
                                 ),
                               ),
@@ -136,6 +137,8 @@ class _EquipmentScreenState extends State<EquipmentScreen> with ResponsiveSize {
                               child: ListTile(
                                 // category avatar
                                 leading: CircleAvatar(
+                                  radius:
+                                      responsiveSizePx(small: 20, medium: 30),
                                   child: FittedBox(
                                     child: Padding(
                                       padding: const EdgeInsets.all(3.0),
@@ -152,7 +155,12 @@ class _EquipmentScreenState extends State<EquipmentScreen> with ResponsiveSize {
                                 // list item title
                                 title: Text(
                                   '${item.producer}  ${item.model}',
-                                  style: Theme.of(context).textTheme.headline6,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline6!
+                                      .copyWith(
+                                          fontSize: responsiveSizePx(
+                                              small: 18, medium: 22)),
                                 ),
                                 // list item subtitle
                                 subtitle: Column(

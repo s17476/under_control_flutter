@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
 
-class TimeBarChart extends StatelessWidget {
+class TimeBarChart extends StatelessWidget with ResponsiveSize {
   const TimeBarChart({Key? key, required this.assetsTime}) : super(key: key);
 
   final Map<String, int> assetsTime;
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     Map<String, int> sortedMap = {};
 
     sortedMap.addEntries(assetsTime.entries.toList()
       ..sort((a, b) => (b.value).compareTo(a.value)));
 
-    final double chartWidthBlock = (SizeConfig.blockSizeHorizontal * 65) /
+    final double chartWidthBlock = responsiveSizePct(small: 60, medium: 80) /
         sortedMap[sortedMap.keys.toList()[0]]!;
 
     return Padding(

@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:under_control_flutter/models/item.dart';
 
 class StatusIcon extends StatelessWidget {
-  const StatusIcon(
-      {Key? key,
-      required this.heroTag,
-      required this.inspectionStatus,
-      required this.size,
-      required this.textSize})
-      : super(key: key);
+  const StatusIcon({
+    Key? key,
+    required this.heroTag,
+    required this.inspectionStatus,
+    required this.size,
+    required this.textSize,
+  }) : super(key: key);
 
   final String heroTag;
   final int inspectionStatus;
   final double size;
-  final int textSize;
+  final double textSize;
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +29,11 @@ class StatusIcon extends StatelessWidget {
                 ),
               ),
               if (textSize != 0)
-                const Text(
+                Text(
                   'OK',
                   style: TextStyle(
                     color: Colors.green,
+                    fontSize: textSize,
                   ),
                 ),
             ],
@@ -49,10 +50,11 @@ class StatusIcon extends StatelessWidget {
                     ),
                   ),
                   if (textSize != 0)
-                    const Text(
+                    Text(
                       'FAILED',
                       style: TextStyle(
                         color: Colors.red,
+                        fontSize: textSize,
                       ),
                     ),
                 ],
@@ -69,10 +71,11 @@ class StatusIcon extends StatelessWidget {
                         ),
                       ),
                       if (textSize != 0)
-                        const Text(
+                        Text(
                           'NEEDS ATTENTION',
                           style: TextStyle(
                             color: Colors.amber,
+                            fontSize: textSize,
                           ),
                         ),
                     ],
@@ -88,10 +91,11 @@ class StatusIcon extends StatelessWidget {
                         ),
                       ),
                       if (textSize != 0)
-                        const Text(
+                        Text(
                           'EXPIRED',
                           style: TextStyle(
                             color: Colors.red,
+                            fontSize: textSize,
                           ),
                         ),
                     ],

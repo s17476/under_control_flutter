@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
@@ -20,7 +21,8 @@ class EquipmentDetailsScreen extends StatefulWidget {
   State<EquipmentDetailsScreen> createState() => _EquipmentDetailsScreenState();
 }
 
-class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
+class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen>
+    with ResponsiveSize {
   late Item item;
 
   // delete dialog
@@ -44,10 +46,10 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text(
+              child: const Text(
                 'No',
                 style: TextStyle(
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -55,11 +57,11 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
               onPressed: () {
                 Navigator.of(context).pop(item);
               },
-              child: Text(
+              child: const Text(
                 'Yes',
                 style: TextStyle(
-                  color: Theme.of(context).errorColor,
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  color: Colors.red,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -83,14 +85,18 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final textStyle = Theme.of(context).textTheme.headline6!.copyWith();
+    SizeConfig.init(context);
+    final textStyle = Theme.of(context)
+        .textTheme
+        .headline6!
+        .copyWith(fontSize: responsiveSizePx(small: 18, medium: 22));
     final expiredTextStyle = textStyle.copyWith(
       color: Theme.of(context).errorColor,
     );
     final labelTextStyle = Theme.of(context)
         .textTheme
         .headline6!
-        .copyWith(fontSize: SizeConfig.blockSizeHorizontal * 3);
+        .copyWith(fontSize: responsiveSizePx(small: 12, medium: 14));
 
     return Scaffold(
       appBar: AppBar(
@@ -115,8 +121,8 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
               color: Theme.of(context).appBarTheme.foregroundColor,
             ),
           ),
-          SizedBox(
-            width: SizeConfig.blockSizeHorizontal * 2,
+          const SizedBox(
+            width: 5,
           ),
 
           // delete button
@@ -147,14 +153,14 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
               color: Theme.of(context).errorColor,
             ),
           ),
-          SizedBox(
-            width: SizeConfig.blockSizeHorizontal * 3,
+          const SizedBox(
+            width: 15,
           ),
         ],
       ),
       body: Container(
-        width: SizeConfig.blockSizeHorizontal * 100,
-        height: SizeConfig.blockSizeVertical * 110,
+        width: responsiveSizePct(small: 100),
+        height: responsiveSizeVerticalPct(small: 110),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -178,7 +184,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(
-                          width: SizeConfig.blockSizeHorizontal * 50,
+                          width: responsiveSizePct(small: 50, medium: 70),
                           // left column
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -318,8 +324,8 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                               child: StatusIcon(
                                 heroTag: item.itemId!,
                                 inspectionStatus: item.inspectionStatus,
-                                size: 20,
-                                textSize: 7,
+                                size: responsiveSizePx(small: 70, medium: 100),
+                                textSize: 18,
                               ),
                             ),
                           ],
@@ -334,7 +340,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                           item.comments.isEmpty ? '------' : item.comments,
                           style: TextStyle(
                             color: Theme.of(context).textTheme.headline6!.color,
-                            fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                            fontSize: responsiveSizePx(small: 18, medium: 22),
                           ),
                         ),
                       ),
@@ -352,7 +358,7 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                   label: Text(
                     "Add new task",
                     style: TextStyle(
-                      fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                      fontSize: responsiveSizePx(small: 18, medium: 30),
                       color: Colors.black,
                     ),
                   ),
@@ -360,14 +366,14 @@ class _EquipmentDetailsScreenState extends State<EquipmentDetailsScreen> {
                       AddTaskScreen.routeName,
                       arguments: ['asset', item]),
                   icon: Container(
-                    padding: EdgeInsets.only(
-                      left: SizeConfig.blockSizeHorizontal * 1,
-                      right: SizeConfig.blockSizeHorizontal * 1.5,
+                    padding: const EdgeInsets.only(
+                      left: 5,
+                      right: 5,
                     ),
                     alignment: Alignment.topRight,
                     child: Icon(
                       Icons.add_task,
-                      size: SizeConfig.blockSizeHorizontal * 6,
+                      size: responsiveSizePx(small: 25, medium: 40),
                     ),
                   ),
                 ),

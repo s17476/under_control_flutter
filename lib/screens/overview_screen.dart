@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/chart_data_provider.dart';
@@ -16,7 +17,7 @@ class OverviewScreen extends StatefulWidget {
   State<OverviewScreen> createState() => _OverviewScreenState();
 }
 
-class _OverviewScreenState extends State<OverviewScreen> {
+class _OverviewScreenState extends State<OverviewScreen> with ResponsiveSize {
   List<Color> gradientColors = [
     const Color(0xff23b6e6),
     const Color(0xff02d39a),
@@ -189,6 +190,8 @@ class _OverviewScreenState extends State<OverviewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
+    maxBarWidth = (SizeConfig.blockSizeHorizontal * 100) - 16;
     var chartDataProvider = Provider.of<ChartDataProvider>(context);
     chartData = chartDataProvider.chartValues;
     final taskProvider = Provider.of<ChartDataProvider>(context);
@@ -213,10 +216,10 @@ class _OverviewScreenState extends State<OverviewScreen> {
               children: [
                 Container(
                   padding: const EdgeInsets.only(top: 16),
-                  child: Text(
+                  child: const Text(
                     'Cost chart',
                     style: TextStyle(
-                      fontSize: SizeConfig.blockSizeHorizontal * 6,
+                      fontSize: 20,
                     ),
                   ),
                 ),
@@ -263,15 +266,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
                                         Icon(
                                           Icons.query_stats,
                                           color: Colors.black.withOpacity(0.5),
-                                          size: SizeConfig.blockSizeHorizontal *
-                                              15,
+                                          size: responsiveSizePx(
+                                              small: 60, medium: 100),
                                         ),
                                         Text(
                                           'No data found',
                                           style: TextStyle(
-                                            fontSize:
-                                                SizeConfig.blockSizeHorizontal *
-                                                    8,
+                                            fontSize: responsiveSizePx(
+                                                small: 26, medium: 32),
                                             color:
                                                 Colors.black.withOpacity(0.5),
                                             fontWeight: FontWeight.bold,
@@ -339,7 +341,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                           icon: Icon(
                             Icons.keyboard_arrow_down_rounded,
                             color: Theme.of(context).primaryIconTheme.color,
-                            size: SizeConfig.blockSizeHorizontal * 8,
+                            size: 30,
                           ),
                           alignment: AlignmentDirectional.centerStart,
                           decoration: InputDecoration(
@@ -378,14 +380,14 @@ class _OverviewScreenState extends State<OverviewScreen> {
                               value: '${item.itemId}',
                               child: Padding(
                                 padding: EdgeInsets.only(
-                                  left: SizeConfig.blockSizeHorizontal * 2,
+                                  left: responsiveSizePx(small: 10, medium: 20),
                                 ),
                                 child: Text(
                                   '${item.producer} ${item.model} ${item.internalId}',
                                   overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize:
-                                        SizeConfig.blockSizeHorizontal * 4,
+                                        responsiveSizePx(small: 16, medium: 22),
                                   ),
                                 ),
                               ),
@@ -399,7 +401,7 @@ class _OverviewScreenState extends State<OverviewScreen> {
                       padding:
                           const EdgeInsets.only(top: 8.0, left: 4, right: 8),
                       child: IconButton(
-                        iconSize: SizeConfig.blockSizeHorizontal * 14,
+                        iconSize: 50,
                         onPressed: () {
                           chartDataProvider.getAssetExpenses(
                             itemId: selectedAsset,

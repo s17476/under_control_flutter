@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/date_calc.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/checklist.dart';
 import 'package:under_control_flutter/models/inspection.dart';
@@ -23,7 +24,7 @@ class AddInspectionScreen extends StatefulWidget {
 }
 
 class _AddInspectionScreenState extends State<AddInspectionScreen>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, ResponsiveSize {
   late Item item;
   late Task? task;
 
@@ -201,10 +202,10 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
             onPressed: () {
               saveInspection();
             },
-            icon: Icon(
+            icon: const Icon(
               Icons.save,
               color: Colors.green,
-              size: SizeConfig.blockSizeHorizontal * 9,
+              size: 40,
             ),
           ),
           const SizedBox(
@@ -213,8 +214,8 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
         ],
       ),
       body: Container(
-        width: SizeConfig.blockSizeHorizontal * 100,
-        height: SizeConfig.blockSizeVertical * 110,
+        width: responsiveSizePct(small: 100),
+        height: responsiveSizeVerticalPct(small: 110),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -242,7 +243,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                           Text(
                             'Choose checklist:',
                             style: TextStyle(
-                              fontSize: SizeConfig.blockSizeHorizontal * 4,
+                              fontSize: responsiveSizePx(small: 18, medium: 24),
                               color:
                                   Theme.of(context).textTheme.headline6!.color,
                             ),
@@ -253,13 +254,13 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                             borderRadius: BorderRadius.circular(10),
                             value: _checklistName,
                             icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                            iconSize: SizeConfig.blockSizeHorizontal * 6,
+                            iconSize: responsiveSizePx(small: 30, medium: 45),
                             iconEnabledColor: Theme.of(context).primaryColor,
                             alignment: Alignment.center,
                             elevation: 16,
                             style: TextStyle(
                               color: Theme.of(context).primaryColor,
-                              fontSize: SizeConfig.blockSizeHorizontal * 4,
+                              fontSize: responsiveSizePx(small: 18, medium: 24),
                               fontWeight: FontWeight.w600,
                             ),
                             underline: Container(height: 0),
@@ -397,12 +398,9 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                                       controller: _textController,
                                       decoration: InputDecoration(
                                         contentPadding: EdgeInsets.symmetric(
-                                          vertical:
-                                              SizeConfig.blockSizeHorizontal *
-                                                  1,
-                                          horizontal:
-                                              SizeConfig.blockSizeHorizontal *
-                                                  5,
+                                          vertical: 4,
+                                          horizontal: responsiveSizePx(
+                                              small: 20, medium: 30),
                                         ),
                                         border: OutlineInputBorder(
                                           borderRadius:
@@ -462,13 +460,14 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                                     icon: Icon(
                                       Icons.add,
                                       color: Colors.green,
-                                      size: SizeConfig.blockSizeHorizontal * 7,
+                                      size: responsiveSizePx(
+                                          small: 35, medium: 50),
                                     ),
                                     label: Text(
                                       'Add field',
                                       style: TextStyle(
-                                        fontSize:
-                                            SizeConfig.blockSizeHorizontal * 4,
+                                        fontSize: responsiveSizePx(
+                                            small: 18, medium: 24),
                                       ),
                                     ),
                                   ),
@@ -489,12 +488,9 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                                         controller: _nameTextController,
                                         decoration: InputDecoration(
                                           contentPadding: EdgeInsets.symmetric(
-                                            vertical:
-                                                SizeConfig.blockSizeHorizontal *
-                                                    1,
-                                            horizontal:
-                                                SizeConfig.blockSizeHorizontal *
-                                                    5,
+                                            vertical: 4,
+                                            horizontal: responsiveSizePx(
+                                                small: 20, medium: 30),
                                           ),
                                           border: OutlineInputBorder(
                                             borderRadius:
@@ -564,8 +560,8 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                                         icon: Icon(
                                           Icons.save,
                                           color: Colors.green,
-                                          size: SizeConfig.blockSizeHorizontal *
-                                              8,
+                                          size: responsiveSizePx(
+                                              small: 30, medium: 40),
                                         ),
                                       ),
                                     ),
@@ -586,8 +582,8 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                                       icon: Icon(
                                         Icons.delete,
                                         color: Colors.red,
-                                        size:
-                                            SizeConfig.blockSizeHorizontal * 8,
+                                        size: responsiveSizePx(
+                                            small: 30, medium: 40),
                                       ),
                                     ),
                                   ],
@@ -609,10 +605,9 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                                 controller: _commentsTextController,
                                 decoration: InputDecoration(
                                   contentPadding: EdgeInsets.symmetric(
-                                    vertical:
-                                        SizeConfig.blockSizeHorizontal * 1,
+                                    vertical: 4,
                                     horizontal:
-                                        SizeConfig.blockSizeHorizontal * 5,
+                                        responsiveSizePx(small: 20, medium: 30),
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(30),
@@ -640,7 +635,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                             choosenDate,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: SizeConfig.blockSizeHorizontal * 4,
+                              fontSize: responsiveSizePx(small: 18, medium: 30),
                               color:
                                   Theme.of(context).textTheme.headline6!.color,
                             ),
@@ -650,7 +645,8 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                             child: Text(
                               'Pick',
                               style: TextStyle(
-                                fontSize: SizeConfig.blockSizeHorizontal * 4,
+                                fontSize:
+                                    responsiveSizePx(small: 18, medium: 30),
                               ),
                             ),
                           ),
@@ -663,7 +659,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                           Text(
                             'Cyclic task:',
                             style: TextStyle(
-                              fontSize: SizeConfig.blockSizeHorizontal * 4,
+                              fontSize: responsiveSizePx(small: 18, medium: 30),
                               color:
                                   Theme.of(context).textTheme.headline6!.color,
                             ),
@@ -672,13 +668,13 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                             borderRadius: BorderRadius.circular(10),
                             value: _inspectionInterval,
                             icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                            iconSize: SizeConfig.blockSizeHorizontal * 6,
+                            iconSize: responsiveSizePx(small: 18, medium: 30),
                             iconEnabledColor: Theme.of(context).primaryColor,
                             alignment: Alignment.center,
                             elevation: 16,
                             style: TextStyle(
                               color: Colors.green,
-                              fontSize: SizeConfig.blockSizeHorizontal * 4,
+                              fontSize: responsiveSizePx(small: 18, medium: 30),
                             ),
                             underline: Container(height: 0),
                             onChanged: (String? newValue) {
@@ -713,7 +709,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                           Text(
                             'Inspection status:',
                             style: TextStyle(
-                              fontSize: SizeConfig.blockSizeHorizontal * 4,
+                              fontSize: responsiveSizePx(small: 18, medium: 30),
                               color:
                                   Theme.of(context).textTheme.headline6!.color,
                             ),
@@ -722,7 +718,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                             borderRadius: BorderRadius.circular(10),
                             value: _statusString,
                             icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                            iconSize: SizeConfig.blockSizeHorizontal * 6,
+                            iconSize: responsiveSizePx(small: 18, medium: 30),
                             iconEnabledColor: Theme.of(context).primaryColor,
                             alignment: Alignment.center,
                             elevation: 16,
@@ -732,7 +728,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
                                   : _statusString == 'Needs attention'
                                       ? Colors.amber
                                       : Colors.red,
-                              fontSize: SizeConfig.blockSizeHorizontal * 4,
+                              fontSize: responsiveSizePx(small: 18, medium: 30),
                             ),
                             underline: Container(height: 0),
                             onChanged: (String? newValue) {
