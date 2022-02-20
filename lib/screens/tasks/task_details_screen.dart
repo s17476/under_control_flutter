@@ -435,6 +435,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     // used to store task state before saving
     transferObjectTask ??= task.copyWith(date: DateTime.now());
 

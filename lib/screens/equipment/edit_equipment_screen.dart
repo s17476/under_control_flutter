@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/providers/item_provider.dart';
@@ -14,7 +15,7 @@ class EditEquipmentScreen extends StatefulWidget {
 }
 
 class _EditEquipmentScreenState extends State<EditEquipmentScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, ResponsiveSize {
   final _formKey = GlobalKey<FormState>();
   late Item _item;
 
@@ -71,6 +72,7 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit asset'),
@@ -82,14 +84,14 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                 Icons.save,
                 size: 32,
               )),
-          SizedBox(
-            width: SizeConfig.blockSizeHorizontal * 3,
+          const SizedBox(
+            width: 10,
           ),
         ],
       ),
       body: Container(
-        width: SizeConfig.blockSizeHorizontal * 100,
-        height: SizeConfig.blockSizeVertical * 110,
+        width: responsiveSizePct(small: 100),
+        height: responsiveSizeVerticalPct(small: 110),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -103,9 +105,9 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
         child: SingleChildScrollView(
           child: AnimatedPadding(
             padding: EdgeInsets.only(
-              left: SizeConfig.blockSizeHorizontal * 10,
-              right: SizeConfig.blockSizeHorizontal * 10,
-              top: SizeConfig.blockSizeHorizontal * 5,
+              left: responsiveSizePct(small: 10, medium: 20),
+              right: responsiveSizePct(small: 10, medium: 20),
+              top: responsiveSizePx(small: 20, medium: 70),
             ),
             duration: const Duration(milliseconds: 400),
             curve: Curves.easeInOut,
@@ -118,11 +120,11 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                     children: [
                       Icon(
                         Icons.handyman,
-                        size: SizeConfig.blockSizeHorizontal * 20,
+                        size: responsiveSizePct(small: 20),
                         color: Theme.of(context).primaryColor,
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 30, medium: 40),
                       ),
                       // internal id
                       TextFormField(
@@ -131,9 +133,9 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                         keyboardType: TextInputType.name,
                         textInputAction: TextInputAction.next,
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 20,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -157,7 +159,7 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                         },
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 24, medium: 36),
                       ),
                       // producer
                       TextFormField(
@@ -169,9 +171,9 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                           labelStyle: const TextStyle(
                             color: Colors.white,
                           ),
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 20,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -192,7 +194,7 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                         },
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 24, medium: 36),
                       ),
                       // model
                       TextFormField(
@@ -204,9 +206,9 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                           labelStyle: const TextStyle(
                             color: Colors.white,
                           ),
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 20,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -227,7 +229,7 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                         },
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 24, medium: 36),
                       ),
                       //catergory
                       TextFormField(
@@ -239,9 +241,9 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                           labelStyle: const TextStyle(
                             color: Colors.white,
                           ),
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 20,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -262,7 +264,7 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                         },
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 24, medium: 36),
                       ),
                       //location
                       TextFormField(
@@ -274,9 +276,9 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                           labelStyle: const TextStyle(
                             color: Colors.white,
                           ),
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 20,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -297,7 +299,7 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                         },
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 24, medium: 36),
                       ),
                       // comments
                       TextFormField(
@@ -309,9 +311,9 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                           labelStyle: const TextStyle(
                             color: Colors.white,
                           ),
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 20,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -328,14 +330,11 @@ class _EditEquipmentScreenState extends State<EditEquipmentScreen>
                           _comments = value!;
                         },
                       ),
-                      SizedBox(
-                        height: SizeConfig.blockSizeVertical * 1,
-                      ),
                     ],
                   ),
                 ),
                 SizedBox(
-                  height: SizeConfig.blockSizeVertical * 2,
+                  height: responsiveSizePx(small: 24, medium: 36),
                 ),
               ],
             ),

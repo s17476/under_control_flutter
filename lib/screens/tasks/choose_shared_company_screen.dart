@@ -36,7 +36,7 @@ class ChooseSharedCompanyScreen extends StatelessWidget {
                 'No',
                 style: TextStyle(
                   color: Theme.of(context).errorColor,
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  fontSize: 18,
                 ),
               ),
             ),
@@ -44,10 +44,10 @@ class ChooseSharedCompanyScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop(company);
               },
-              child: Text(
+              child: const Text(
                 'Yes',
                 style: TextStyle(
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  fontSize: 18,
                 ),
               ),
             ),

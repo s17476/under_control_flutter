@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/date_calc.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:intl/intl.dart';
 import 'package:under_control_flutter/models/app_user.dart';
@@ -22,7 +23,7 @@ class AddTaskScreen extends StatefulWidget {
 }
 
 class _AddTaskScreenState extends State<AddTaskScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, ResponsiveSize {
   final _formKey = GlobalKey<FormState>();
 
   String? parameter;
@@ -101,7 +102,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
   }
 
 // add new task
-  Future<Item?> _addNewTask() async {
+  Future<void> _addNewTask() async {
     if (_formKey.currentState != null) {
       // validate user input
       bool isValid = _formKey.currentState!.validate();
@@ -245,6 +246,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     allAssets = Provider.of<ItemProvider>(context).items;
     allAssets.insert(
       0,
@@ -281,19 +283,19 @@ class _AddTaskScreenState extends State<AddTaskScreen>
         actions: [
           IconButton(
             onPressed: _addNewTask,
-            icon: Icon(
+            icon: const Icon(
               Icons.save,
-              size: SizeConfig.blockSizeHorizontal * 9,
+              size: 40,
             ),
           ),
-          SizedBox(
-            width: SizeConfig.blockSizeHorizontal * 3,
+          const SizedBox(
+            width: 10,
           ),
         ],
       ),
       body: Container(
-        width: SizeConfig.blockSizeHorizontal * 100,
-        height: SizeConfig.blockSizeVertical * 110,
+        width: responsiveSizePct(small: 100),
+        height: responsiveSizeVerticalPct(small: 110),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -309,7 +311,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
             padding: EdgeInsets.only(
               left: 24,
               right: 24,
-              top: SizeConfig.blockSizeHorizontal * 5,
+              top: responsiveSizePx(small: 20, medium: 30),
             ),
             duration: const Duration(milliseconds: 400),
             curve: Curves.easeInOut,
@@ -323,11 +325,11 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                       // Icon depends on choosen task type
                       Icon(
                         eventIcons[dropdownItems.indexOf(dropdownValue)],
-                        size: SizeConfig.blockSizeHorizontal * 20,
+                        size: responsiveSizePx(small: 80, medium: 150),
                         color: darkTheme[dropdownItems.indexOf(dropdownValue)],
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 30, medium: 40),
                       ),
 
                       // Type dropdown
@@ -335,7 +337,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         icon: Icon(
                           Icons.keyboard_arrow_down_rounded,
                           color: Theme.of(context).primaryIconTheme.color,
-                          size: SizeConfig.blockSizeHorizontal * 8,
+                          size: 30,
                         ),
                         alignment: AlignmentDirectional.centerStart,
                         decoration: InputDecoration(
@@ -372,13 +374,13 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Padding(
-                              padding: EdgeInsets.only(
-                                left: SizeConfig.blockSizeHorizontal * 2,
+                              padding: const EdgeInsets.only(
+                                left: 10,
                               ),
                               child: Text(
                                 value,
-                                style: TextStyle(
-                                  fontSize: SizeConfig.blockSizeHorizontal * 4,
+                                style: const TextStyle(
+                                  fontSize: 16,
                                 ),
                               ),
                             ),
@@ -386,7 +388,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         }).toList(),
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 25, medium: 35),
                       ),
 
                       // Asset dropdown
@@ -395,7 +397,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         icon: Icon(
                           Icons.keyboard_arrow_down_rounded,
                           color: Theme.of(context).primaryIconTheme.color,
-                          size: SizeConfig.blockSizeHorizontal * 8,
+                          size: 30,
                         ),
                         alignment: AlignmentDirectional.centerStart,
                         decoration: InputDecoration(
@@ -441,14 +443,14 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           return DropdownMenuItem<String>(
                             value: '${item.itemId}',
                             child: Padding(
-                              padding: EdgeInsets.only(
-                                left: SizeConfig.blockSizeHorizontal * 2,
+                              padding: const EdgeInsets.only(
+                                left: 10,
                               ),
                               child: Text(
                                 '${item.producer} ${item.model} ${item.internalId}',
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: SizeConfig.blockSizeHorizontal * 4,
+                                style: const TextStyle(
+                                  fontSize: 16,
                                 ),
                               ),
                             ),
@@ -456,7 +458,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         }).toList(),
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 25, medium: 35),
                       ),
 
                       // title
@@ -473,9 +475,9 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                                 Theme.of(context).appBarTheme.foregroundColor,
                             fontSize: 20,
                           ),
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 20,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -495,7 +497,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         },
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 25, medium: 35),
                       ),
 
                       // task descryption
@@ -512,9 +514,9 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                                 Theme.of(context).appBarTheme.foregroundColor,
                             fontSize: 20,
                           ),
-                          contentPadding: EdgeInsets.symmetric(
-                            vertical: SizeConfig.blockSizeHorizontal * 1,
-                            horizontal: SizeConfig.blockSizeHorizontal * 5,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 4,
+                            horizontal: 20,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(30),
@@ -531,7 +533,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         },
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 25, medium: 35),
                       ),
 
                       // Task executor type dropdown
@@ -539,7 +541,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         icon: Icon(
                           Icons.keyboard_arrow_down_rounded,
                           color: Theme.of(context).primaryIconTheme.color,
-                          size: SizeConfig.blockSizeHorizontal * 8,
+                          size: 16,
                         ),
                         alignment: AlignmentDirectional.centerStart,
                         decoration: InputDecoration(
@@ -574,14 +576,14 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           return DropdownMenuItem<String>(
                             value: executorType,
                             child: Padding(
-                              padding: EdgeInsets.only(
-                                left: SizeConfig.blockSizeHorizontal * 2,
+                              padding: const EdgeInsets.only(
+                                left: 10,
                               ),
                               child: Text(
                                 executorType,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: SizeConfig.blockSizeHorizontal * 4,
+                                style: const TextStyle(
+                                  fontSize: 16,
                                 ),
                               ),
                             ),
@@ -589,7 +591,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                         }).toList(),
                       ),
                       SizedBox(
-                        height: SizeConfig.blockSizeVertical * 3,
+                        height: responsiveSizePx(small: 25, medium: 35),
                       ),
 
                       // Task executor dropdown
@@ -598,7 +600,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           icon: Icon(
                             Icons.keyboard_arrow_down_rounded,
                             color: Theme.of(context).primaryIconTheme.color,
-                            size: SizeConfig.blockSizeHorizontal * 8,
+                            size: 35,
                           ),
                           alignment: AlignmentDirectional.centerStart,
                           decoration: InputDecoration(
@@ -641,15 +643,14 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                             return DropdownMenuItem<String>(
                               value: user!.userId,
                               child: Padding(
-                                padding: EdgeInsets.only(
-                                  left: SizeConfig.blockSizeHorizontal * 2,
+                                padding: const EdgeInsets.only(
+                                  left: 10,
                                 ),
                                 child: Text(
                                   user.userName,
                                   overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                    fontSize:
-                                        SizeConfig.blockSizeHorizontal * 4,
+                                  style: const TextStyle(
+                                    fontSize: 16,
                                   ),
                                 ),
                               ),
@@ -666,14 +667,16 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                               choosenCompanyName!,
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                fontSize: SizeConfig.blockSizeHorizontal * 4,
+                                fontSize: 16,
                                 color: Theme.of(context)
                                     .textTheme
                                     .headline6!
                                     .color,
                               ),
                             ),
-                            SizedBox(width: SizeConfig.blockSizeHorizontal * 3),
+                            SizedBox(
+                              width: responsiveSizePx(small: 25, medium: 35),
+                            ),
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context)
@@ -689,10 +692,10 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                                   }
                                 });
                               },
-                              child: Text(
+                              child: const Text(
                                 'Pick a company',
                                 style: TextStyle(
-                                  fontSize: SizeConfig.blockSizeHorizontal * 4,
+                                  fontSize: 16,
                                   color: Colors.black,
                                 ),
                               ),
@@ -707,12 +710,14 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                             choosenDate,
                             textAlign: TextAlign.center,
                             style: TextStyle(
-                              fontSize: SizeConfig.blockSizeHorizontal * 4,
+                              fontSize: 16,
                               color:
                                   Theme.of(context).textTheme.headline6!.color,
                             ),
                           ),
-                          SizedBox(width: SizeConfig.blockSizeHorizontal * 3),
+                          SizedBox(
+                            width: responsiveSizePx(small: 25, medium: 35),
+                          ),
                           TextButton(
                             onPressed: () {
                               FocusScope.of(context).requestFocus(FocusNode());
@@ -721,10 +726,10 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                                     dropdownItems.indexOf(dropdownValue)]!,
                               );
                             },
-                            child: Text(
+                            child: const Text(
                               'Pick',
                               style: TextStyle(
-                                fontSize: SizeConfig.blockSizeHorizontal * 4,
+                                fontSize: 18,
                                 color: Colors.black,
                               ),
                             ),
@@ -739,7 +744,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           Text(
                             'Cyclic task:',
                             style: TextStyle(
-                              fontSize: SizeConfig.blockSizeHorizontal * 4,
+                              fontSize: 16,
                               color:
                                   Theme.of(context).textTheme.headline6!.color,
                             ),
@@ -748,12 +753,12 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                             borderRadius: BorderRadius.circular(10),
                             value: _taskInterval,
                             icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                            iconSize: SizeConfig.blockSizeHorizontal * 4,
+                            iconSize: 35,
                             alignment: Alignment.center,
                             elevation: 16,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.black,
-                              fontSize: SizeConfig.blockSizeHorizontal * 4,
+                              fontSize: 18,
                             ),
                             underline: Container(height: 0),
                             onChanged: (String? newValue) {
@@ -781,8 +786,8 @@ class _AddTaskScreenState extends State<AddTaskScreen>
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: SizeConfig.blockSizeVertical * 0.5,
+                      const SizedBox(
+                        height: 30,
                       ),
                     ],
                   ),

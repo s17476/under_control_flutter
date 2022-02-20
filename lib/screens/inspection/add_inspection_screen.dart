@@ -188,6 +188,7 @@ class _AddInspectionScreenState extends State<AddInspectionScreen>
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     // set shown date
     String choosenDate;
     _inspectionDate ??= DateTime.now();
