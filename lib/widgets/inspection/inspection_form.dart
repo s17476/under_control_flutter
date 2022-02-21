@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/checklist.dart';
 import 'package:under_control_flutter/models/inspection.dart';
@@ -24,7 +25,7 @@ class InspectionForm extends StatefulWidget {
 }
 
 class _InspectionFormState extends State<InspectionForm>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, ResponsiveSize {
   final List<AnimationController> _animationControllers = [];
   final List<Animation<double>> _animations = [];
 
@@ -101,6 +102,7 @@ class _InspectionFormState extends State<InspectionForm>
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -108,14 +110,16 @@ class _InspectionFormState extends State<InspectionForm>
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: responsiveSizePx(small: 32, medium: 64),
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Checklist:',
                         style: TextStyle(
-                          fontSize: SizeConfig.blockSizeHorizontal * 4,
+                          fontSize: responsiveSizePx(small: 18, medium: 24),
                           color: Theme.of(context).textTheme.headline6!.color,
                         ),
                       ),
@@ -125,13 +129,13 @@ class _InspectionFormState extends State<InspectionForm>
                         borderRadius: BorderRadius.circular(10),
                         value: _checklistName,
                         icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                        iconSize: SizeConfig.blockSizeHorizontal * 6,
+                        iconSize: responsiveSizePx(small: 25, medium: 45),
                         iconEnabledColor: Colors.black,
                         alignment: Alignment.center,
                         elevation: 16,
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: SizeConfig.blockSizeHorizontal * 4,
+                          fontSize: responsiveSizePx(small: 18, medium: 25),
                           fontWeight: FontWeight.w600,
                         ),
                         underline: Container(height: 0),
@@ -267,11 +271,9 @@ class _InspectionFormState extends State<InspectionForm>
                                     TextCapitalization.sentences,
                                 controller: _textController,
                                 decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.symmetric(
-                                    vertical:
-                                        SizeConfig.blockSizeHorizontal * 1,
-                                    horizontal:
-                                        SizeConfig.blockSizeHorizontal * 5,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                    horizontal: 20,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(30),
@@ -328,12 +330,13 @@ class _InspectionFormState extends State<InspectionForm>
                               icon: Icon(
                                 Icons.add,
                                 color: Colors.black,
-                                size: SizeConfig.blockSizeHorizontal * 7,
+                                size: responsiveSizePx(small: 25, medium: 35),
                               ),
                               label: Text(
                                 'Add field',
                                 style: TextStyle(
-                                  fontSize: SizeConfig.blockSizeHorizontal * 4,
+                                  fontSize:
+                                      responsiveSizePx(small: 18, medium: 24),
                                   color: Colors.black,
                                 ),
                               ),
@@ -353,11 +356,9 @@ class _InspectionFormState extends State<InspectionForm>
                                       TextCapitalization.sentences,
                                   controller: _nameTextController,
                                   decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(
-                                      vertical:
-                                          SizeConfig.blockSizeHorizontal * 1,
-                                      horizontal:
-                                          SizeConfig.blockSizeHorizontal * 5,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 4,
+                                      horizontal: 20,
                                     ),
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(30),
@@ -422,7 +423,8 @@ class _InspectionFormState extends State<InspectionForm>
                                   icon: Icon(
                                     Icons.save,
                                     color: Colors.green,
-                                    size: SizeConfig.blockSizeHorizontal * 8,
+                                    size:
+                                        responsiveSizePx(small: 30, medium: 40),
                                   ),
                                 ),
                               ),
@@ -442,7 +444,7 @@ class _InspectionFormState extends State<InspectionForm>
                                 icon: Icon(
                                   Icons.delete,
                                   color: Colors.red,
-                                  size: SizeConfig.blockSizeHorizontal * 8,
+                                  size: responsiveSizePx(small: 30, medium: 40),
                                 ),
                               ),
                             ],
@@ -466,7 +468,7 @@ class _InspectionFormState extends State<InspectionForm>
                       Text(
                         'Inspection status:',
                         style: TextStyle(
-                          fontSize: SizeConfig.blockSizeHorizontal * 4,
+                          fontSize: responsiveSizePx(small: 18, medium: 24),
                           color: Theme.of(context).textTheme.headline6!.color,
                         ),
                       ),
@@ -474,7 +476,7 @@ class _InspectionFormState extends State<InspectionForm>
                         borderRadius: BorderRadius.circular(10),
                         value: _statusString,
                         icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                        iconSize: SizeConfig.blockSizeHorizontal * 6,
+                        iconSize: responsiveSizePx(small: 30, medium: 40),
                         iconEnabledColor: Theme.of(context).primaryColor,
                         alignment: Alignment.center,
                         elevation: 16,
@@ -484,7 +486,7 @@ class _InspectionFormState extends State<InspectionForm>
                               : _statusString == 'Needs attention'
                                   ? Colors.amber
                                   : Colors.red,
-                          fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                          fontSize: responsiveSizePx(small: 18, medium: 24),
                           fontWeight: FontWeight.w500,
                         ),
                         underline: Container(height: 0),

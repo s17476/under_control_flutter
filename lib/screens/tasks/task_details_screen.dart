@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:under_control_flutter/helpers/date_calc.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/inspection.dart';
 import 'package:under_control_flutter/models/item.dart';
@@ -24,7 +25,7 @@ class TaskDetailsScreen extends StatefulWidget {
 }
 
 class _TaskDetailsScreenState extends State<TaskDetailsScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, ResponsiveSize {
   final _formKey = GlobalKey<FormState>();
 
   late Task task;
@@ -194,10 +195,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text(
+              child: const Text(
                 'No',
                 style: TextStyle(
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -209,7 +210,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                 'Yes',
                 style: TextStyle(
                   color: Theme.of(context).errorColor,
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -245,7 +246,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                 'No',
                 style: TextStyle(
                   color: Theme.of(context).errorColor,
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -253,10 +254,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: Text(
+              child: const Text(
                 'Yes',
                 style: TextStyle(
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -443,7 +444,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
     final textStyle = Theme.of(context).textTheme.headline6!.copyWith();
 
     final labelTextStyle = Theme.of(context).textTheme.headline6!.copyWith(
-          fontSize: SizeConfig.blockSizeHorizontal * 3,
+          fontSize: 12,
           color: Theme.of(context).hintColor,
         );
 
@@ -524,13 +525,13 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
               ),
             ),
           SizedBox(
-            width: SizeConfig.blockSizeHorizontal * 3,
+            width: responsiveSizePx(small: 10, medium: 20),
           ),
         ],
       ),
       body: Container(
-        width: SizeConfig.blockSizeHorizontal * 100,
-        height: SizeConfig.blockSizeVertical * 110,
+        width: responsiveSizePct(small: 100),
+        height: responsiveSizeVerticalPct(small: 110),
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
@@ -557,12 +558,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                         child: Container(
                           child: Icon(
                             _eventIcons[task.type.index],
-                            size: SizeConfig.blockSizeHorizontal * 20,
+                            size: responsiveSizePx(small: 90, medium: 170),
                             color:
                                 Theme.of(context).appBarTheme.foregroundColor,
                           ),
-                          width: SizeConfig.blockSizeHorizontal * 25,
-                          height: SizeConfig.blockSizeHorizontal * 25,
+                          width: responsiveSizePx(small: 105, medium: 200),
+                          height: responsiveSizePx(small: 105, medium: 200),
                           decoration: BoxDecoration(
                             color: darkTheme[task.type.index],
                             borderRadius: const BorderRadius.only(
@@ -606,14 +607,14 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                   //  status
                   Padding(
                     padding: EdgeInsets.only(
-                      right: SizeConfig.blockSizeHorizontal * 8,
+                      right: responsiveSizePx(small: 25, medium: 45),
                     ),
                     child: Column(
                       children: [
                         Icon(
                           _statusIcons[task.status.index],
                           color: Colors.white,
-                          size: SizeConfig.blockSizeHorizontal * 10,
+                          size: responsiveSizePx(small: 40, medium: 80),
                         ),
                         Text(
                           _statusText[task.status.index],
@@ -968,12 +969,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                         icon: _isInEditMode
                             ? Icon(
                                 Icons.cancel,
-                                size: SizeConfig.blockSizeHorizontal * 6,
+                                size: responsiveSizePx(small: 25, medium: 40),
                                 color: Theme.of(context).errorColor,
                               )
                             : Icon(
                                 Icons.keyboard_arrow_down_outlined,
-                                size: SizeConfig.blockSizeHorizontal * 8,
+                                size: responsiveSizePx(small: 25, medium: 40),
                               ),
                         label: Text(
                           _isInEditMode ? 'Cancel' : 'Complete the task',
@@ -981,7 +982,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                             color: _isInEditMode
                                 ? Theme.of(context).appBarTheme.foregroundColor
                                 : Theme.of(context).appBarTheme.backgroundColor,
-                            fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                            fontSize: responsiveSizePx(small: 18, medium: 24),
                           ),
                         ),
                       ),
@@ -1012,7 +1013,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                           },
                           icon: Icon(
                             Icons.save,
-                            size: SizeConfig.blockSizeHorizontal * 6,
+                            size: responsiveSizePx(small: 25, medium: 40),
                             color: Theme.of(context).primaryColor,
                           ),
                           label: Text(
@@ -1025,7 +1026,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                                   : Theme.of(context)
                                       .appBarTheme
                                       .backgroundColor,
-                              fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                              fontSize: responsiveSizePx(small: 18, medium: 24),
                             ),
                           ),
                         ),
@@ -1044,7 +1045,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                           },
                           icon: Icon(
                             Icons.done,
-                            size: SizeConfig.blockSizeHorizontal * 6,
+                            size: responsiveSizePx(small: 25, medium: 40),
                             color: Theme.of(context).primaryColor,
                           ),
                           label: Text(
@@ -1057,7 +1058,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                                   : Theme.of(context)
                                       .appBarTheme
                                       .backgroundColor,
-                              fontSize: SizeConfig.blockSizeHorizontal * 4.5,
+                              fontSize: responsiveSizePx(small: 18, medium: 24),
                             ),
                           ),
                         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/models/task.dart';
@@ -11,7 +12,7 @@ import 'package:under_control_flutter/screens/tasks/shared_task_detail_screen.da
 import 'package:under_control_flutter/screens/tasks/task_details_screen.dart';
 import 'package:under_control_flutter/widgets/task/task_list_item.dart';
 
-class CalendarEventsList extends StatelessWidget {
+class CalendarEventsList extends StatelessWidget with ResponsiveSize {
   const CalendarEventsList({
     Key? key,
     required this.selectedEvents,
@@ -61,10 +62,10 @@ class CalendarEventsList extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
-              child: Text(
+              child: const Text(
                 'No',
                 style: TextStyle(
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -76,7 +77,7 @@ class CalendarEventsList extends StatelessWidget {
                 'Yes',
                 style: TextStyle(
                   color: Theme.of(context).errorColor,
-                  fontSize: SizeConfig.blockSizeVertical * 2.5,
+                  fontSize: 20,
                 ),
               ),
             ),
@@ -89,6 +90,7 @@ class CalendarEventsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SizeConfig.init(context);
     return Expanded(
       child: ValueListenableBuilder<List<Task>>(
         valueListenable: selectedEvents,
@@ -97,7 +99,7 @@ class CalendarEventsList extends StatelessWidget {
           return value.isNotEmpty
               ? ListView.builder(
                   shrinkWrap: true,
-                  padding: EdgeInsets.all(SizeConfig.blockSizeHorizontal),
+                  padding: const EdgeInsets.all(4),
                   itemCount: value.length,
                   itemBuilder: (ctx, index) {
                     Item? item;
@@ -195,7 +197,7 @@ class CalendarEventsList extends StatelessWidget {
                               child: Icon(
                                 Icons.delete,
                                 color: Colors.white,
-                                size: SizeConfig.blockSizeHorizontal * 15,
+                                size: responsiveSizePx(small: 40, medium: 80),
                               ),
                             ),
                             background: Container(
@@ -207,13 +209,14 @@ class CalendarEventsList extends StatelessWidget {
                                   Icon(
                                     Icons.done,
                                     color: Colors.white,
-                                    size: SizeConfig.blockSizeHorizontal * 15,
+                                    size:
+                                        responsiveSizePx(small: 40, medium: 80),
                                   ),
                                   Text(
                                     'Rapid Complete',
                                     style: TextStyle(
-                                      fontSize:
-                                          SizeConfig.blockSizeHorizontal * 5,
+                                      fontSize: responsiveSizePx(
+                                          small: 24, medium: 40),
                                     ),
                                   ),
                                 ],
@@ -264,9 +267,9 @@ class CalendarEventsList extends StatelessWidget {
                           );
                   },
                 )
-              : Padding(
-                  padding: EdgeInsets.all(SizeConfig.blockSizeVertical * 5),
-                  child: const Text("No events for the selected date"),
+              : const Padding(
+                  padding: EdgeInsets.all(60),
+                  child: Text("No events for the selected date"),
                 );
         },
       ),
