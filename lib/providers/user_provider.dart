@@ -24,6 +24,7 @@ class UserProvider with ChangeNotifier {
         userImage: _user!.userImage,
         company: _user!.company,
         companyId: _user!.companyId,
+        approved: _user!.approved,
       );
     }
     return null;
@@ -52,6 +53,7 @@ class UserProvider with ChangeNotifier {
           userImage: doc['imgUrl'],
           company: doc['company'],
           companyId: doc['companyId'],
+          approved: doc['approved'],
         ));
       }
     });
@@ -74,10 +76,12 @@ class UserProvider with ChangeNotifier {
       final userSnapshot = documentSnapshot.data() as Map<String, dynamic>;
       if (userSnapshot['company'] == null) {
         tmpUser = AppUser(
-            userId: documentSnapshot.id,
-            email: userSnapshot['email'],
-            userName: userSnapshot['userName'],
-            userImage: userSnapshot['imgUrl']);
+          userId: documentSnapshot.id,
+          email: userSnapshot['email'],
+          userName: userSnapshot['userName'],
+          userImage: userSnapshot['imgUrl'],
+          approved: userSnapshot['approved'],
+        );
       } else {
         tmpUser = AppUser.company(
           userId: documentSnapshot.id,
@@ -86,6 +90,7 @@ class UserProvider with ChangeNotifier {
           userImage: userSnapshot['imgUrl'],
           company: userSnapshot['company'],
           companyId: userSnapshot['companyId'],
+          approved: userSnapshot['approved'],
         );
       }
       _isLoading = false;
@@ -117,6 +122,7 @@ class UserProvider with ChangeNotifier {
           userImage: userSnapshot['imgUrl'],
           company: userSnapshot['company'],
           companyId: userSnapshot['companyId'],
+          approved: userSnapshot['approved'],
         );
       } else {
         ScaffoldMessenger.of(context)
@@ -150,6 +156,7 @@ class UserProvider with ChangeNotifier {
           userImage: userSnapshot['imgUrl'],
           company: userSnapshot['company'],
           companyId: userSnapshot['companyId'],
+          approved: userSnapshot['approved'],
         );
       }
       return tmpUser;
@@ -165,6 +172,7 @@ class UserProvider with ChangeNotifier {
       userImage: _user!.userImage,
       company: company.name,
       companyId: company.companyId,
+      approved: _user!.approved,
     );
     await updateUser(context);
   }
@@ -180,8 +188,17 @@ class UserProvider with ChangeNotifier {
       'imgUrl': _user!.userImage,
       'company': _user!.company,
       'companyId': _user!.companyId,
+      'approved': _user!.approved,
     });
     notifyListeners();
+  }
+
+  // change company
+  Future<void> changeCompany(BuildContext context) async {
+    _user!.company = null;
+    _user!.companyId = null;
+
+    updateUser(context);
   }
 
   //signup and signin method
@@ -230,6 +247,7 @@ class UserProvider with ChangeNotifier {
           'userName': userName,
           'email': email,
           'imgUrl': imgUrl,
+          'approved': false,
         });
 
         _user = AppUser(
@@ -238,6 +256,7 @@ class UserProvider with ChangeNotifier {
           userName: userName,
           // password: password,
           userImage: imgUrl,
+          approved: false,
         );
 
         _isLoading = false;

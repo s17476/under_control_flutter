@@ -15,6 +15,7 @@ import 'package:under_control_flutter/screens/inspection/add_inspection_screen.d
 import 'package:under_control_flutter/screens/start/add_company_screen.dart';
 import 'package:under_control_flutter/screens/equipment/add_equipment_screen.dart';
 import 'package:under_control_flutter/screens/start/auth_screen.dart';
+import 'package:under_control_flutter/screens/start/await_approval_screen.dart';
 import 'package:under_control_flutter/screens/start/choose_company_screen.dart';
 import 'package:under_control_flutter/screens/equipment/edit_equipment_screen.dart';
 import 'package:under_control_flutter/screens/equipment/equipment_details_screen.dart';
@@ -149,7 +150,11 @@ class _AppState extends State<App> {
                     // user data initialized and has company
                     if (userProvider.user != null &&
                         userProvider.user!.companyId != null) {
-                      return const MainScreen();
+                      if (userProvider.user!.approved) {
+                        return const MainScreen();
+                      } else {
+                        return const AwaitApprovalScreen();
+                      }
                     } else {
                       // user data initialized and has no company
                       if (userProvider.user != null &&
