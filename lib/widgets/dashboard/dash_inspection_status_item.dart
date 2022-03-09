@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:under_control_flutter/helpers/responsive_size.dart';
 import 'package:under_control_flutter/helpers/size_config.dart';
 import 'package:under_control_flutter/models/item.dart';
 import 'package:under_control_flutter/widgets/start/status_icon.dart';
 
-class DashInspectionStatusItem extends StatelessWidget {
+class DashInspectionStatusItem extends StatelessWidget with ResponsiveSize {
   const DashInspectionStatusItem(
       {Key? key,
       required this.isLoading,
@@ -36,7 +37,7 @@ class DashInspectionStatusItem extends StatelessWidget {
               StatusIcon(
                 heroTag: '',
                 inspectionStatus: status.index,
-                size: 7,
+                size: responsiveSizePx(small: 25, medium: 45),
                 textSize: 0,
               ),
             ],

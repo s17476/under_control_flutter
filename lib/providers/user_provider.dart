@@ -37,6 +37,19 @@ class UserProvider with ChangeNotifier {
 
   List<AppUser?> get allUsersInCompany => [..._allUsersInCompany];
 
+  // check if current user is only user in company
+  // if so, make him administrator
+  Future<void> isFirstUserInCompany() async {
+    await initializeCompanyUsers();
+    if (_allUsersInCompany.length <= 1) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(_user!.userId)
+          .update({'approved': true});
+      _user!.approved = true;
+    }
+  }
+
   // initializes users in company
   Future<void> initializeCompanyUsers() async {
     List<AppUser?> tmpUsers = [];
@@ -73,26 +86,28 @@ class UserProvider with ChangeNotifier {
         .get()
         .then((DocumentSnapshot documentSnapshot) {
       AppUser? tmpUser;
-      final userSnapshot = documentSnapshot.data() as Map<String, dynamic>;
-      if (userSnapshot['company'] == null) {
-        tmpUser = AppUser(
-          userId: documentSnapshot.id,
-          email: userSnapshot['email'],
-          userName: userSnapshot['userName'],
-          userImage: userSnapshot['imgUrl'],
-          approved: userSnapshot['approved'],
-        );
-      } else {
-        tmpUser = AppUser.company(
-          userId: documentSnapshot.id,
-          email: userSnapshot['email'],
-          userName: userSnapshot['userName'],
-          userImage: userSnapshot['imgUrl'],
-          company: userSnapshot['company'],
-          companyId: userSnapshot['companyId'],
-          approved: userSnapshot['approved'],
-        );
-      }
+      try {
+        final userSnapshot = documentSnapshot.data() as Map<String, dynamic>;
+        if (userSnapshot['company'] == null) {
+          tmpUser = AppUser(
+            userId: documentSnapshot.id,
+            email: userSnapshot['email'],
+            userName: userSnapshot['userName'],
+            userImage: userSnapshot['imgUrl'],
+            approved: userSnapshot['approved'],
+          );
+        } else {
+          tmpUser = AppUser.company(
+            userId: documentSnapshot.id,
+            email: userSnapshot['email'],
+            userName: userSnapshot['userName'],
+            userImage: userSnapshot['imgUrl'],
+            company: userSnapshot['company'],
+            companyId: userSnapshot['companyId'],
+            approved: userSnapshot['approved'],
+          );
+        }
+      } catch (e) {}
       _isLoading = false;
       _hasData = true;
       return tmpUser;
@@ -175,6 +190,7 @@ class UserProvider with ChangeNotifier {
       approved: _user!.approved,
     );
     await updateUser(context);
+    isFirstUserInCompany();
   }
 
   // updates user data in DB
