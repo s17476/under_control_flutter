@@ -175,7 +175,6 @@ class _AppState extends State<App> {
                     }
                   } else if (!userSnapshot.hasData &&
                       userSnapshot.connectionState != ConnectionState.waiting) {
-                    // print('auth        ' + userSnapshot.connectionState.name);
                     return const AuthScreen();
                   }
                   return const LoadingScreen();

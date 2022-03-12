@@ -89,7 +89,6 @@ class _DashTaskStatusCardState extends State<DashTaskStatusCard>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
-                            width: responsiveSizePct(small: 60),
                             child: Text(
                               task.title,
                               overflow: TextOverflow.ellipsis,

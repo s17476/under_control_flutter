@@ -39,6 +39,8 @@ class _AuthFormWidgetState extends State<AuthFormWidget>
     super.initState();
     //initialize animations controllers
 
+    Provider.of<UserProvider>(context, listen: false).isLoading = false;
+
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),

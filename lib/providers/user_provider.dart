@@ -10,6 +10,7 @@ import 'package:under_control_flutter/models/company.dart';
 class UserProvider with ChangeNotifier {
   AppUser? _user;
   List<AppUser?> _allUsersInCompany = [];
+  List<AppUser?> _usersToApprove = [];
   var _isLoading = false;
   var _hasData = false;
   final _firebaseAuth = FirebaseAuth.instance;
@@ -30,8 +31,13 @@ class UserProvider with ChangeNotifier {
     return null;
   }
 
+  // returns users awaiting approval by administrator
+  List<AppUser?> get usersToApprove => _usersToApprove;
+
   //returns data loading status
   bool get isLoading => _isLoading;
+
+  set isLoading(bool val) => _isLoading = val;
 
   bool get hasData => _hasData;
 
@@ -319,5 +325,56 @@ class UserProvider with ChangeNotifier {
   // listens to user authentification status
   Stream<User?> authStateChanges() {
     return FirebaseAuth.instance.authStateChanges();
+  }
+
+  // gets users awaiting approval by administrator
+  Future<void> fetchAndSetUsersToApprove() async {
+    List<AppUser?> tmpUsers = [];
+    await FirebaseFirestore.instance
+        .collection('users')
+        .where('companyId', isEqualTo: _user!.companyId)
+        .where('approved', isEqualTo: false)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (var doc in querySnapshot.docs) {
+        try {
+          doc['rejected'];
+        } catch (e) {
+          tmpUsers.add(
+            AppUser.company(
+                userId: doc.id,
+                email: doc['email'],
+                userName: doc['userName'],
+                userImage: doc['imgUrl'],
+                company: doc['company'],
+                companyId: doc['companyId'],
+                approved: doc['approved']),
+          );
+        }
+      }
+    });
+    _usersToApprove = tmpUsers;
+    notifyListeners();
+  }
+
+  // approve user
+  Future<void> approveUser(AppUser user) async {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.userId)
+        .update({'approved': true});
+  }
+
+  // approve user
+  Future<void> rejectUser(AppUser user) async {
+    FirebaseFirestore.instance.collection('users').doc(user.userId).set({
+      'userName': user.userName,
+      'email': user.email,
+      'imgUrl': user.userImage,
+      'company': user.company,
+      'companyId': user.companyId,
+      'approved': user.approved,
+      'rejected': true,
+    });
   }
 }

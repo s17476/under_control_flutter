@@ -84,7 +84,6 @@ class _DashCompletedTasksState extends State<DashCompletedTasks>
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 SizedBox(
-                                  width: responsiveSizePct(small: 50),
                                   child: Text(
                                     task.title,
                                     overflow: TextOverflow.ellipsis,
