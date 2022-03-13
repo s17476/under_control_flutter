@@ -4,7 +4,12 @@ enum TaskStatus { planned, started, completed }
 
 enum TaskType { maintenance, event, inspection, reparation }
 
-enum TaskExecutor { shared, company, user, all }
+enum TaskExecutor {
+  shared,
+  company,
+  user,
+  all,
+}
 
 class Task {
   String? taskId;

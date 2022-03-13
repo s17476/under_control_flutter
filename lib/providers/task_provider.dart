@@ -145,7 +145,7 @@ class TaskProvider with ChangeNotifier {
           duration: doc['duration'],
         );
         if (_tasks.containsKey(stringDate)) {
-          _tasks[stringDate]!.add(tmpTask);
+          _tasks[stringDate]!.insert(0, tmpTask);
         } else {
           _tasks[stringDate] = [tmpTask];
         }
@@ -194,7 +194,7 @@ class TaskProvider with ChangeNotifier {
           duration: doc['duration'],
         );
         if (_tasksArchive.containsKey(stringDate)) {
-          _tasksArchive[stringDate]!.add(tmpTask);
+          _tasksArchive[stringDate]!.insert(0, tmpTask);
         } else {
           _tasksArchive[stringDate] = [tmpTask];
         }
@@ -348,9 +348,9 @@ class TaskProvider with ChangeNotifier {
       tmpTask = task.copyWith(taskId: autoreneratedId.id);
       return tmpTask;
     });
-    if (tmpTask.executor == TaskExecutor.shared) {
-      await shareTask(tmpTask);
-    }
+    // if (tmpTask.executor == TaskExecutor.shared) {
+    //   await shareTask(tmpTask);
+    // }
     return result;
   }
 
@@ -386,9 +386,9 @@ class TaskProvider with ChangeNotifier {
       tmpTask = task.copyWith(taskId: autoreneratedId.id);
       return tmpTask;
     });
-    if (tmpTask.executor == TaskExecutor.shared) {
-      await shareTaskByShared(tmpTask, companyId);
-    }
+    // if (tmpTask.executor == TaskExecutor.shared) {
+    //   await shareTaskByShared(tmpTask, companyId);
+    // }
     return result;
   }
 
@@ -636,9 +636,9 @@ class TaskProvider with ChangeNotifier {
             .collection('tasks')
             .doc(task.taskId);
 
-    if (task.executor == TaskExecutor.shared) {
-      await deleteSharedWithTask(task);
-    }
+    // if (task.executor == TaskExecutor.shared) {
+    //   await deleteSharedWithTask(task);
+    // }
 
     await taskRef.delete();
 
@@ -778,6 +778,21 @@ class TaskProvider with ChangeNotifier {
     await addTask(_undoTask!).then((value) =>
         deleteFromTaskArchive(_undoContext!, _undoTask!)
             .then((value) => response = value));
+    return response;
+  }
+
+  // check if task is steel active
+  Future<bool> checkIfActive(Task task) async {
+    bool response = false;
+
+    await FirebaseFirestore.instance
+        .collection('companies')
+        .doc(_user!.companyId)
+        .collection('tasks')
+        .doc(task.taskId)
+        .get()
+        .then((doc) => response = doc.exists);
+
     return response;
   }
 }

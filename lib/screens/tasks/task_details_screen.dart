@@ -35,6 +35,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
   String _executorName = '';
   String _creatorName = '';
   bool _isInEditMode = false;
+  bool _isTaskActive = true;
   Task? oldTask;
   Task? transferObjectTask;
 
@@ -275,7 +276,20 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
 
   // save changes if completed == false
   // complete task if completed == true
-  void _completeTask(bool completed) async {
+  Future<void> _completeTask(bool completed) async {
+    // check if task is steel active
+    await Provider.of<TaskProvider>(context, listen: false)
+        .checkIfActive(task)
+        .then((value) {
+      if (!value) {
+        _isTaskActive = value;
+      }
+    });
+
+    if (!_isTaskActive) {
+      return;
+    }
+
     if (_formKey.currentState != null) {
       // validate user input
       bool isValid = _formKey.currentState!.validate();
@@ -464,9 +478,22 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
             onPressed: () {
               _showDeleteDialog(context, task).then((value) {
                 if (value == true) {
-                  Provider.of<TaskProvider>(context, listen: false)
-                      .deleteTask(task);
-                  Navigator.of(context).pop('deleted');
+                  if (_isTaskActive) {
+                    Provider.of<TaskProvider>(context, listen: false)
+                        .deleteTask(task);
+                    Navigator.of(context).pop('deleted');
+                  } else {
+                    ScaffoldMessenger.of(context)
+                      ..removeCurrentSnackBar()
+                      ..showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                            'The task is no longer available. It has either already been completed by another user or deleted.',
+                          ),
+                          backgroundColor: Theme.of(context).errorColor,
+                        ),
+                      );
+                  }
                 }
               });
             },
@@ -480,7 +507,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
               task.status != TaskStatus.completed &&
               task.type != TaskType.inspection)
             IconButton(
-              onPressed: () {
+              onPressed: () async {
                 FocusScope.of(context).unfocus();
                 _toggleEditMode();
                 if (_isInEditMode) {
@@ -489,15 +516,20 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                   _animationController!.reverse();
                 }
 
-                _completeTask(false);
+                await _completeTask(false);
 
                 ScaffoldMessenger.of(context)
                   ..removeCurrentSnackBar()
                   ..showSnackBar(
                     SnackBar(
-                      content: const Text('Data saved'),
-                      backgroundColor:
-                          Theme.of(context).appBarTheme.backgroundColor,
+                      content: Text(
+                        _isTaskActive
+                            ? 'Data saved'
+                            : 'The task is no longer available. It has either already been completed by another user or deleted.',
+                      ),
+                      backgroundColor: _isTaskActive
+                          ? Theme.of(context).appBarTheme.backgroundColor
+                          : Theme.of(context).errorColor,
                     ),
                   );
               },
@@ -513,9 +545,17 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                 bool exit = false;
                 _showCompleteDialog(context, task).then((value) async {
                   if (value == true) {
-                    // if task is inspection
-
                     _completeTask(true);
+                    ScaffoldMessenger.of(context)
+                      ..removeCurrentSnackBar()
+                      ..showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                            'The task is no longer available. It has either already been completed by another user or deleted.',
+                          ),
+                          backgroundColor: Theme.of(context).errorColor,
+                        ),
+                      );
                   }
                 });
               },
@@ -989,7 +1029,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                       //save task button
                       if (_isInEditMode && task.type != TaskType.inspection)
                         TextButton.icon(
-                          onPressed: () {
+                          onPressed: () async {
                             FocusScope.of(context).unfocus();
                             _toggleEditMode();
                             if (_isInEditMode) {
@@ -998,16 +1038,22 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                               _animationController!.reverse();
                             }
 
-                            _completeTask(false);
+                            await _completeTask(false);
 
                             ScaffoldMessenger.of(context)
                               ..removeCurrentSnackBar()
                               ..showSnackBar(
                                 SnackBar(
-                                  content: const Text('Data saved'),
-                                  backgroundColor: Theme.of(context)
-                                      .appBarTheme
-                                      .backgroundColor,
+                                  content: Text(
+                                    _isTaskActive
+                                        ? 'Data saved'
+                                        : 'The task is no longer available. It has either already been completed by another user or deleted.',
+                                  ),
+                                  backgroundColor: _isTaskActive
+                                      ? Theme.of(context)
+                                          .appBarTheme
+                                          .backgroundColor
+                                      : Theme.of(context).errorColor,
                                 ),
                               );
                           },
@@ -1040,6 +1086,17 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen>
                                 .then((value) async {
                               if (value == true) {
                                 _completeTask(true);
+                                ScaffoldMessenger.of(context)
+                                  ..removeCurrentSnackBar()
+                                  ..showSnackBar(
+                                    SnackBar(
+                                      content: const Text(
+                                        'The task is no longer available. It has either already been completed by another user or deleted.',
+                                      ),
+                                      backgroundColor:
+                                          Theme.of(context).errorColor,
+                                    ),
+                                  );
                               }
                             });
                           },

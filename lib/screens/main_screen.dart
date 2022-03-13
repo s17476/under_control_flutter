@@ -36,7 +36,7 @@ class _MainScreenState extends State<MainScreen> with ResponsiveSize {
 
   // task executors filter options
   List<String> dropdownItems = [
-    'Shared',
+    // 'Shared',
     'Company',
     'Mine',
     'All',
@@ -230,7 +230,7 @@ class _MainScreenState extends State<MainScreen> with ResponsiveSize {
                             Provider.of<TaskProvider>(context, listen: false)
                                     .executor =
                                 TaskExecutor.values[
-                                    dropdownItems.indexOf(dropdownValue)];
+                                    dropdownItems.indexOf(dropdownValue) + 1];
                           },
                           dropdownColor: Colors.black,
                         ),

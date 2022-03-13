@@ -55,7 +55,7 @@ class _AddTaskScreenState extends State<AddTaskScreen>
   final List<String> executorTypeItems = const [
     'Company',
     'Specific user',
-    'Shared'
+    // 'Shared'
   ];
 
   String dropdownValue = 'Maintenance';
