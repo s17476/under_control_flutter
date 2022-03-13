@@ -15,16 +15,16 @@ class _TasksScreenState extends State<TasksScreen> {
 
   // refresh task list
   Future<void> _refreshTasks() async {
-    setState(() {
-      _isLoading = true;
-    });
-    await Provider.of<TaskProvider>(context, listen: false)
-        .fetchAndSetTasks()
-        .then((_) {
-      setState(() {
-        _isLoading = false;
-      });
-    });
+    // setState(() {
+    //   _isLoading = true;
+    // });
+    // await Provider.of<TaskProvider>(context, listen: false)
+    //     .fetchAndSetTasks()
+    //     .then((_) {
+    //   setState(() {
+    //     _isLoading = false;
+    //   });
+    // });
   }
 
   // events to show

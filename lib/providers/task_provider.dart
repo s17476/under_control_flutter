@@ -48,7 +48,7 @@ class TaskProvider with ChangeNotifier {
   // switches between active and done tasks
   void toggleIsActive() {
     _isActive = !isActive;
-    fetchAndSetTasks();
+    // fetchAndSetTasks();
     notifyListeners();
   }
 
@@ -108,23 +108,17 @@ class TaskProvider with ChangeNotifier {
   // gets tasks data from DB
   Future<void> fetchAndSetTasks() async {
     _isLoading = true;
-    Map<String, List<Task>> tmpTasks = {};
-    final taskRef = isActive
-        ? FirebaseFirestore.instance
-            .collection('companies')
-            .doc(_user!.companyId)
-            .collection('tasks')
-            .orderBy('date', descending: false)
-            .get()
-        : FirebaseFirestore.instance
-            .collection('companies')
-            .doc(_user!.companyId)
-            .collection('archive')
-            .orderBy('date', descending: true)
-            .get();
 
-    await taskRef.then((QuerySnapshot querySnapshot) {
-      for (var doc in querySnapshot.docs) {
+    final taskRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(_user!.companyId)
+        .collection('tasks')
+        .orderBy('date', descending: false)
+        .snapshots();
+
+    taskRef.listen((snapshot) {
+      _tasks.clear();
+      for (DocumentSnapshot doc in snapshot.docs) {
         final date = DateTime.parse(doc['date']);
         final stringDate = DateFormat('dd/MM/yyyy').format(date);
         final nextDate =
@@ -150,21 +144,64 @@ class TaskProvider with ChangeNotifier {
           cost: doc['cost'],
           duration: doc['duration'],
         );
-        if (tmpTasks.containsKey(stringDate)) {
-          tmpTasks[stringDate]!.add(tmpTask);
+        if (_tasks.containsKey(stringDate)) {
+          _tasks[stringDate]!.add(tmpTask);
         } else {
-          tmpTasks[stringDate] = [tmpTask];
+          _tasks[stringDate] = [tmpTask];
         }
       }
-      if (isActive) {
-        _tasks = tmpTasks;
-      } else {
-        _tasksArchive = tmpTasks;
-      }
+      _isLoading = false;
+      notifyListeners();
     });
-    await fetchAndSetSharedTasks();
-    _isLoading = false;
-    notifyListeners();
+  }
+
+  Future<void> fetchAndSetCompletedTasks() async {
+    _isLoading = true;
+
+    final taskRef = FirebaseFirestore.instance
+        .collection('companies')
+        .doc(_user!.companyId)
+        .collection('archive')
+        .orderBy('date', descending: false)
+        .snapshots();
+
+    taskRef.listen((snapshot) {
+      _tasksArchive.clear();
+      for (DocumentSnapshot doc in snapshot.docs) {
+        final date = DateTime.parse(doc['date']);
+        final stringDate = DateFormat('dd/MM/yyyy').format(date);
+        final nextDate =
+            doc['nextDate'] != null ? DateTime.parse(doc['nextDate']) : null;
+
+        final tmpTask = Task(
+          taskId: doc.id,
+          title: doc['title'],
+          date: date,
+          nextDate: nextDate,
+          taskInterval: doc['taskInterval'],
+          executor: TaskExecutor.values[doc['executor']],
+          executorId: doc['executorId'],
+          userId: doc['userId'],
+          itemId: doc['itemId'],
+          itemName: doc['itemName'],
+          location: doc['location'],
+          description: doc['description'],
+          comments: doc['comments'],
+          status: TaskStatus.values[doc['status']],
+          type: TaskType.values[doc['type']],
+          images: doc['images'],
+          cost: doc['cost'],
+          duration: doc['duration'],
+        );
+        if (_tasksArchive.containsKey(stringDate)) {
+          _tasksArchive[stringDate]!.add(tmpTask);
+        } else {
+          _tasksArchive[stringDate] = [tmpTask];
+        }
+      }
+      _isLoading = false;
+      notifyListeners();
+    });
   }
 
   // gets shared done tasks
@@ -279,56 +316,6 @@ class TaskProvider with ChangeNotifier {
     });
   }
 
-  // gets completed tasks from DB
-  Future<void> fetchAndSetCompletedTasks() async {
-    _isLoading = true;
-    Map<String, List<Task>> tmpTasks = {};
-    final taskRef = FirebaseFirestore.instance
-        .collection('companies')
-        .doc(_user!.companyId)
-        .collection('archive')
-        .orderBy('date', descending: true)
-        .get();
-
-    await taskRef.then((QuerySnapshot querySnapshot) {
-      for (var doc in querySnapshot.docs) {
-        final date = DateTime.parse(doc['date']);
-        final stringDate = DateFormat('dd/MM/yyyy').format(date);
-        final nextDate =
-            doc['nextDate'] != null ? DateTime.parse(doc['nextDate']) : null;
-
-        final tmpTask = Task(
-          taskId: doc.id,
-          title: doc['title'],
-          date: date,
-          nextDate: nextDate,
-          taskInterval: doc['taskInterval'],
-          executor: TaskExecutor.values[doc['executor']],
-          executorId: doc['executorId'],
-          userId: doc['userId'],
-          itemId: doc['itemId'],
-          itemName: doc['itemName'],
-          location: doc['location'],
-          description: doc['description'],
-          comments: doc['comments'],
-          status: TaskStatus.values[doc['status']],
-          type: TaskType.values[doc['type']],
-          images: doc['images'],
-          cost: doc['cost'],
-          duration: doc['duration'],
-        );
-        if (tmpTasks.containsKey(stringDate)) {
-          tmpTasks[stringDate]!.add(tmpTask);
-        } else {
-          tmpTasks[stringDate] = [tmpTask];
-        }
-      }
-      _tasksArchive = tmpTasks;
-      _isLoading = false;
-      notifyListeners();
-    });
-  }
-
   // adds new task to DB
   Future<Task?> addTask(Task task) async {
     Task tmpTask = task;
@@ -359,14 +346,6 @@ class TaskProvider with ChangeNotifier {
       'duration': task.duration,
     }).then((autoreneratedId) {
       tmpTask = task.copyWith(taskId: autoreneratedId.id);
-      final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
-      if (_tasks.containsKey(date)) {
-        _tasks[date]!.add(tmpTask);
-      } else {
-        _tasks[date] = [tmpTask];
-      }
-
-      notifyListeners();
       return tmpTask;
     });
     if (tmpTask.executor == TaskExecutor.shared) {
@@ -405,14 +384,6 @@ class TaskProvider with ChangeNotifier {
       'duration': task.duration,
     }).then((autoreneratedId) {
       tmpTask = task.copyWith(taskId: autoreneratedId.id);
-      final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
-      if (_tasks.containsKey(date)) {
-        _tasks[date]!.add(tmpTask);
-      } else {
-        _tasks[date] = [tmpTask];
-      }
-
-      notifyListeners();
       return tmpTask;
     });
     if (tmpTask.executor == TaskExecutor.shared) {
@@ -538,7 +509,7 @@ class TaskProvider with ChangeNotifier {
     if (nextTask == null) {
       return null;
     }
-    _tasks.remove(task);
+    // _tasks.remove(task);
     notifyListeners();
     return await addTask(nextTask);
   }
@@ -567,7 +538,7 @@ class TaskProvider with ChangeNotifier {
 
   // adds task to archive
   Future<void> addToArchive(Task task) async {
-    Task tmpTask;
+    // Task tmpTask;
 
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
@@ -596,21 +567,21 @@ class TaskProvider with ChangeNotifier {
       _undoTask = _undoTask?.copyWith(
         taskId: autoreneratedId.id,
       );
-      tmpTask = task.copyWith();
+      // tmpTask = task.copyWith();
 
-      final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
-      if (_tasksArchive.containsKey(date)) {
-        _tasksArchive[date]!.add(tmpTask);
-      } else {
-        _tasksArchive[date] = [tmpTask];
-      }
-      notifyListeners();
+      // final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
+      // if (_tasksArchive.containsKey(date)) {
+      //   _tasksArchive[date]!.add(tmpTask);
+      // } else {
+      //   _tasksArchive[date] = [tmpTask];
+      // }
+      // notifyListeners();
     });
   }
 
   // adds shared task to archive
   Future<void> addSharedToArchive(Task task, String companyId) async {
-    Task tmpTask;
+    // Task tmpTask;
 
     final tasksRef = FirebaseFirestore.instance
         .collection('companies')
@@ -639,15 +610,15 @@ class TaskProvider with ChangeNotifier {
       _undoTask = _undoTask?.copyWith(
         taskId: autoreneratedId.id,
       );
-      tmpTask = task.copyWith();
+      // tmpTask = task.copyWith();
 
-      final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
-      if (_tasksArchive.containsKey(date)) {
-        _tasksArchive[date]!.add(tmpTask);
-      } else {
-        _tasksArchive[date] = [tmpTask];
-      }
-      notifyListeners();
+      // final date = DateFormat('dd/MM/yyyy').format(tmpTask.date);
+      // if (_tasksArchive.containsKey(date)) {
+      //   _tasksArchive[date]!.add(tmpTask);
+      // } else {
+      //   _tasksArchive[date] = [tmpTask];
+      // }
+      // notifyListeners();
     });
   }
 
@@ -669,14 +640,16 @@ class TaskProvider with ChangeNotifier {
       await deleteSharedWithTask(task);
     }
 
-    await taskRef.delete().then((_) {
-      final key = DateFormat('dd/MM/yyyy').format(task.date);
-      _tasks[key]!.removeWhere((element) => element.taskId == task.taskId);
-      if (_tasks[key] != null && _tasks[key]!.isEmpty) {
-        _tasks.remove(key);
-      }
-    }).catchError((error) {});
-    notifyListeners();
+    await taskRef.delete();
+
+    // .then((_) {
+    //   final key = DateFormat('dd/MM/yyyy').format(task.date);
+    //   _tasks[key]!.removeWhere((element) => element.taskId == task.taskId);
+    //   if (_tasks[key] != null && _tasks[key]!.isEmpty) {
+    //     _tasks.remove(key);
+    //   }
+    // }).catchError((error) {});
+    // notifyListeners();
     return response;
   }
 
@@ -691,14 +664,16 @@ class TaskProvider with ChangeNotifier {
 
     await deleteSharedWithTask(task);
 
-    await taskRef.delete().then((_) {
-      final key = DateFormat('dd/MM/yyyy').format(task.date);
-      _tasks[key]!.removeWhere((element) => element.taskId == task.taskId);
-      if (_tasks[key] != null && _tasks[key]!.isEmpty) {
-        _tasks.remove(key);
-      }
-    }).catchError((error) {});
-    notifyListeners();
+    await taskRef.delete();
+
+    // .then((_) {
+    //   final key = DateFormat('dd/MM/yyyy').format(task.date);
+    //   _tasks[key]!.removeWhere((element) => element.taskId == task.taskId);
+    //   if (_tasks[key] != null && _tasks[key]!.isEmpty) {
+    //     _tasks.remove(key);
+    //   }
+    // }).catchError((error) {});
+    // notifyListeners();
     return response;
   }
 
@@ -734,15 +709,16 @@ class TaskProvider with ChangeNotifier {
         .collection('archive')
         .doc(task.taskId)
         .delete()
-        .then((_) {
-      final key = DateFormat('dd/MM/yyyy').format(task.date);
-      _tasksArchive[key]!
-          .removeWhere((element) => element.taskId == task.taskId);
-      if (_tasksArchive[key]!.isEmpty) {
-        _tasksArchive.remove(key);
-      }
-      notifyListeners();
-    }).catchError((error) {
+        //     .then((_) {
+        //   final key = DateFormat('dd/MM/yyyy').format(task.date);
+        //   _tasksArchive[key]!
+        //       .removeWhere((element) => element.taskId == task.taskId);
+        //   if (_tasksArchive[key]!.isEmpty) {
+        //     _tasksArchive.remove(key);
+        //   }
+        //   notifyListeners();
+        // })
+        .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Failed to delete item"),
